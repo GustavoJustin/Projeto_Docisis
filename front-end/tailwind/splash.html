@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docisis — Carregando</title>
+
+
+<!-- Fontes: Fraunces (marca) e Inter (texto de apoio) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- CSS do Tailwind compilado via CLI (mesmo output.css do login) -->
+<link rel="stylesheet" href="../src/css/output.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          cream: '#FBF6EF',
+          cocoa: {
+            50: '#FBF8F3',
+            100: '#EDE3D6',
+            200: '#D8CCB8',
+            300: '#B5A891',
+            400: '#9C8D78',
+            500: '#8B5E34',
+            600: '#754D29',
+            700: '#5C3D22',
+            800: '#3A2A1A',
+            900: '#2B2118'
+          },
+          blush: {
+            200: '#F7D9DF',
+            300: '#F2C7D0',
+            500: '#C97A8E',
+            800: '#8B4A5C'
+          },
+          rose: {
+            100: '#FBE4EC',
+            300: '#F0B8CE',
+            500: '#E27FA6'
+          }
+        },
+        fontFamily: {
+          display: ['Fraunces', 'serif']
+        }
+      }
+    }
+  };
+</script>
+
+<style>
+  /* Fonte padrão do texto normal do site inteiro */
+  body { font-family: 'Inter', sans-serif; }
+  /* Classe usada nos títulos/marca, pra usar a fonte serifada Fraunces */
+  .font-display { font-family: 'Fraunces', serif; }
+
+  /* Define a animação "carregando": a barra cresce de 0% até 100% de largura,
+     fica parada um pouco em 100%, e reinicia sozinha (efeito de loop infinito) */
+  @keyframes carregando {
+    0%   { width: 0%; }
+    70%  { width: 100%; }
+    100% { width: 100%; }
+  }
+  /* Aplica a animação acima na barrinha de progresso, durando 1.8s por ciclo,
+     com aceleração/desaceleração suave (ease-in-out) e repetindo pra sempre (infinite) */
+  .barra-carregando {
+    animation: carregando 1.8s ease-in-out infinite;
+  }
+</style>
+</head>
+
+<!--
+  Classes do <body>:
+  relative        -> vira referência de posição pros elementos "absolute" de dentro (as manchas de fundo)
+  bg-cream        -> cor de fundo creme (definida no @theme do input.css)
+  min-h-screen    -> altura mínima = altura total da tela (a página nunca fica menor que a janela)
+  flex            -> ativa o modelo flexbox pra alinhar os filhos
+  items-center    -> centraliza os filhos verticalmente
+  justify-center  -> centraliza os filhos horizontalmente
+  overflow-hidden -> corta qualquer coisa que vaze pra fora da tela (as manchas borradas, por ex.)
+-->
+<body class="relative bg-cream min-h-screen flex items-center justify-center overflow-hidden">
+
+  <!--
+    Manchas de gradiente decorativas nos cantos (efeito do mockup original):
+    pointer-events-none -> a mancha não "bloqueia" cliques do mouse, é só visual
+    absolute            -> se posiciona livre, fora do fluxo normal da página
+    -top-24 -left-24    -> puxa a mancha pra fora da tela (canto superior esquerdo), criando o efeito de "vazamento"
+    w-72 h-72           -> tamanho fixo (18rem x 18rem)
+    rounded-full        -> deixa perfeitamente redondo (um círculo)
+    bg-rose-100/60      -> cor rosa clara, com 60% de opacidade (o /60 controla a transparência)
+    blur-3xl            -> desfoque bem forte, pra virar um "borrão" suave de cor em vez de um círculo nítido
+  -->
+  <div class="pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full bg-rose-100/60 blur-3xl"></div>
+  <div class="pointer-events-none absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-cocoa-200/50 blur-3xl"></div>
+
+  <!--
+    Conteúdo central da splash:
+    relative z-10  -> garante que esse bloco fique ACIMA das manchas de fundo (z-10 = mais na frente)
+    flex flex-col  -> os filhos ficam empilhados um embaixo do outro (coluna, não lado a lado)
+    items-center   -> centraliza os filhos na horizontal dentro da coluna
+    text-center    -> centraliza o texto dentro de cada linha
+    px-6           -> um respiro (padding) nas laterais, pra não colar nas bordas em telas pequenas
+  -->
+  <div class="relative z-10 flex flex-col items-center text-center px-6">
+
+    <!--
+      Selo circular com anel tracejado:
+      w-20 h-20            -> tamanho do círculo (5rem x 5rem)
+      rounded-full         -> formato circular
+      border border-dashed -> borda tracejada (em vez de linha contínua)
+      border-cocoa-200     -> cor marrom bem clara pra essa borda
+      flex items-center justify-center -> centraliza o quadradinho de dentro
+      mb-6                 -> espaço embaixo, separando do título "Docisis"
+    -->
+    <div class="w-20 h-20 rounded-full border border-dashed border-cocoa-200 flex items-center justify-center mb-6">
+
+      <!--
+        Quadrado com gradiente (o ícone em si):
+        w-11 h-11              -> tamanho do quadrado
+        rounded-xl             -> cantos bem arredondados
+        bg-gradient-to-br      -> gradiente de cor que vai na diagonal (canto superior-esquerdo até inferior-direito)
+        from-cocoa-400 to-cocoa-600 -> começa num marrom mais claro e termina num marrom mais escuro
+        shadow-sm              -> uma sombra sutil embaixo, pra dar profundidade
+      -->
+      <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-cocoa-400 to-cocoa-600 flex items-center justify-center shadow-sm">
+        <!--
+          Losango branco no centro (representa o "D" de Docisis de forma abstrata):
+          w-3 h-3       -> tamanho pequeno
+          bg-cream      -> cor clara (contrasta com o fundo marrom)
+          rotate-45     -> gira 45 graus, transformando o quadrado em losango
+          rounded-[2px] -> arredonda bem pouco as pontas (valor customizado entre colchetes)
+        -->
+        <div class="w-3 h-3 bg-cream rotate-45 rounded-[2px]"></div>
+      </div>
+    </div>
+
+    <!-- Nome da marca: fonte serifada, tamanho grande, negrito, na cor marrom principal -->
+    <h1 class="font-display text-3xl font-bold text-cocoa-700">Docisis</h1>
+
+    <!--
+      Subtítulo pequeno:
+      mt-1              -> pequena margem no topo, separando do título
+      text-[11px]       -> tamanho de fonte customizado (11 pixels, entre colchetes)
+      tracking-widest   -> aumenta bastante o espaçamento entre as letras (efeito "GESTÃO  DE  ESTOQUE")
+      text-cocoa-400    -> marrom mais claro, pra ficar discreto
+      font-medium       -> peso da fonte um pouco mais forte que o normal
+    -->
+    <p class="mt-1 text-[11px] tracking-widest text-cocoa-400 font-medium">
+      GESTÃO DE ESTOQUE
+    </p>
+
+    <!--
+      Bloco de carregamento (texto + barra):
+      mt-16       -> bastante espaço acima, separando visualmente da marca
+      flex flex-col items-center gap-2 -> empilha texto e barra, centralizados, com espaçinho entre eles
+    -->
+    <div class="mt-16 flex flex-col items-center gap-2">
+      <p class="text-xs text-cocoa-400">Carregando seus dados…</p>
+
+      <!--
+        Trilho da barra de progresso (a parte cinza/fixa, de fundo):
+        w-32 h-1            -> bem fina e curta
+        rounded-full        -> pontas arredondadas
+        bg-cocoa-200/60     -> marrom bem claro e semi-transparente
+        overflow-hidden     -> corta a barra de dentro pra ela não "vazar" do trilho quando cresce
+      -->
+      <div class="w-32 h-1 rounded-full bg-cocoa-200/60 overflow-hidden">
+        <!--
+          Barra que realmente se move (a parte colorida, animada):
+          h-full             -> ocupa toda a altura do trilho
+          rounded-full       -> pontas arredondadas
+          bg-cocoa-500       -> cor marrom mais viva, pra se destacar do trilho claro
+          barra-carregando   -> classe customizada (definida lá em cima no <style>) que aplica a animação de crescer e reiniciar
+        -->
+        <div class="h-full rounded-full bg-cocoa-500 barra-carregando"></div>
+      </div>
+    </div>
+  </div>
+
+  <!--
+    Redirecionamento automático: depois que a splash screen aparece por um tempinho
+    (2500 milissegundos = 2,5 segundos), o navegador troca sozinho pra tela de Estoque.
+    Se quiser trocar pra qual página vai depois, é só mudar o 'estoque.html' aqui.
+  -->
+  <script>
+    setTimeout(() => {
+      // Altere de 'estoque.html' para o nome correto do arquivo
+      window.location.href = 'estoqueInsumo.html';
+    }, 2500);
+  </script>
+
+</body>
+</html>

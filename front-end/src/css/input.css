@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+@source "../tailwind/*.html";
+@source "../src/**/*.js";
+
+@theme {
+  --color-cocoa-50: #FBF8F3;
+  --color-cocoa-100: #EDE3D6;
+  --color-cocoa-200: #D8CCB8;
+  --color-cocoa-300: #B5A891;
+  --color-cocoa-400: #9C8D78;
+  --color-cocoa-500: #8B5E34;
+  --color-cocoa-600: #754D29;
+  --color-cocoa-700: #5C3D22;
+  --color-cocoa-800: #3A2A1A;
+  --color-cocoa-900: #2B2118;
+  --color-blush-200: #F7D9DF;
+  --color-blush-300: #F2C7D0;
+  --color-blush-500: #C97A8E;
+  --color-blush-800: #8B4A5C;
+  --color-rose-100: #FBE4EC;
+  --color-rose-300: #F0B8CE;
+  --color-rose-500: #E27FA6;
+  --color-cream: #FBF6EF;
+  --font-display: 'Fraunces', serif;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.font-display {
+  font-family: 'Fraunces', serif;
+}

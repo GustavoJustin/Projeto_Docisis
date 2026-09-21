@@ -1,0 +1,14 @@
+# Dependências (a pasta mais pesada)
+node_modules
+
+# Configurações do ambiente e chaves
+.env
+
+# Arquivos de build/compilação
+dist/
+build/
+
+# Arquivos temporários do sistema
+.DS_Store
+Thumbs.db
+*.log

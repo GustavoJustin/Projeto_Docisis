@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estoque de Matérias-Primas</title>
+
+  <!-- Importação de fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- CSS gerado pelo Tailwind NPM + Fallback CDN -->
+  <link rel="stylesheet" href="../src/css/output.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#EBE7E1',
+              cream: '#F7F4EF',
+              brown: '#9E6A38',
+              'brown-dark': '#784D23',
+              'brown-light': '#D4A373',
+              'text-dark': '#3A2E2B',
+              'text-muted': '#8C7A6B',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Fraunces', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-brand-bg min-h-screen flex  md:p-6 text-brand-text-dark font-sans gap-6 h-screen overflow-hidden">
+
+  <!-- ==================== NOVO SIDEBAR LATERAL ==================== -->
+  <div id="sidebar-container" data-active="estoqueInsumo" class="w-64 shrink-0 p-0"></div>
+
+  <!-- ==================== CONTEÚDO PRINCIPAL (INTACTO) ==================== -->
+  <main class="flex-1 m-4 bg-white rounded-2xl flex flex-col overflow-hidden shadow-sm border border-black/5">
+
+    <header class="px-8 py-6 flex items-start justify-between shrink-0">
+      <div>
+        <h1 class="font-display text-2xl font-bold text-brand-text-dark">Estoque de Matérias-Primas</h1>
+        <p class="text-xs text-brand-text-muted mt-1">Gerencie seus insumos básicos com precisão e controle de
+          qualidade.</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="relative flex items-center">
+          <input id="input-busca" type="text" placeholder="Buscar insumos..."
+            class="w-64 rounded-lg border border-black/10 bg-brand-cream/40 pl-8 pr-3 py-1.5 text-xs text-brand-text-dark focus:outline-none focus:ring-1 focus:ring-brand-brown">
+          <svg class="w-3.5 h-3.5 absolute left-2.5 text-brand-text-muted pointer-events-none" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <button
+          class="w-8 h-8 rounded-lg border border-black/10 flex items-center justify-center text-brand-text-muted hover:bg-black/5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 010 4m-6 8a2 2 0 100-4m0 4a2 2 0 010-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 010-4m0 4v2m0-6V4" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="px-8 flex-1 overflow-y-auto space-y-6 pb-6">
+
+      <!-- Categorias -->
+      <div id="filtros-categoria" class="flex items-center gap-2 overflow-x-auto pb-1">
+        <button data-categoria="Tudo"
+          class="filtro-btn px-3.5 py-1 rounded-full text-xs font-semibold bg-brand-brown text-white shadow-sm cursor-pointer transition-colors">Tudo</button>
+        <button data-categoria="Açúcares"
+          class="filtro-btn px-3.5 py-1 rounded-full text-xs font-medium bg-pink-100/60 text-brand-text-dark hover:bg-pink-100 transition-colors cursor-pointer">Açúcares</button>
+        <button data-categoria="Farinhas"
+          class="filtro-btn px-3.5 py-1 rounded-full text-xs font-medium bg-pink-100/60 text-brand-text-dark hover:bg-pink-100 transition-colors cursor-pointer">Farinhas</button>
+        <button data-categoria="Laticínios"
+          class="filtro-btn px-3.5 py-1 rounded-full text-xs font-medium bg-pink-100/60 text-brand-text-dark hover:bg-pink-100 transition-colors cursor-pointer">Laticínios</button>
+        <button data-categoria="Chocolates"
+          class="filtro-btn px-3.5 py-1 rounded-full text-xs font-medium bg-pink-100/60 text-brand-text-dark hover:bg-pink-100 transition-colors cursor-pointer">Chocolates</button>
+        <button data-categoria="Essências"
+          class="filtro-btn px-3.5 py-1 rounded-full text-xs font-medium bg-pink-100/60 text-brand-text-dark hover:bg-pink-100 transition-colors cursor-pointer">Essências</button>
+      </div>
+
+      <!-- Grid de Insumos -->
+      <div id="grid-produtos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+        <!-- Card 1: Açúcar Refinado -->
+        <div
+          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm"
+          data-categoria="Açúcares" data-nome="açúcar refinado" data-unidade="kg">
+          <div>
+            <div class="relative h-36 rounded-xl overflow-hidden mb-3 bg-gray-50 flex items-center justify-center">
+              <button type="button"
+                class="btn-excluir absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 hover:bg-rose-50 text-rose-500 flex items-center justify-center shadow-xs transition-colors cursor-pointer"
+                title="Excluir insumo">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+              <img
+                src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQGGT6WRzr9Asc6EIosGJb07vaoh_qzpEQtZ4UauCL0sJ15juelSEzcLigFtJFWsYv8zK1jqjvAWZeIWEsRcvQTqwSaILKIHT97dDqfQFQfFZXuHEhX81MZK-G0X3lNEZn0S82pCg&usqp=CAc"
+                alt="Açúcar Refinado" class="w-full h-full object-contain p-2">
+            </div>
+
+            <div class="px-1 space-y-2">
+              <div class="flex items-baseline justify-between">
+                <h3 class="font-bold text-xs text-brand-text-dark">Açúcar Refinado</h3>
+                <span class="text-xs font-bold text-brand-brown">R$ 4,20/kg</span>
+              </div>
+              <p class="text-[10px] text-brand-text-muted">Categoria: Açúcares</p>
+
+              <div class="pt-2">
+                <div class="flex justify-between text-[9px] text-brand-text-muted mb-1">
+                  <span>Nível de Estoque</span>
+                  <span>45/50 kg</span>
+                </div>
+                <div class="w-full bg-black/5 rounded-full h-1">
+                  <div class="bg-brand-brown h-full rounded-full" style="width: 85%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-4 px-1">
+            <span class="qtd-valor text-base font-bold text-brand-text-dark">45 <span
+                class="text-xs font-normal text-brand-text-muted">kg</span></span>
+            <div class="flex items-center gap-2 border border-black/10 rounded-lg px-2 py-0.5">
+              <button type="button"
+                class="btn-menos text-xs font-bold text-brand-text-muted hover:text-brand-text-dark cursor-pointer">-</button>
+              <button type="button"
+                class="btn-mais text-xs font-bold text-brand-text-muted hover:text-brand-text-dark cursor-pointer">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Farinha de Trigo -->
+        <div
+          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm"
+          data-categoria="Farinhas" data-nome="farinha de trigo" data-unidade="kg">
+          <div>
+            <div class="relative h-36 rounded-xl overflow-hidden mb-3 bg-gray-50 flex items-center justify-center">
+              <button type="button"
+                class="btn-excluir absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 hover:bg-rose-50 text-rose-500 flex items-center justify-center shadow-xs transition-colors cursor-pointer"
+                title="Excluir insumo">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+              <img
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdrynqi_fgBBzTeXRKlMYmVqJ48zt1K2OjGX5ef5P5Ig&s=10"
+                alt="Farinha de Trigo" class="w-full h-full object-contain p-2">
+            </div>
+
+            <div class="px-1 space-y-2">
+              <div class="flex items-baseline justify-between">
+                <h3 class="font-bold text-xs text-brand-text-dark">Farinha de Trigo</h3>
+                <span class="text-xs font-bold text-brand-brown">R$ 5,10/kg</span>
+              </div>
+              <p class="text-[10px] text-brand-text-muted">Categoria: Farinhas</p>
+
+              <div class="pt-2">
+                <div class="flex justify-between text-[9px] text-brand-text-muted mb-1">
+                  <span>Nível de Estoque</span>
+                  <span>8/40 kg</span>
+                </div>
+                <div class="w-full bg-black/5 rounded-full h-1">
+                  <div class="bg-rose-500 h-full rounded-full" style="width: 20%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-4 px-1">
+            <span class="qtd-valor text-base font-bold text-rose-500">8 <span
+                class="text-xs font-normal text-rose-400">kg</span></span>
+            <div class="flex items-center gap-2 border border-black/10 rounded-lg px-2 py-0.5">
+              <button type="button"
+                class="btn-menos text-xs font-bold text-brand-text-muted hover:text-brand-text-dark cursor-pointer">-</button>
+              <button type="button"
+                class="btn-mais text-xs font-bold text-brand-text-muted hover:text-brand-text-dark cursor-pointer">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Manteiga com Sal -->
+        <div
+          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm"
+          data-categoria="Laticínios" data-nome="manteiga com sal" data-unidade="un">
+          <div>
+            <div class="relative h-36 rounded-xl overflow-hidden mb-3 bg-gray-50 flex items-center justify-center">
+              <button type="button"
+                class="btn-excluir absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 hover:bg-rose-50 text-rose-500 flex items-center justify-center shadow-xs transition-colors cursor-pointer"
+                title="Excluir insumo">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+              <img src="https://www.extramercado.com.br/img/uploads/1/901/33320901.png" alt="Manteiga Itambé"
+                class="w-full h-full object-contain p-2">
+            </div>
+
+            <div class="px-1 space-y-2">
+              <div class="flex items-baseline justify-between">
+                <h3 class="font-bold text-xs text-brand-text-dark">Manteiga com Sal</h3>
+                <span class="text-xs font-bold text-brand-brown">R$ 21,90/500g</span>
+              </div>
+              <p class="text-[10px] text-brand-text-muted">Categoria: Laticínios</p>
+
+              <div class="pt-2">
+                <div class="flex justify-between text-[9px] text-brand-text-muted mb-1">
+                  <span>Nível de Estoque</span>
+                  <span>15/25 un</span>
+                </div>
+                <div class="w-full bg-black/5 rounded-full h-1">
+                  <div class="bg-amber-500 h-full rounded-full" style="width: 60%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-4 px-1">
+            <span class="qtd-valor text-base font-bold text-brand-text-dark">15 <span
+                class="text-xs font-normal text-brand-text-muted">un</span></span>
+            <div class="flex items-center gap-2 border border-black/10 rounded-lg px-2 py-0.5">
+              <button type="button"
+                class="btn-menos text-xs font-bold text-brand-text-muted hover:text-brand-text-dark cursor-pointer">-</button>
+              <button type="button"
+                class="btn-mais text-xs font-bold text-brand-text-muted hover:text-brand-text-dark cursor-pointer">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: Chocolate em Pó -->
+        <div
+          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm"
+          data-categoria="Chocolates" data-nome="chocolate em pó 100%" data-unidade="un">
+          <div>
+            <div class="relative h-36 rounded-xl overflow-hidden mb-3 bg-gray-50 flex items-center justify-center">
+              <button type="button"
+                class="btn-excluir absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 hover:bg-rose-50 text-rose-500 flex items-center justify-center shadow-xs transition-colors cursor-pointer"
+                title="Excluir insumo">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+              <img src="https://cdn.awsli.com.br/618/618763/produto/3043115985a0a78a02.jpg"
+                alt="Chocolate em Pó Sicao 100%" class="w-full h-full object-contain p-2">
+            </div>
+
+            <div class="px-1 space-y-2">
+              <div class="flex items-baseline justify-between">
+                <h3 class="font-bold text-xs text-brand-text-dark">Chocolate em Pó 100%</h3>
+                <span class="text-xs font-bold text-brand-brown">R$ 28,50/500g</span>
+              </div>
+              <p class="text-[10px] text-brand-text-muted">Categoria: Chocolates</p>
+
+              <div class="pt-2">
+                <div class="flex justify-between text-[9px] text-brand-text-muted mb-1">
+                  <span>Nível de Estoque</span>
+                  <span>4/20 un</span>
+                </div>
+                <div class="w-full bg-black/5 rounded-full h-1">
+                  <div class="bg-rose-500 h-full rounded-full" style="width: 20%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-4 px-1">
+            <span class="qtd-valor text-base font-bold text-rose-500">4 <span
+                class="text-xs font-normal text-rose-400">un</span></span>
+            <div class="flex items-center gap-2 border border-black/10 rounded-lg px-2 py-0.5">
+              <button type="button"
+                class="btn-menos text-xs font-bold text-brand-text-muted hover:text-brand-text-dark cursor-pointer">-</button>
+              <button type="button"
+                class="btn-mais text-xs font-bold text-brand-text-muted hover:text-brand-text-dark cursor-pointer">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5: Essência de Baunilha -->
+        <div
+          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm"
+          data-categoria="Essências" data-nome="essência de baunilha" data-unidade="un">
+          <div>
+            <div class="relative h-36 rounded-xl overflow-hidden mb-3 bg-gray-50 flex items-center justify-center">
+              <button type="button"
+                class="btn-excluir absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 hover:bg-rose-50 text-rose-500 flex items-center justify-center shadow-xs transition-colors cursor-pointer"
+                title="Excluir insumo">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+              <img src="https://m.media-amazon.com/images/I/61QVpUvpL1L._AC_UF894,1000_QL80_.jpg"
+                alt="Essência de Baunilha" class="w-full h-full object-contain p-2">
+            </div>
+
+            <div class="px-1 space-y-2">
+              <div class="flex items-baseline justify-between">
+                <h3 class="font-bold text-xs text-brand-text-dark">Essência de Baunilha</h3>
+                <span class="text-xs font-bold text-brand-brown">R$ 4,90/30ml</span>
+              </div>
+              <p class="text-[10px] text-brand-text-muted">Categoria: Essências</p>
+
+              <div class="pt-2">
+                <div class="flex justify-between text-[9px] text-brand-text-muted mb-1">
+                  <span>Nível de Estoque</span>
+                  <span>12/20 un</span>
+                </div>
+                <div class="w-full bg-black/5 rounded-full h-1">
+                  <div class="bg-brand-brown h-full rounded-full" style="width: 60%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-4 px-1">
+            <span class="qtd-valor text-base font-bold text-brand-text-dark">12 <span
+                class="text-xs font-normal text-brand-text-muted">un</span></span>
+            <div class="flex items-center gap-2 border border-black/10 rounded-lg px-2 py-0.5">
+              <button type="button"
+                class="btn-menos text-xs font-bold text-brand-text-muted hover:text-brand-text-dark cursor-pointer">-</button>
+              <button type="button"
+                class="btn-mais text-xs font-bold text-brand-text-muted hover:text-brand-text-dark cursor-pointer">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6: Adicionar Novo Insumo -->
+        <div id="btn-card-adicionar"
+          class="cartao-adicionar border-2 border-dashed border-black/10 rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-brand-brown transition-colors min-h-[260px]">
+          <div
+            class="w-8 h-8 rounded-full bg-brand-cream flex items-center justify-center mb-2 text-brand-brown font-bold text-sm">
+            +</div>
+          <h4 class="font-bold text-xs text-brand-text-dark">Adicionar Nova Matéria-Prima</h4>
+          <p class="text-[10px] text-brand-text-muted mt-1 max-w-[140px]">Cadastre novos insumos para sua produção</p>
+        </div>
+
+      </div>
+    </div>
+
+    <footer
+      class="px-8 py-4 border-t border-black/5 flex items-center justify-between shrink-0 text-[10px] text-brand-text-muted">
+      <span>Mostrando matérias-primas cadastradas</span>
+
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-1">
+          <button class="px-1.5 py-0.5 hover:text-brand-text-dark cursor-pointer">‹</button>
+          <button
+            class="w-5 h-5 rounded bg-brand-brown text-white font-bold flex items-center justify-center cursor-pointer">1</button>
+          <button class="w-5 h-5 rounded hover:bg-black/5 flex items-center justify-center cursor-pointer">2</button>
+          <button class="w-5 h-5 rounded hover:bg-black/5 flex items-center justify-center cursor-pointer">3</button>
+          <button class="px-1.5 py-0.5 hover:text-brand-text-dark cursor-pointer">›</button>
+        </div>
+
+        <button id="btn-novo-footer"
+          class="w-8 h-8 rounded-full bg-brand-brown text-white flex items-center justify-center shadow-md hover:bg-brand-brown-dark transition-colors cursor-pointer"
+          title="Adicionar Insumo">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+        </button>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- ==================== MODAL ADICIONAR NOVO INSUMO ==================== -->
+  <div id="modal-insumo"
+    class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl border border-black/10 space-y-4">
+
+      <div class="flex items-center justify-between pb-2 border-b border-black/5">
+        <h3 class="font-display font-bold text-base text-brand-text-dark">Cadastrar Novo Insumo</h3>
+        <button id="btn-fechar-modal"
+          class="text-brand-text-muted hover:text-brand-text-dark text-xl font-bold cursor-pointer">&times;</button>
+      </div>
+
+      <form id="form-novo-insumo" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-brand-text-dark mb-1">Nome do Insumo *</label>
+          <input type="text" id="input-nome" required placeholder="Ex: Leite Condensado"
+            class="w-full rounded-lg border border-black/10 bg-brand-cream/30 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-brown">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-brand-text-dark mb-1">Categoria *</label>
+            <select id="input-categoria" required
+              class="w-full rounded-lg border border-black/10 bg-brand-cream/30 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-brown">
+              <option value="Açúcares">Açúcares</option>
+              <option value="Farinhas">Farinhas</option>
+              <option value="Laticínios">Laticínios</option>
+              <option value="Chocolates">Chocolates</option>
+              <option value="Essências">Essências</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-brand-text-dark mb-1">Preço / Medida</label>
+            <input type="text" id="input-preco" placeholder="Ex: R$ 6,50/un"
+              class="w-full rounded-lg border border-black/10 bg-brand-cream/30 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-brown">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-brand-text-dark mb-1">Qtd Atual *</label>
+            <input type="number" id="input-qtd-atual" required min="0" placeholder="10"
+              class="w-full rounded-lg border border-black/10 bg-brand-cream/30 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-brown">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-brand-text-dark mb-1">Qtd Máx *</label>
+            <input type="number" id="input-qtd-max" required min="1" placeholder="20"
+              class="w-full rounded-lg border border-black/10 bg-brand-cream/30 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-brown">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-brand-text-dark mb-1">Unidade</label>
+            <select id="input-unidade"
+              class="w-full rounded-lg border border-black/10 bg-brand-cream/30 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-brown">
+              <option value="un">un</option>
+              <option value="kg">kg</option>
+              <option value="g">g</option>
+              <option value="L">L</option>
+              <option value="ml">ml</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-brand-text-dark mb-1">URL da Imagem (Opcional)</label>
+          <input type="url" id="input-imagem" placeholder="https://exemplo.com/imagem.png"
+            class="w-full rounded-lg border border-black/10 bg-brand-cream/30 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-brand-brown">
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-black/5">
+          <button type="button" id="btn-cancelar"
+            class="px-4 py-2 rounded-xl text-xs font-semibold text-brand-text-muted hover:bg-black/5 transition-colors cursor-pointer">Cancelar</button>
+          <button type="submit"
+            class="px-4 py-2 rounded-xl text-xs font-semibold bg-brand-brown text-white hover:bg-brand-brown-dark transition-colors shadow-sm cursor-pointer">Salvar
+            Insumo</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE CONFIRMAÇÃO DE EXCLUSÃO ==================== -->
+  <div id="modal-excluir"
+    class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl border border-black/10 text-center space-y-4">
+      <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center mx-auto">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="font-display font-bold text-base text-brand-text-dark">Excluir Insumo</h3>
+        <p id="texto-confirma-exclusao" class="text-xs text-brand-text-muted mt-1 leading-relaxed">Deseja realmente
+          excluir este item do estoque?</p>
+      </div>
+      <div class="flex items-center gap-3 pt-2">
+        <button type="button" id="btn-cancelar-exclusao"
+          class="w-full py-2.5 rounded-xl text-xs font-semibold text-brand-text-muted bg-brand-cream/60 hover:bg-black/5 transition-colors cursor-pointer">Cancelar</button>
+        <button type="button" id="btn-confirmar-exclusao"
+          class="w-full py-2.5 rounded-xl text-xs font-semibold bg-rose-500 text-white hover:bg-rose-600 transition-colors shadow-sm cursor-pointer">Sim,
+          Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script Interativo para Filtros, Ações, Modais e Exclusão -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const botoes = document.querySelectorAll('.filtro-btn');
+      const inputBusca = document.getElementById('input-busca');
+      const cardAdicionar = document.getElementById('btn-card-adicionar');
+      const gridProdutos = document.getElementById('grid-produtos');
+
+      // Elementos do Modal de Insumo
+      const modal = document.getElementById('modal-insumo');
+      const formInsumo = document.getElementById('form-novo-insumo');
+      const btnNovoSidebar = document.getElementById('btn-novo-sidebar');
+      const btnNovoFooter = document.getElementById('btn-novo-footer');
+      const btnFecharModal = document.getElementById('btn-fechar-modal');
+      const btnCancelar = document.getElementById('btn-cancelar');
+
+      // Elementos do Modal de Exclusão Customizado
+      const modalExcluir = document.getElementById('modal-excluir');
+      const textoConfirmaExclusao = document.getElementById('texto-confirma-exclusao');
+      const btnCancelarExclusao = document.getElementById('btn-cancelar-exclusao');
+      const btnConfirmarExclusao = document.getElementById('btn-confirmar-exclusao');
+      let cardParaExcluir = null;
+
+      let categoriaAtiva = 'Tudo';
+
+      // ==================== FILTROS E BUSCA ====================
+      function aplicarFiltros() {
+        const produtos = document.querySelectorAll('.cartao-produto');
+        const termoBusca = inputBusca ? inputBusca.value.toLowerCase().trim() : '';
+
+        produtos.forEach(produto => {
+          const categoria = produto.getAttribute('data-categoria');
+          const nome = produto.getAttribute('data-nome') || '';
+
+          const combinaCategoria = (categoriaAtiva === 'Tudo' || categoria === categoriaAtiva);
+          const combinaBusca = nome.includes(termoBusca);
+
+          if (combinaCategoria && combinaBusca) {
+            produto.style.display = 'flex';
+          } else {
+            produto.style.display = 'none';
+          }
+        });
+
+        if (cardAdicionar) {
+          if (categoriaAtiva === 'Tudo' && !termoBusca) {
+            cardAdicionar.style.display = 'flex';
+          } else {
+            cardAdicionar.style.display = 'none';
+          }
+        }
+      }
+
+      botoes.forEach(botao => {
+        botao.addEventListener('click', () => {
+          botoes.forEach(b => {
+            b.classList.remove('bg-brand-brown', 'text-white', 'font-semibold');
+            b.classList.add('bg-pink-100/60', 'text-brand-text-dark', 'font-medium');
+          });
+
+          botao.classList.remove('bg-pink-100/60', 'text-brand-text-dark', 'font-medium');
+          botao.classList.add('bg-brand-brown', 'text-white', 'font-semibold');
+
+          categoriaAtiva = botao.getAttribute('data-categoria');
+          aplicarFiltros();
+        });
+      });
+
+      if (inputBusca) {
+        inputBusca.addEventListener('input', aplicarFiltros);
+      }
+
+      // ==================== LÓGICA DE EXCLUSÃO CUSTOMIZADA ====================
+      function abrirModalExclusao(card) {
+        cardParaExcluir = card;
+        const nomeProduto = card.querySelector('h3') ? card.querySelector('h3').innerText : 'este insumo';
+        textoConfirmaExclusao.textContent = `Deseja realmente excluir "${nomeProduto}" do estoque? Esta ação não poderá ser desfeita.`;
+        modalExcluir.classList.remove('hidden');
+      }
+
+      function fecharModalExclusao() {
+        modalExcluir.classList.add('hidden');
+        cardParaExcluir = null;
+      }
+
+      btnCancelarExclusao.addEventListener('click', fecharModalExclusao);
+      btnConfirmarExclusao.addEventListener('click', () => {
+        if (cardParaExcluir) {
+          cardParaExcluir.remove();
+          aplicarFiltros();
+        }
+        fecharModalExclusao();
+      });
+
+      modalExcluir.addEventListener('click', (e) => {
+        if (e.target === modalExcluir) fecharModalExclusao();
+      });
+
+      // ==================== EVENTOS DOS CARDS (BOTOES + - E EXCLUIR) ====================
+      function vincularEventosCard(card) {
+        // Botão de Excluir
+        const btnExcluir = card.querySelector('.btn-excluir');
+        if (btnExcluir) {
+          btnExcluir.addEventListener('click', (e) => {
+            e.stopPropagation();
+            abrirModalExclusao(card);
+          });
+        }
+
+        // Botões de Quantidade + e -
+        const btnMenos = card.querySelector('.btn-menos');
+        const btnMais = card.querySelector('.btn-mais');
+        const displayQtd = card.querySelector('.qtd-valor');
+        const unidade = card.getAttribute('data-unidade') || 'un';
+
+        if (btnMenos && btnMais && displayQtd) {
+          btnMenos.addEventListener('click', (e) => {
+            e.stopPropagation();
+            let valor = parseFloat(displayQtd.innerText);
+            if (valor > 0) {
+              valor = Math.max(0, valor - 1);
+              const ehVermelho = displayQtd.classList.contains('text-rose-500');
+              const corUnidade = ehVermelho ? 'text-rose-400' : 'text-brand-text-muted';
+              displayQtd.innerHTML = `${valor} <span class="text-xs font-normal ${corUnidade}">${unidade}</span>`;
+            }
+          });
+
+          btnMais.addEventListener('click', (e) => {
+            e.stopPropagation();
+            let valor = parseFloat(displayQtd.innerText);
+            valor += 1;
+            const ehVermelho = displayQtd.classList.contains('text-rose-500');
+            const corUnidade = ehVermelho ? 'text-rose-400' : 'text-brand-text-muted';
+            displayQtd.innerHTML = `${valor} <span class="text-xs font-normal ${corUnidade}">${unidade}</span>`;
+          });
+        }
+      }
+
+      // Inicializar nos cards já existentes na página
+      document.querySelectorAll('.cartao-produto').forEach(vincularEventosCard);
+
+      // ==================== LÓGICA DO MODAL DE CADASTRO ====================
+      function abrirModal() {
+        modal.classList.remove('hidden');
+      }
+
+      function fecharModal() {
+        modal.classList.add('hidden');
+        formInsumo.reset();
+      }
+
+      if (cardAdicionar) cardAdicionar.addEventListener('click', abrirModal);
+      if (btnNovoSidebar) btnNovoSidebar.addEventListener('click', abrirModal);
+      if (btnNovoFooter) btnNovoFooter.addEventListener('click', abrirModal);
+      if (btnFecharModal) btnFecharModal.addEventListener('click', fecharModal);
+      if (btnCancelar) btnCancelar.addEventListener('click', fecharModal);
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) fecharModal();
+      });
+
+      // Submissão do Formulario para Adicionar Insumo
+      formInsumo.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const nome = document.getElementById('input-nome').value.trim();
+        const categoria = document.getElementById('input-categoria').value;
+        const preco = document.getElementById('input-preco').value.trim() || 'R$ 0,00';
+        const qtdAtual = parseInt(document.getElementById('input-qtd-atual').value) || 0;
+        const qtdMax = parseInt(document.getElementById('input-qtd-max').value) || 1;
+        const unidade = document.getElementById('input-unidade').value;
+        let imagem = document.getElementById('input-imagem').value.trim();
+
+        if (!imagem) {
+          imagem = 'https://cdn-icons-png.flaticon.com/512/3081/3081986.png';
+        }
+
+        const porcentagem = Math.min(100, Math.round((qtdAtual / qtdMax) * 100));
+        const estoqueBaixo = porcentagem <= 25;
+        const corBarra = estoqueBaixo ? 'bg-rose-500' : 'bg-brand-brown';
+        const corTextoQtd = estoqueBaixo ? 'text-rose-500' : 'text-brand-text-dark';
+        const corTextoUnidade = estoqueBaixo ? 'text-rose-400' : 'text-brand-text-muted';
+
+        const novoCard = document.createElement('div');
+        novoCard.className = 'cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm';
+        novoCard.setAttribute('data-categoria', categoria);
+        novoCard.setAttribute('data-nome', nome.toLowerCase());
+        novoCard.setAttribute('data-unidade', unidade);
+
+        novoCard.innerHTML = `
+          <div>
+            <div class="relative h-36 rounded-xl overflow-hidden mb-3 bg-gray-50 flex items-center justify-center">
+              <button type="button" class="btn-excluir absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 hover:bg-rose-50 text-rose-500 flex items-center justify-center shadow-xs transition-colors cursor-pointer" title="Excluir insumo">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+              <img src="${imagem}" alt="${nome}" class="w-full h-full object-contain p-2" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3081/3081986.png'">
+            </div>
+            
+            <div class="px-1 space-y-2">
+              <div class="flex items-baseline justify-between">
+                <h3 class="font-bold text-xs text-brand-text-dark">${nome}</h3>
+                <span class="text-xs font-bold text-brand-brown">${preco}</span>
+              </div>
+              <p class="text-[10px] text-brand-text-muted">Categoria: ${categoria}</p>
+
+              <div class="pt-2">
+                <div class="flex justify-between text-[9px] text-brand-text-muted mb-1">
+                  <span>Nível de Estoque</span>
+                  <span>${qtdAtual}/${qtdMax} ${unidade}</span>
+                </div>
+                <div class="w-full bg-black/5 rounded-full h-1">
+                  <div class="${corBarra} h-full rounded-full" style="width: ${porcentagem}%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex items-center justify-between pt-4 px-1">
+            <span class="qtd-valor text-base font-bold ${corTextoQtd}">${qtdAtual} <span class="text-xs font-normal ${corTextoUnidade}">${unidade}</span></span>
+            <div class="flex items-center gap-2 border border-black/10 rounded-lg px-2 py-0.5">
+              <button type="button" class="btn-menos text-xs font-bold text-brand-text-muted hover:text-brand-text-dark cursor-pointer">-</button>
+              <button type="button" class="btn-mais text-xs font-bold text-brand-text-muted hover:text-brand-text-dark cursor-pointer">+</button>
+            </div>
+          </div>
+        `;
+
+        gridProdutos.insertBefore(novoCard, cardAdicionar);
+        vincularEventosCard(novoCard);
+        fecharModal();
+        aplicarFiltros();
+      });
+    });
+  </script>
+  <script>lucide.createIcons()</script>
+  <script src="../src/componentes/sidebar.js" defer></script>
+</body>
+
+</html>

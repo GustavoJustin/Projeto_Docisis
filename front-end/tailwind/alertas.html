@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel de Alertas - Confeitaria</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-[#FAFAFA] text-[#4A3F39] flex">
+
+  <!-- Sidebar -->
+  <div id="sidebar-container" data-active="alertas" class="w-64 shrink-0"></div>
+
+  <!-- Conteúdo Principal -->
+  <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
+
+    <!-- Header -->
+    <header class="h-16 flex items-center justify-between px-8 bg-white border-b border-gray-100 shrink-0">
+      <div class="flex items-center gap-3">
+        <h1 class="text-xl font-bold text-[#6D4936]">Painel de Alertas</h1>
+        <span class="text-gray-300">|</span>
+        <span class="text-xs text-gray-500 font-medium">Central de Atenção Imediata</span>
+      </div>
+
+      <div class="flex items-center gap-6">
+        <div class="relative w-64">
+          <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input id="searchInput" type="text" placeholder="Buscar alertas..."
+            class="w-full pl-9 pr-4 py-1.5 bg-gray-100/80 border border-transparent rounded-full text-xs focus:outline-none focus:bg-white focus:border-[#D8A87D]" />
+        </div>
+        <div class="flex items-center gap-4 text-gray-500">
+          <button class="hover:text-[#875C46] relative">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+              </path>
+            </svg>
+          </button>
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100"
+            alt="User Avatar" class="w-8 h-8 rounded-full object-cover border border-gray-200" />
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-8 space-y-6">
+
+      <!-- Tabs & Sorting -->
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-2 bg-gray-200/50 p-1 rounded-xl text-xs font-bold text-gray-500"
+          id="filterTabs">
+          <button data-filter="all"
+            class="tab-btn bg-white text-gray-800 px-4 py-2 rounded-lg shadow-sm transition-all">TODOS ALERTAS</button>
+          <button data-filter="vencido" class="tab-btn px-4 py-2 hover:text-gray-800 transition-all">VENCIDOS</button>
+          <button data-filter="prox-vencimento" class="tab-btn px-4 py-2 hover:text-gray-800 transition-all">PRÓX.
+            VENCIMENTO</button>
+          <button data-filter="critico" class="tab-btn px-4 py-2 hover:text-gray-800 transition-all">ESTOQUE
+            CRÍTICO</button>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs text-gray-500">
+          <span>Ordenar por:</span>
+          <select
+            class="bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-700 focus:outline-none">
+            <option>Urgência (Alta para Baixa)</option>
+            <option>Data de Vencimento</option>
+            <option>Quantidade</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Column 1 & 2: Alert Cards Container -->
+        <div class="lg:col-span-2 space-y-4" id="alertCardsContainer">
+
+          <!-- Card 1: VENCIDO -->
+          <div data-category="vencido"
+            class="alert-card bg-white rounded-2xl border border-gray-100 p-5 shadow-sm border-l-4 border-l-red-500 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between transition-all">
+            <div class="flex gap-4 items-center">
+              <img
+                src="https://docemalu.vtexassets.com/arquivos/ids/5370095-800-auto?v=639021294901070000&width=800&height=auto&aspect=true"
+                alt="Chocolate Belga" class="w-24 h-24 rounded-xl object-cover shrink-0" />
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="bg-red-100 text-red-600 text-[9px] font-bold px-2 py-0.5 rounded uppercase">VENCIDO</span>
+                  <span class="text-[10px] text-gray-400 font-medium">SKU: MAT-CHOC-70</span>
+                </div>
+                <h3 class="font-bold text-gray-800 text-base item-title">Chocolate Belga 70% Cacau</h3>
+                <p class="text-xs text-gray-400">Lote #CB-2023-09 • Venceu em: 15/10/2023</p>
+                <div class="flex gap-6 pt-2">
+                  <div>
+                    <span class="text-[10px] text-gray-400 block uppercase font-medium">QUANTIDADE</span>
+                    <span class="text-xs font-bold text-gray-800">4.5 kg</span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-gray-400 block uppercase font-medium">VALOR PERDA</span>
+                    <span class="text-xs font-bold text-gray-800">R$ 382,50</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2 w-full sm:w-32 shrink-0">
+              <button onclick="openReporModal('Chocolate Belga 70% Cacau')"
+                class="w-full bg-[#784E38] hover:bg-[#633e2c] text-white text-xs font-semibold py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-colors">
+                Repor Item
+              </button>
+              <button onclick="dismissCard(this)"
+                class="w-full bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
+                Descartar
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: ESTOQUE CRÍTICO -->
+          <div data-category="critico"
+            class="alert-card bg-white rounded-2xl border border-gray-100 p-5 shadow-sm border-l-4 border-l-amber-500 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between transition-all">
+            <div class="flex gap-4 items-center">
+              <img src="https://www.quataalimentos.com.br/wp-content/uploads/2018/01/Creme-de-Leite-Fresco-1kg.jpg"
+                alt="Creme de Leite" class="w-24 h-24 rounded-xl object-cover shrink-0" />
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="bg-amber-100 text-amber-800 text-[9px] font-bold px-2 py-0.5 rounded uppercase">ESTOQUE
+                    CRÍTICO</span>
+                  <span class="text-[10px] text-gray-400 font-medium">SKU: MAT-CRME-02</span>
+                </div>
+                <h3 class="font-bold text-gray-800 text-base item-title">Creme de Leite Fresco</h3>
+                <p class="text-xs text-gray-400">Uso diário intenso. Nível abaixo de 10% do mínimo.</p>
+                <div class="flex gap-6 pt-2 items-center">
+                  <div>
+                    <span class="text-[10px] text-gray-400 block uppercase font-medium">QUANTIDADE</span>
+                    <span class="text-xs font-bold text-gray-800">1.2 Litros</span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-gray-400 block uppercase font-medium">NÍVEL ATUAL</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                      <div class="w-16 bg-gray-100 rounded-full h-1.5">
+                        <div class="bg-amber-700 h-1.5 rounded-full w-[12%]"></div>
+                      </div>
+                      <span class="text-xs font-bold text-gray-800">12%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2 w-full sm:w-32 shrink-0">
+              <button onclick="openReporModal('Creme de Leite Fresco')"
+                class="w-full bg-[#784E38] hover:bg-[#633e2c] text-white text-xs font-semibold py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-colors">
+                Repor Item
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: PRÓX. VENCIMENTO -->
+          <div data-category="prox-vencimento"
+            class="alert-card bg-white rounded-2xl border border-gray-100 p-5 shadow-sm border-l-4 border-l-rose-800 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between transition-all">
+            <div class="flex gap-4 items-center">
+              <img src="https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&q=80&w=200"
+                alt="Morangos Silvestres" class="w-24 h-24 rounded-xl object-cover shrink-0" />
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="bg-rose-100 text-rose-800 text-[9px] font-bold px-2 py-0.5 rounded uppercase">PROX.
+                    VENCIMENTO</span>
+                  <span class="text-[10px] text-gray-400 font-medium">SKU: FRU-MORO-01</span>
+                </div>
+                <h3 class="font-bold text-gray-800 text-base item-title">Morangos Silvestres Selecionados</h3>
+                <p class="text-xs text-gray-400">Validade expira em <span class="font-bold text-gray-700">2 DIAS</span>
+                </p>
+                <div class="flex gap-6 pt-2">
+                  <div>
+                    <span class="text-[10px] text-gray-400 block uppercase font-medium">DISPONÍVEL</span>
+                    <span class="text-xs font-bold text-gray-800">8 Bandejas</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2 w-full sm:w-32 shrink-0">
+              <button onclick="showToast('Priorizado', 'Uso prioritário registrado para a cozinha.')"
+                class="w-full bg-[#784E38] hover:bg-[#633e2c] text-white text-xs font-semibold py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-colors">
+                Priorizar Uso
+              </button>
+              <button onclick="dismissCard(this)"
+                class="w-full bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 text-xs font-semibold py-2 px-3 rounded-lg transition-colors">
+                Descartar
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Column 3: Summary Sidebar -->
+        <div>
+          <div class="bg-[#FCE8EE]/70 rounded-2xl p-6 border border-pink-100 space-y-6">
+            <div class="flex items-center justify-between text-[#882E40]">
+              <span class="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5">
+                RESUMO DA SEMANA
+              </span>
+            </div>
+
+            <div>
+              <div id="totalAlertsCount" class="text-4xl font-extrabold text-[#7A2838]">12</div>
+              <div class="text-sm font-bold text-[#7A2838] mt-1">Alertas Ativos</div>
+              <p class="text-xs text-rose-800/70 mt-1 leading-relaxed">
+                Sua atenção é necessária para evitar perdas e manter a produção.
+              </p>
+            </div>
+
+            <div class="space-y-3 pt-2 text-xs border-t border-pink-200/50">
+              <div class="flex justify-between items-center text-rose-900 font-medium">
+                <span>A vencer (48h)</span>
+                <span class="font-bold">05</span>
+              </div>
+              <div class="flex justify-between items-center text-rose-900 font-medium">
+                <span>Abaixo do Mínimo</span>
+                <span class="font-bold">07</span>
+              </div>
+            </div>
+
+            <button onclick="showToast('Relatório Gerado', 'Relatório semanal enviado para o seu e-mail.')"
+              class="w-full bg-[#784E38] hover:bg-[#633e2c] text-white text-xs font-bold py-3 rounded-xl transition-colors shadow-sm">
+              Ver Relatório Completo
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- Toast Notification Overlay -->
+    <div id="toastNotification"
+      class="fixed bottom-6 right-8 bg-[#2D3748] text-white rounded-xl p-4 shadow-xl flex items-center gap-3 border border-gray-700 max-w-md transition-all duration-300 z-40">
+      <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="text-xs">
+        <p id="toastTitle" class="font-bold text-white">Sistema Atualizado</p>
+        <p id="toastMessage" class="text-gray-300 mt-0.5">Operação concluída com sucesso.</p>
+      </div>
+      <button onclick="closeToast()" class="text-gray-400 hover:text-white ml-auto">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Modal 1: Novo Item -->
+  <div id="modalNovoItem"
+    class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-5">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <h3 class="font-bold text-gray-800 text-base">Cadastrar Novo Item</h3>
+        <button onclick="closeModal('modalNovoItem')" class="text-gray-400 hover:text-gray-600">✕</button>
+      </div>
+      <form onsubmit="handleNovoItem(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Nome do Item</label>
+          <input type="text" required placeholder="Ex: Leite Condensado 395g"
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#D8A87D]" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">SKU</label>
+            <input type="text" required placeholder="MAT-LEIT-01"
+              class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#D8A87D]" />
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Quantidade</label>
+            <input type="number" step="0.1" required placeholder="10"
+              class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#D8A87D]" />
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Data de Validade</label>
+          <input type="date" required
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#D8A87D]" />
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeModal('modalNovoItem')"
+            class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition-colors">Cancelar</button>
+          <button type="submit"
+            class="w-1/2 bg-[#784E38] hover:bg-[#633e2c] text-white font-semibold py-2.5 rounded-lg transition-colors">Salvar
+            Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Repor Item -->
+  <div id="modalRepor" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-5">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <h3 class="font-bold text-gray-800 text-base">Solicitar Reposição</h3>
+        <button onclick="closeModal('modalRepor')" class="text-gray-400 hover:text-gray-600">✕</button>
+      </div>
+      <form onsubmit="handleReporSubmit(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-gray-500 mb-1">Item Selecionado</label>
+          <input id="reporItemNome" type="text" readonly
+            class="w-full px-3 py-2 bg-gray-100 text-gray-700 font-bold rounded-lg focus:outline-none" />
+        </div>
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Quantidade a Repor</label>
+          <input type="number" step="0.1" required placeholder="Ex: 5"
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#D8A87D]" />
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeModal('modalRepor')"
+            class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition-colors">Cancelar</button>
+          <button type="submit"
+            class="w-1/2 bg-[#784E38] hover:bg-[#633e2c] text-white font-semibold py-2.5 rounded-lg transition-colors">Confirmar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Interatividade JS -->
+  <script>
+    // Controle de Modais
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+      document.getElementById(id).classList.add('flex');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+      document.getElementById(id).classList.remove('flex');
+    }
+
+    function openReporModal(itemName) {
+      document.getElementById('reporItemNome').value = itemName;
+      openModal('modalRepor');
+    }
+
+    // Formulários
+    function handleNovoItem(e) {
+      e.preventDefault();
+      closeModal('modalNovoItem');
+      showToast('Item Cadastrado', 'O novo insumo foi inserido no sistema com sucesso.');
+    }
+
+    function handleReporSubmit(e) {
+      e.preventDefault();
+      const item = document.getElementById('reporItemNome').value;
+      closeModal('modalRepor');
+      showToast('Pedido de Reposição Sent', `A ordem de compra para ${item} foi gerada.`);
+    }
+
+    // Ações de Cards
+    function dismissCard(btn) {
+      const card = btn.closest('.alert-card');
+      card.style.opacity = '0';
+      card.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        card.remove();
+        showToast('Alerta Descartado', 'O item foi removido da lista de prioridades.');
+      }, 200);
+    }
+
+    // Notificação Toast
+    function showToast(title, message) {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastTitle').innerText = title;
+      document.getElementById('toastMessage').innerText = message;
+      toast.classList.remove('hidden');
+    }
+
+    function closeToast() {
+      document.getElementById('toastNotification').classList.add('hidden');
+    }
+
+    // Filtros das Abas
+    document.querySelectorAll('#filterTabs .tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Estilo das abas
+        document.querySelectorAll('#filterTabs .tab-btn').forEach(b => {
+          b.className = 'tab-btn px-4 py-2 hover:text-gray-800 transition-all';
+        });
+        btn.className = 'tab-btn bg-white text-gray-800 px-4 py-2 rounded-lg shadow-sm transition-all';
+
+        // Filtragem dos cards
+        const filter = btn.getAttribute('data-filter');
+        document.querySelectorAll('.alert-card').forEach(card => {
+          if (filter === 'all' || card.getAttribute('data-category') === filter) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // Busca em tempo real
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll('.alert-card').forEach(card => {
+        const title = card.querySelector('.item-title').innerText.toLowerCase();
+        if (title.includes(query)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  </script>
+
+  <script>lucide.createIcons()</script>
+  <script src="../src/componentes/sidebar.js" defer></script>
+</body>
+
+</html>
