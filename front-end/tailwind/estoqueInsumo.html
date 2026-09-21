@@ -13,33 +13,9 @@
     href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet">
 
-  <!-- CSS gerado pelo Tailwind NPM + Fallback CDN -->
+  <!-- CSS gerado pelo Tailwind via npm -->
   <link rel="stylesheet" href="../src/css/output.css">
   <script src="https://unpkg.com/lucide@latest"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              bg: '#EBE7E1',
-              cream: '#F7F4EF',
-              brown: '#9E6A38',
-              'brown-dark': '#784D23',
-              'brown-light': '#D4A373',
-              'text-dark': '#3A2E2B',
-              'text-muted': '#8C7A6B',
-            }
-          },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            display: ['Fraunces', 'serif'],
-          }
-        }
-      }
-    }
-  </script>
 </head>
 
 <body class="bg-brand-bg min-h-screen flex text-brand-text-dark font-sans h-screen overflow-hidden">
@@ -347,12 +323,12 @@
 
         <!-- Card 6: Adicionar Novo Insumo -->
         <div id="btn-card-adicionar"
-          class="cartao-adicionar border-2 border-dashed border-black/10 rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-brand-brown transition-colors min-h-[260px]">
+          class="cartao-adicionar border-2 border-dashed border-black/10 rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-brand-brown transition-colors min-h-260px">
           <div
             class="w-8 h-8 rounded-full bg-brand-cream flex items-center justify-center mb-2 text-brand-brown font-bold text-sm">
             +</div>
           <h4 class="font-bold text-xs text-brand-text-dark">Adicionar Nova Matéria-Prima</h4>
-          <p class="text-[10px] text-brand-text-muted mt-1 max-w-[140px]">Cadastre novos insumos para sua produção</p>
+          <p class="text-[10px] text-brand-text-muted mt-1 max-w-140px">Cadastre novos insumos para sua produção</p>
         </div>
 
       </div>
@@ -386,7 +362,7 @@
 
   <!-- ==================== MODAL ADICIONAR NOVO INSUMO ==================== -->
   <div id="modal-insumo"
-    class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
     <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl border border-black/10 space-y-4">
 
       <div class="flex items-center justify-between pb-2 border-b border-black/5">
@@ -465,7 +441,7 @@
 
   <!-- ==================== MODAL DE CONFIRMAÇÃO DE EXCLUSÃO ==================== -->
   <div id="modal-excluir"
-    class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
     <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl border border-black/10 text-center space-y-4">
       <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center mx-auto">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
