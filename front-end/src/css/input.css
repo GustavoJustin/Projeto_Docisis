@@ -4,6 +4,14 @@
 @source "../src/**/*.js";
 
 @theme {
+  --color-brand-bg: #EBE7E1;
+  --color-brand-cream: #F7F4EF;
+  --color-brand-brown: #9E6A38;
+  --color-brand-brown-dark: #784D23;
+  --color-brand-brown-light: #D4A373;
+  --color-brand-text-dark: #3A2E2B;
+  --color-brand-text-muted: #8C7A6B;
+
   --color-cocoa-50: #FBF8F3;
   --color-cocoa-100: #EDE3D6;
   --color-cocoa-200: #D8CCB8;
@@ -22,7 +30,9 @@
   --color-rose-300: #F0B8CE;
   --color-rose-500: #E27FA6;
   --color-cream: #FBF6EF;
+
   --font-display: 'Fraunces', serif;
+  --font-sans: 'Inter', sans-serif;
 }
 
 body {
