@@ -1,12 +1,8 @@
-// app.js
+require('dotenv').config(); 
 const express = require('express');
+const routes = require('./routes');
+
 const app = express();
-
 app.use(express.json());
-
-// Suas rotas
-app.get('/health', (req, res) => {
-  return res.status(200).json({ status: 'ok' });
-});
-
+app.use(routes); 
 module.exports = app;
