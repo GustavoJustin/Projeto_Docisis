@@ -11,40 +11,65 @@ const request = require("supertest");
 const jwt = require("jsonwebtoken");
 const app = require("../app");
 
-describe("TC-AUTH-01 — Cadastro de novos funcionários", () => {
-  let token;
+describe("Módulo de Funcionários", () => {
+  let tokenAdmin;
+  let idFuncionarioCriado;
 
-  beforeAll(() => {
-    token = jwt.sign(
-      {
-        id_funcionario: 1,
-        email: "daniel@gmail.com",
-        id_cargos: 1
-      },
+  beforeAll(async () => {
+    // 1. Pré-condição: Criação do token de gestor/administrador (id_cargos = 1)
+    tokenAdmin = jwt.sign(
+      { id_funcionario: 1, email: "admin@docisis.com", id_cargos: 1 },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+
+    // 2. Pré-condição do TC-FUNC-02: Cria um funcionário e guarda seu ID para a busca
+    const timestamp = Date.now().toString().slice(-8);
+    const res = await request(app)
+      .post("/funcionarios")
+      .set("Authorization", `Bearer ${tokenAdmin}`)
+      .send({
+        nome: "Funcionário Teste Busca",
+        cpf: `777${timestamp}`,
+        id_cargos: 1,
+        email: `busca.${timestamp}@docisis.com`,
+        senha: "SenhaValida123"
+      });
+
+    idFuncionarioCriado = res.body.resultado;
   });
 
-  test("deve cadastrar um novo funcionario com sucesso", async () => {
+  test("TC-FUNC-01 — Cadastro de novos funcionários", async () => {
     const timestamp = Date.now().toString().slice(-8);
     const cpfValido = `999${timestamp}`;
 
     const novoFuncionario = {
-      nome: "Lucas Andrade",
+      nome: "Carlos Eduardo",
       cpf: cpfValido,
       id_cargos: 1,
-      email: `lucas.${timestamp}@gmail.com`,
-      senha: "senhaSegura123"
+      email: `carlos.${timestamp}@docisis.com`,
+      senha: "SenhaValida123"
     };
 
     const response = await request(app)
       .post("/funcionarios")
-      .set("Authorization", `Bearer ${token}`)
+      .set("Authorization", `Bearer ${tokenAdmin}`)
       .send(novoFuncionario);
 
     expect(response.status).toBe(201);
     expect(response.body).toHaveProperty("sucesso", true);
-    expect(response.body).toHaveProperty("mensagem", "Sucesso ao cadastrar");
+    expect(response.body).toHaveProperty("resultado");
+  });
+
+  test("TC-FUNC-02 — Acessar um funcionário específico e seus dados", async () => {
+    // Usa o ID criado previamente na pré-condição
+    const response = await request(app)
+      .get(`/funcionarios/${idFuncionarioCriado}`)
+      .set("Authorization", `Bearer ${tokenAdmin}`);
+
+    console.log("Status TC-FUNC-02:", response.status);
+    console.log("Corpo TC-FUNC-02:", response.body);
+
+    expect(response.status).toBe(200);
   });
 });
