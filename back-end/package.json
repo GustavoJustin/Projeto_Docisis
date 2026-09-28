@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --runInBand --detectOpenHandles",
     "start": "node src/server.js"
   },
   "keywords": [],
@@ -19,7 +19,10 @@
     "jsonwebtoken": "^9.0.3",
     "lucide": "^1.47.0",
     "multer": "^2.2.0",
-    "mysql2": "^3.23.2",
-    "xlsx": "^0.18.5"
+    "mysql2": "^3.23.2"
+  },
+  "devDependencies": {
+    "jest": "^30.5.2",
+    "supertest": "^7.2.2"
   }
 }
