@@ -76,8 +76,8 @@
 
         <!-- Card 1: Açúcar Refinado -->
         <div
-          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm"
-          data-categoria="Açúcares" data-nome="açúcar refinado" data-unidade="kg">
+          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm cursor-pointer hover:shadow-md hover:border-brand-brown/30 transition-shadow"
+          data-categoria="Açúcares" data-nome="açúcar refinado" data-unidade="kg" data-id="acucar-refinado">
           <div>
             <div class="relative h-36 rounded-xl overflow-hidden mb-3 bg-gray-50 flex items-center justify-center">
               <button type="button"
@@ -126,8 +126,8 @@
 
         <!-- Card 2: Farinha de Trigo -->
         <div
-          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm"
-          data-categoria="Farinhas" data-nome="farinha de trigo" data-unidade="kg">
+          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm cursor-pointer hover:shadow-md hover:border-brand-brown/30 transition-shadow"
+          data-categoria="Farinhas" data-nome="farinha de trigo" data-unidade="kg" data-id="farinha-de-trigo">
           <div>
             <div class="relative h-36 rounded-xl overflow-hidden mb-3 bg-gray-50 flex items-center justify-center">
               <button type="button"
@@ -176,8 +176,8 @@
 
         <!-- Card 3: Manteiga com Sal -->
         <div
-          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm"
-          data-categoria="Laticínios" data-nome="manteiga com sal" data-unidade="un">
+          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm cursor-pointer hover:shadow-md hover:border-brand-brown/30 transition-shadow"
+          data-categoria="Laticínios" data-nome="manteiga com sal" data-unidade="un" data-id="manteiga-com-sal">
           <div>
             <div class="relative h-36 rounded-xl overflow-hidden mb-3 bg-gray-50 flex items-center justify-center">
               <button type="button"
@@ -225,8 +225,8 @@
 
         <!-- Card 4: Chocolate em Pó -->
         <div
-          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm"
-          data-categoria="Chocolates" data-nome="chocolate em pó 100%" data-unidade="un">
+          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm cursor-pointer hover:shadow-md hover:border-brand-brown/30 transition-shadow"
+          data-categoria="Chocolates" data-nome="chocolate em pó 100%" data-unidade="un" data-id="chocolate-em-po-100">
           <div>
             <div class="relative h-36 rounded-xl overflow-hidden mb-3 bg-gray-50 flex items-center justify-center">
               <button type="button"
@@ -274,8 +274,8 @@
 
         <!-- Card 5: Essência de Baunilha -->
         <div
-          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm"
-          data-categoria="Essências" data-nome="essência de baunilha" data-unidade="un">
+          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm cursor-pointer hover:shadow-md hover:border-brand-brown/30 transition-shadow"
+          data-categoria="Essências" data-nome="essência de baunilha" data-unidade="un" data-id="essencia-de-baunilha">
           <div>
             <div class="relative h-36 rounded-xl overflow-hidden mb-3 bg-gray-50 flex items-center justify-center">
               <button type="button"
@@ -321,7 +321,57 @@
           </div>
         </div>
 
-        <!-- Card 6: Adicionar Novo Insumo -->
+        <!-- Card 6: Chocolate Belga 70% Cacau (NOVO) -->
+        <div
+          class="cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm cursor-pointer hover:shadow-md hover:border-brand-brown/30 transition-shadow"
+          data-categoria="Chocolates" data-nome="chocolate belga 70% cacau" data-unidade="kg"
+          data-id="chocolate-belga-70-cacau">
+          <div>
+            <div class="relative h-36 rounded-xl overflow-hidden mb-3 bg-gray-50 flex items-center justify-center">
+              <button type="button"
+                class="btn-excluir absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 hover:bg-rose-50 text-rose-500 flex items-center justify-center shadow-xs transition-colors cursor-pointer"
+                title="Excluir insumo">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+              <img src="http://assets.sistemawbuy.com.br/arquivos/6bfdf09f819f98e498029f0aacbf5f44/produtos/646c2225849d3/f82c9dbf6629caff589bb7996bc041a6-646c22270c3f7.jpg" alt="Chocolate Belga 70% Cacau"
+                class="w-full h-full object-contain p-2">
+            </div>
+
+            <div class="px-1 space-y-2">
+              <div class="flex items-baseline justify-between">
+                <h3 class="font-bold text-xs text-brand-text-dark">Chocolate Belga 70% Cacau</h3>
+                <span class="text-xs font-bold text-brand-brown">R$ 85,00/kg</span>
+              </div>
+              <p class="text-[10px] text-brand-text-muted">Categoria: Chocolates</p>
+
+              <div class="pt-2">
+                <div class="flex justify-between text-[9px] text-brand-text-muted mb-1">
+                  <span>Nível de Estoque</span>
+                  <span>45/100 kg</span>
+                </div>
+                <div class="w-full bg-black/5 rounded-full h-1">
+                  <div class="bg-brand-brown h-full rounded-full" style="width: 45%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-4 px-1">
+            <span class="qtd-valor text-base font-bold text-brand-text-dark">45 <span
+                class="text-xs font-normal text-brand-text-muted">kg</span></span>
+            <div class="flex items-center gap-2 border border-black/10 rounded-lg px-2 py-0.5">
+              <button type="button"
+                class="btn-menos text-xs font-bold text-brand-text-muted hover:text-brand-text-dark cursor-pointer">-</button>
+              <button type="button"
+                class="btn-mais text-xs font-bold text-brand-text-muted hover:text-brand-text-dark cursor-pointer">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 7: Adicionar Novo Insumo -->
         <div id="btn-card-adicionar"
           class="cartao-adicionar border-2 border-dashed border-black/10 rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:border-brand-brown transition-colors min-h-260px">
           <div
@@ -489,6 +539,16 @@
 
       let categoriaAtiva = 'Tudo';
 
+      // ==================== HELPER: gerar slug (para navegação) ====================
+      function slugify(texto) {
+        return texto
+          .toString()
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove acentos
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+      }
+
       // ==================== FILTROS E BUSCA ====================
       function aplicarFiltros() {
         const produtos = document.querySelectorAll('.cartao-produto');
@@ -562,8 +622,20 @@
         if (e.target === modalExcluir) fecharModalExclusao();
       });
 
-      // ==================== EVENTOS DOS CARDS (BOTOES + - E EXCLUIR) ====================
+      // ==================== EVENTOS DOS CARDS (CLIQUE, BOTOES + - E EXCLUIR) ====================
       function vincularEventosCard(card) {
+        // Garante um data-id para navegação, mesmo em cards criados pelo formulário
+        if (!card.getAttribute('data-id')) {
+          const nome = card.getAttribute('data-nome') || '';
+          card.setAttribute('data-id', slugify(nome));
+        }
+
+        // Clique no card abre a página de detalhes da matéria-prima
+        card.addEventListener('click', () => {
+          const id = card.getAttribute('data-id');
+          window.location.href = `materia_prima.html?id=${id}`;
+        });
+
         // Botão de Excluir
         const btnExcluir = card.querySelector('.btn-excluir');
         if (btnExcluir) {
@@ -648,10 +720,11 @@
         const corTextoUnidade = estoqueBaixo ? 'text-rose-400' : 'text-brand-text-muted';
 
         const novoCard = document.createElement('div');
-        novoCard.className = 'cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm';
+        novoCard.className = 'cartao-produto border border-black/10 rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm cursor-pointer hover:shadow-md hover:border-brand-brown/30 transition-shadow';
         novoCard.setAttribute('data-categoria', categoria);
         novoCard.setAttribute('data-nome', nome.toLowerCase());
         novoCard.setAttribute('data-unidade', unidade);
+        novoCard.setAttribute('data-id', slugify(nome));
 
         novoCard.innerHTML = `
           <div>
