@@ -1,26 +1,6 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel de Alertas - Confeitaria</title>
-  <link rel="stylesheet" href="../src/css/output.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-    rel="stylesheet">
-
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <style>
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-  </style>
-</head>
-
-<body class="min-h-screen bg-[#FAFAFA] text-[#4A3F39] flex">
-
-  <!-- Sidebar -->
+function Alertas() {
+  return (
+    //  Sidebar
   <div id="sidebar-container" data-active="alertas" class="w-64 shrink-0"></div>
 
   <!-- Conteúdo Principal -->
@@ -76,11 +56,11 @@
 
         <div class="flex items-center gap-2 text-xs text-gray-500">
           <span>Ordenar por:</span>
-          <select id="sortSelect"
-            class="bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-700 focus:outline-none cursor-pointer">
-            <option value="urgencia">Urgência (Alta para Baixa)</option>
-            <option value="vencimento">Data de Vencimento</option>
-            <option value="quantidade">Quantidade</option>
+          <select
+            class="bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-700 focus:outline-none">
+            <option>Urgência (Alta para Baixa)</option>
+            <option>Data de Vencimento</option>
+            <option>Quantidade</option>
           </select>
         </div>
       </div>
@@ -92,7 +72,7 @@
         <div class="lg:col-span-2 space-y-4" id="alertCardsContainer">
 
           <!-- Card 1: VENCIDO -->
-          <div data-category="vencido" data-urgency="3" data-vencimento="2023-10-15" data-quantidade="4.5"
+          <div data-category="vencido"
             class="alert-card bg-white rounded-2xl border border-gray-100 p-5 shadow-sm border-l-4 border-l-red-500 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between transition-all">
             <div class="flex gap-4 items-center">
               <img
@@ -132,7 +112,7 @@
           </div>
 
           <!-- Card 2: ESTOQUE CRÍTICO -->
-          <div data-category="critico" data-urgency="2" data-vencimento="2026-12-31" data-quantidade="1.2"
+          <div data-category="critico"
             class="alert-card bg-white rounded-2xl border border-gray-100 p-5 shadow-sm border-l-4 border-l-amber-500 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between transition-all">
             <div class="flex gap-4 items-center">
               <img src="https://www.quataalimentos.com.br/wp-content/uploads/2018/01/Creme-de-Leite-Fresco-1kg.jpg"
@@ -172,7 +152,7 @@
           </div>
 
           <!-- Card 3: PRÓX. VENCIMENTO -->
-          <div data-category="prox-vencimento" data-urgency="1" data-vencimento="2026-09-30" data-quantidade="8"
+          <div data-category="prox-vencimento"
             class="alert-card bg-white rounded-2xl border border-gray-100 p-5 shadow-sm border-l-4 border-l-rose-800 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between transition-all">
             <div class="flex gap-4 items-center">
               <img src="https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&q=80&w=200"
@@ -219,7 +199,7 @@
             </div>
 
             <div>
-              <div id="totalAlertsCount" class="text-4xl font-extrabold text-[#7A2838]">3</div>
+              <div id="totalAlertsCount" class="text-4xl font-extrabold text-[#7A2838]">12</div>
               <div class="text-sm font-bold text-[#7A2838] mt-1">Alertas Ativos</div>
               <p class="text-xs text-rose-800/70 mt-1 leading-relaxed">
                 Sua atenção é necessária para evitar perdas e manter a produção.
@@ -229,11 +209,11 @@
             <div class="space-y-3 pt-2 text-xs border-t border-pink-200/50">
               <div class="flex justify-between items-center text-rose-900 font-medium">
                 <span>A vencer (48h)</span>
-                <span class="font-bold">01</span>
+                <span class="font-bold">05</span>
               </div>
               <div class="flex justify-between items-center text-rose-900 font-medium">
                 <span>Abaixo do Mínimo</span>
-                <span class="font-bold">01</span>
+                <span class="font-bold">07</span>
               </div>
             </div>
 
@@ -250,7 +230,7 @@
 
     <!-- Toast Notification Overlay -->
     <div id="toastNotification"
-      class="fixed bottom-6 right-8 bg-[#2D3748] text-white rounded-xl p-4 shadow-xl hidden items-center gap-3 border border-gray-700 max-w-md transition-all duration-300 z-40">
+      class="fixed bottom-6 right-8 bg-[#2D3748] text-white rounded-xl p-4 shadow-xl flex items-center gap-3 border border-gray-700 max-w-md transition-all duration-300 z-40">
       <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -338,128 +318,99 @@
       </form>
     </div>
   </div>
+  )
+}
+  
 
-  <!-- Interatividade JS -->
-  <script>
-    function openModal(id) {
-      document.getElementById(id).classList.remove('hidden');
-      document.getElementById(id).classList.add('flex');
-    }
+  // <!-- Interatividade JS -->
+  // <script>
+  //   // Controle de Modais
+  //   function openModal(id) {
+  //     document.getElementById(id).classList.remove('hidden');
+  //     document.getElementById(id).classList.add('flex');
+  //   }
 
-    function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
-      document.getElementById(id).classList.remove('flex');
-    }
+  //   function closeModal(id) {
+  //     document.getElementById(id).classList.add('hidden');
+  //     document.getElementById(id).classList.remove('flex');
+  //   }
 
-    function openReporModal(itemName) {
-      document.getElementById('reporItemNome').value = itemName;
-      openModal('modalRepor');
-    }
+  //   function openReporModal(itemName) {
+  //     document.getElementById('reporItemNome').value = itemName;
+  //     openModal('modalRepor');
+  //   }
 
-    function updateCounters() {
-      const activeCards = document.querySelectorAll('.alert-card');
-      const countEl = document.getElementById('totalAlertsCount');
-      if (countEl) countEl.innerText = activeCards.length;
-    }
+  //   // Formulários
+  //   function handleNovoItem(e) {
+  //     e.preventDefault();
+  //     closeModal('modalNovoItem');
+  //     showToast('Item Cadastrado', 'O novo insumo foi inserido no sistema com sucesso.');
+  //   }
 
-    function handleNovoItem(e) {
-      e.preventDefault();
-      closeModal('modalNovoItem');
-      showToast('Item Cadastrado', 'O novo insumo foi inserido no sistema com sucesso.');
-    }
+  //   function handleReporSubmit(e) {
+  //     e.preventDefault();
+  //     const item = document.getElementById('reporItemNome').value;
+  //     closeModal('modalRepor');
+  //     showToast('Pedido de Reposição Sent', `A ordem de compra para ${item} foi gerada.`);
+  //   }
 
-    function handleReporSubmit(e) {
-      e.preventDefault();
-      const item = document.getElementById('reporItemNome').value;
-      closeModal('modalRepor');
-      showToast('Pedido Enviado', `A ordem de reposição para ${item} foi enviada.`);
-    }
+  //   // Ações de Cards
+  //   function dismissCard(btn) {
+  //     const card = btn.closest('.alert-card');
+  //     card.style.opacity = '0';
+  //     card.style.transform = 'scale(0.95)';
+  //     setTimeout(() => {
+  //       card.remove();
+  //       showToast('Alerta Descartado', 'O item foi removido da lista de prioridades.');
+  //     }, 200);
+  //   }
 
-    function dismissCard(btn) {
-      const card = btn.closest('.alert-card');
-      card.style.opacity = '0';
-      card.style.transform = 'scale(0.95)';
-      setTimeout(() => {
-        card.remove();
-        updateCounters();
-        showToast('Alerta Descartado', 'O item foi removido da lista de prioridades.');
-      }, 200);
-    }
+  //   // Notificação Toast
+  //   function showToast(title, message) {
+  //     const toast = document.getElementById('toastNotification');
+  //     document.getElementById('toastTitle').innerText = title;
+  //     document.getElementById('toastMessage').innerText = message;
+  //     toast.classList.remove('hidden');
+  //   }
 
-    function showToast(title, message) {
-      const toast = document.getElementById('toastNotification');
-      document.getElementById('toastTitle').innerText = title;
-      document.getElementById('toastMessage').innerText = message;
-      toast.classList.remove('hidden');
-      toast.classList.add('flex');
-    }
+  //   function closeToast() {
+  //     document.getElementById('toastNotification').classList.add('hidden');
+  //   }
 
-    function closeToast() {
-      const toast = document.getElementById('toastNotification');
-      toast.classList.add('hidden');
-      toast.classList.remove('flex');
-    }
+  //   // Filtros das Abas
+  //   document.querySelectorAll('#filterTabs .tab-btn').forEach(btn => {
+  //     btn.addEventListener('click', () => {
+  //       // Estilo das abas
+  //       document.querySelectorAll('#filterTabs .tab-btn').forEach(b => {
+  //         b.className = 'tab-btn px-4 py-2 hover:text-gray-800 transition-all';
+  //       });
+  //       btn.className = 'tab-btn bg-white text-gray-800 px-4 py-2 rounded-lg shadow-sm transition-all';
 
-    // Filtros por Categoria
-    document.querySelectorAll('#filterTabs .tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('#filterTabs .tab-btn').forEach(b => {
-          b.className = 'tab-btn px-4 py-2 hover:text-gray-800 transition-all';
-        });
-        btn.className = 'tab-btn bg-white text-gray-800 px-4 py-2 rounded-lg shadow-sm transition-all';
+  //       // Filtragem dos cards
+  //       const filter = btn.getAttribute('data-filter');
+  //       document.querySelectorAll('.alert-card').forEach(card => {
+  //         if (filter === 'all' || card.getAttribute('data-category') === filter) {
+  //           card.style.display = 'flex';
+  //         } else {
+  //           card.style.display = 'none';
+  //         }
+  //       });
+  //     });
+  //   });
 
-        const filter = btn.getAttribute('data-filter');
-        document.querySelectorAll('.alert-card').forEach(card => {
-          if (filter === 'all' || card.getAttribute('data-category') === filter) {
-            card.style.display = 'flex';
-          } else {
-            card.style.display = 'none';
-          }
-        });
-      });
-    });
+  //   // Busca em tempo real
+  //   document.getElementById('searchInput').addEventListener('input', (e) => {
+  //     const query = e.target.value.toLowerCase();
+  //     document.querySelectorAll('.alert-card').forEach(card => {
+  //       const title = card.querySelector('.item-title').innerText.toLowerCase();
+  //       if (title.includes(query)) {
+  //         card.style.display = 'flex';
+  //       } else {
+  //         card.style.display = 'none';
+  //       }
+  //     });
+  //   });
+  // </script>
 
-    // Ordenação dos Alertas
-    const sortSelect = document.getElementById('sortSelect');
-    if (sortSelect) {
-      sortSelect.addEventListener('change', (e) => {
-        const value = e.target.value;
-        const container = document.getElementById('alertCardsContainer');
-        const cards = Array.from(container.querySelectorAll('.alert-card'));
-
-        cards.sort((a, b) => {
-          if (value === 'urgencia') {
-            return parseInt(b.getAttribute('data-urgency')) - parseInt(a.getAttribute('data-urgency'));
-          } else if (value === 'vencimento') {
-            return new Date(a.getAttribute('data-vencimento')) - new Date(b.getAttribute('data-vencimento'));
-          } else if (value === 'quantidade') {
-            return parseFloat(b.getAttribute('data-quantidade')) - parseFloat(a.getAttribute('data-quantidade'));
-          }
-          return 0;
-        });
-
-        cards.forEach(card => container.appendChild(card));
-      });
-    }
-
-    // Busca em tempo real
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase();
-      document.querySelectorAll('.alert-card').forEach(card => {
-        const title = card.querySelector('.item-title').innerText.toLowerCase();
-        if (title.includes(query)) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    });
-
-    document.addEventListener('DOMContentLoaded', updateCounters);
-  </script>
-
-  <script>lucide.createIcons()</script>
-  <script src="../src/componentes/sidebar.js" defer></script>
-</body>
-
-</html>
+  // <script>lucide.createIcons()</script>
+  // <script src="../src/componentes/sidebar.js" defer></script>

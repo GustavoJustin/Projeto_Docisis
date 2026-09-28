@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cadastrar Novo Funcionário - DoceGestão</title>
 
+  <!-- CDN do Tailwind CSS -->
   <link rel="stylesheet" href="../src/css/output.css">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -21,7 +22,7 @@
     <!-- Header do Topo -->
     <header class="h-16 flex items-center justify-between px-8 bg-white border-b border-gray-200 shrink-0">
       <div class="flex items-center gap-2 text-sm">
-        <a href="gestao-equipes.html" class="text-gray-400 hover:text-[#875C46] transition-colors">Gestão de Equipes</a>
+        <a href="index.html" class="text-gray-400 hover:text-[#875C46] transition-colors">Dashboard</a>
         <span class="text-gray-300">/</span>
         <span class="text-[#875C46] font-semibold">Cadastrar Funcionário</span>
       </div>
@@ -265,36 +266,12 @@
       const photoPreview = document.getElementById('photo-preview');
       const uploadPlaceholder = document.getElementById('upload-placeholder');
       const btnCancelar = document.getElementById('btn-cancelar');
+      const btnNovoItem = document.getElementById('btn-novo-item');
       const radioNivel = document.querySelectorAll('input[name="nivel_acesso"]');
       const cardAdmin = document.getElementById('card-admin');
       const cardFunc = document.getElementById('card-func');
 
-      // Máscara CPF
-      const inputCPF = document.getElementById('input-cpf');
-      if (inputCPF) {
-        inputCPF.addEventListener('input', (e) => {
-          let v = e.target.value.replace(/\D/g, '');
-          if (v.length > 11) v = v.slice(0, 11);
-          v = v.replace(/(\d{3})(\d)/, '$1.$2');
-          v = v.replace(/(\d{3})(\d)/, '$1.$2');
-          v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-          e.target.value = v;
-        });
-      }
-
-      // Máscara Telefone
-      const inputTel = document.getElementById('input-telefone');
-      if (inputTel) {
-        inputTel.addEventListener('input', (e) => {
-          let v = e.target.value.replace(/\D/g, '');
-          if (v.length > 11) v = v.slice(0, 11);
-          v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
-          v = v.replace(/(\d{5})(\d)/, '$1-$2');
-          e.target.value = v;
-        });
-      }
-
-      // Upload de foto
+      // 1. Upload e Preview da Foto
       inputFoto.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -308,7 +285,7 @@
         }
       });
 
-      // Cartões de nível de acesso
+      // 2. Alternância de Estilo dos Cards de Nível de Acesso
       radioNivel.forEach((radio) => {
         radio.addEventListener('change', (e) => {
           if (e.target.value === 'administrador') {
@@ -321,7 +298,7 @@
         });
       });
 
-      // Validação e Gravação
+      // 3. Validação e Envio do Formulário
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const senha = document.getElementById('input-senha').value;
@@ -333,32 +310,26 @@
         }
 
         const nome = document.getElementById('input-nome').value;
-        const nivelSelecionado = document.querySelector('input[name="nivel_acesso"]:checked').value;
-
-        const novoFunc = {
-          id: Date.now(),
-          nome: nome,
-          cpf: document.getElementById('input-cpf').value,
-          email: document.getElementById('input-email').value,
-          cargo: nivelSelecionado === 'administrador' ? 'Administrador' : 'Funcionário',
-          status: 'Ativo',
-          foto: photoPreview.src && !photoPreview.classList.contains('hidden') ? photoPreview.src : null
-        };
-
-        const equipe = JSON.parse(localStorage.getItem('equipe_docegestao') || '[]');
-        equipe.push(novoFunc);
-        localStorage.setItem('equipe_docegestao', JSON.stringify(equipe));
-
         alert(`Funcionário ${nome} cadastrado com sucesso!`);
-        window.location.href = 'gestao-equipes.html';
+
+        // Limpar o formulário após cadastro bem-sucedido
+        btnCancelar.click();
       });
 
-      // Limpar
+      // 4. Botão Cancelar / Limpar Formulário
       btnCancelar.addEventListener('click', () => {
         form.reset();
         photoPreview.src = '';
         photoPreview.classList.add('hidden');
         uploadPlaceholder.classList.remove('hidden');
+        cardAdmin.className = 'relative flex items-start p-4 rounded-xl border-2 border-[#875C46] bg-[#FDFBF7] cursor-pointer transition-all';
+        cardFunc.className = 'relative flex items-start p-4 rounded-xl border border-gray-200 bg-white hover:border-[#875C46]/50 cursor-pointer transition-all';
+      });
+
+      // 5. Botão "Novo Item" da Sidebar
+      btnNovoItem.addEventListener('click', () => {
+        alert('Ação rápida: Redirecionando para a criação de um novo produto no estoque.');
+        window.location.href = 'materia_prima.html';
       });
     });
   </script>
