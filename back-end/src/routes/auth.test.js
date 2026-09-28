@@ -21,14 +21,14 @@ describe("Módulo de Autenticação — Login", () => {
   };
 
   beforeAll(async () => {
-    // 1. Gera token admin para autorizar o cadastro do usuário de teste
+    // 1. Gera token admin para autorizar o registo prévio
     const tokenAdmin = jwt.sign(
       { id_funcionario: 1, email: "daniel@gmail.com", id_cargos: 1 },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    // 2. Garante a pré-condição: usuário cadastrado com senha válida
+    // 2. Garante a pré-condição: utilizador registado com senha válida
     await request(app)
       .post("/funcionarios")
       .set("Authorization", `Bearer ${tokenAdmin}`)
@@ -51,13 +51,24 @@ describe("Módulo de Autenticação — Login", () => {
       .post("/login")
       .send({
         email: usuarioTeste.email,
-        senha: "SenhaIncorreta" // Senha errada intencional
+        senha: "SenhaIncorreta"
       });
 
-    console.log("Status TC-AUTH-03:", response.status);
-    console.log("Corpo TC-AUTH-03:", response.body);
+    expect(response.status).toBe(401);
+  });
 
-    // Valida o status 401 Unauthorized esperado
+  test("TC-AUTH-04 — Login com e-mail inexistente", async () => {
+    const response = await request(app)
+      .post("/login")
+      .send({
+        email: "naoexiste@vetcare.com",
+        senha: "Qualquer123"
+      });
+
+    console.log("Status TC-AUTH-04:", response.status);
+    console.log("Corpo TC-AUTH-04:", response.body);
+
+    // Valida o status 401 Unauthorized esperado para não revelar e-mails registados
     expect(response.status).toBe(401);
   });
 });
