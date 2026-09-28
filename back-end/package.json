@@ -15,10 +15,11 @@
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "html2pdf.js": "^0.14.0",
     "jsonwebtoken": "^9.0.3",
+    "lucide": "^1.47.0",
     "multer": "^2.2.0",
-    "mysql2": "^3.23.2"
-  },
-  "devDependencies": {
+    "mysql2": "^3.23.2",
+    "xlsx": "^0.18.5"
   }
 }
