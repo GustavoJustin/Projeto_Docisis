@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estoque de Matérias-Primas - DoceGostoso</title>
+
+  <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Compiled Tailwind v4 CSS -->
+  <link rel="stylesheet" href="../css/output.css">
+
+</head>
+<body class="bg-[#F8F5F0] text-[#2B1D12] min-h-screen flex flex-col justify-between antialiased">
+
+  <!-- ================= TOP HEADER BAR ================= -->
+  <header class="bg-cocoa-800 border-b border-[#6B4E3B]/60 text-[#F7F1EA] px-4 sm:px-8 py-3.5 flex flex-wrap justify-between items-center gap-4 shadow-md">
+    <!-- Title & Breadcrumb -->
+    <div>
+      <p class="text-xs text-[#D9C6B4] font-medium">Gestão <span class="mx-1">/</span> Estoque</p>
+      <h1 class="font-serif-heading text-lg sm:text-xl font-bold tracking-tight text-[#F5EFE9]">Estoque de Matérias-Primas</h1>
+    </div>
+
+    <!-- User Profile & Actions -->
+    <div class="flex items-center gap-3 sm:gap-5">
+      <!-- Notification Icon -->
+       <!-- Altera conforme o numero de notificacoes -->
+      <button class="relative p-2 text-[#E6D7C6] hover:text-white hover:bg-white/10 rounded-full transition" aria-label="Notificações">
+        <i data-lucide="bell" class="w-5 h-5"></i>
+        <span class="absolute top-1 right-1 bg-[#D97706] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">1</span>
+      </button>
+
+      <!-- Settings Icon -->
+      <button class="p-2 text-[#E6D7C6] hover:text-white hover:bg-white/10 rounded-full transition" aria-label="Configurações">
+        <i data-lucide="settings" class="w-5 h-5"></i>
+      </button>
+
+      <!-- User Avatar -->
+      <div class="flex items-center gap-3 border-l border-[#6B4E3B]/70 pl-3 sm:pl-5">
+        <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80&w=120" 
+             alt="Avatar de Maria Luiza" 
+             class="w-9 h-9 rounded-full object-cover border border-#D4A373">
+        <div class="hidden sm:block text-left">
+          <p class="text-xs font-bold leading-tight text-[#FDF7F1]">Maria Luiza</p>
+          <p class="text-[11px] text-[#D9C6B4]">Administrador(a)</p>
+        </div>
+      </div>
+
+      <!-- Logout Button -->
+      <button class="ml-1 text-xs font-semibold bg-[#4D362B] hover:bg-[#5B4135] text-[#F5EFE8] px-3.5 py-1.5 rounded-md border border-[#7A5B48] transition">
+        Sair
+      </button>
+    </div>
+  </header>
+
+  <script>
+    if (window.lucide && lucide.createIcons) {
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html> 
