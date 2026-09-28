@@ -24,13 +24,13 @@ describe("Módulo de Funcionários", () => {
       { expiresIn: "1h" }
     );
 
-    // 2. Pré-condição: Registo de um funcionário para testes de consulta e atualização
+    // 2. Pré-condição: Registo prévio de um funcionário para testes de busca e exclusão
     const timestampFunc = Date.now().toString().slice(-6);
     const resFunc = await request(app)
       .post("/funcionarios")
       .set("Authorization", `Bearer ${tokenAdmin}`)
       .send({
-        nome: "Funcionário Teste Operações",
+        nome: "Funcionário Teste Exclusão",
         cpf: `10${timestampFunc}`,
         id_cargos: 2,
         email: `operacoes.${timestampFunc}@docisis.com`,
@@ -39,7 +39,7 @@ describe("Módulo de Funcionários", () => {
 
     idFuncionarioCriado = resFunc.body.resultado;
 
-    // 3. Pré-condição: Registo de um administrador para consulta
+    // 3. Pré-condição: Registo prévio de um administrador para consulta
     const timestampAdmin = Date.now().toString().slice(-6);
     const resAdmin = await request(app)
       .post("/funcionarios")
@@ -111,23 +111,14 @@ describe("Módulo de Funcionários", () => {
     expect(response.status).toBe(200);
   });
 
-  test("TC-FUNC-05 — Atualização de dados de um funcionário existente", async () => {
-    const timestamp = Date.now().toString().slice(-6);
-    const dadosAtualizados = {
-      nome: "Funcionário Nome Alterado",
-      cpf: Number(`14${timestamp}`),
-      id_cargos: 1,
-      email: `alterado.${timestamp}@docisis.com`
-    };
-
+  test("TC-FUNC-05 — Exclusão de um funcionário existente", async () => {
     const response = await request(app)
-      .put(`/funcionarios/${idFuncionarioCriado}`)
-      .set("Authorization", `Bearer ${tokenAdmin}`)
-      .send(dadosAtualizados);
+      .delete(`/funcionarios/${idFuncionarioCriado}`)
+      .set("Authorization", `Bearer ${tokenAdmin}`);
 
     console.log("Status TC-FUNC-05:", response.status);
     console.log("Corpo TC-FUNC-05:", response.body);
 
-    expect(response.status).toBe(200);
+    expect([200, 204]).toContain(response.status);
   });
 });
