@@ -21,14 +21,12 @@ describe("Módulo de Autenticação — Login", () => {
   };
 
   beforeAll(async () => {
-    // 1. Gera token admin para autorizar o registo prévio
     const tokenAdmin = jwt.sign(
       { id_funcionario: 1, email: "daniel@gmail.com", id_cargos: 1 },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    // 2. Garante a pré-condição: utilizador registado com senha válida
     await request(app)
       .post("/funcionarios")
       .set("Authorization", `Bearer ${tokenAdmin}`)
@@ -65,10 +63,6 @@ describe("Módulo de Autenticação — Login", () => {
         senha: "Qualquer123"
       });
 
-    console.log("Status TC-AUTH-04:", response.status);
-    console.log("Corpo TC-AUTH-04:", response.body);
-
-    // Valida o status 401 Unauthorized esperado para não revelar e-mails registados
     expect(response.status).toBe(401);
   });
 });

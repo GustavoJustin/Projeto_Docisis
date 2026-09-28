@@ -14,38 +14,52 @@ const app = require("../app");
 describe("Módulo de Funcionários", () => {
   let tokenAdmin;
   let idFuncionarioCriado;
+  let idAdminCriado;
 
   beforeAll(async () => {
-    // 1. Pré-condição: Criação do token de gestor/administrador (id_cargos = 1)
+    // 1. Pré-condição: Token do gestor autenticado
     tokenAdmin = jwt.sign(
       { id_funcionario: 1, email: "admin@docisis.com", id_cargos: 1 },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    // 2. Pré-condição do TC-FUNC-02: Cria um funcionário e guarda seu ID para a busca
-    const timestamp = Date.now().toString().slice(-8);
-    const res = await request(app)
+    // 2. Pré-condição: Registo de um funcionário para testes de consulta e atualização
+    const timestampFunc = Date.now().toString().slice(-6);
+    const resFunc = await request(app)
       .post("/funcionarios")
       .set("Authorization", `Bearer ${tokenAdmin}`)
       .send({
-        nome: "Funcionário Teste Busca",
-        cpf: `777${timestamp}`,
-        id_cargos: 1,
-        email: `busca.${timestamp}@docisis.com`,
+        nome: "Funcionário Teste Operações",
+        cpf: `10${timestampFunc}`,
+        id_cargos: 2,
+        email: `operacoes.${timestampFunc}@docisis.com`,
         senha: "SenhaValida123"
       });
 
-    idFuncionarioCriado = res.body.resultado;
+    idFuncionarioCriado = resFunc.body.resultado;
+
+    // 3. Pré-condição: Registo de um administrador para consulta
+    const timestampAdmin = Date.now().toString().slice(-6);
+    const resAdmin = await request(app)
+      .post("/funcionarios")
+      .set("Authorization", `Bearer ${tokenAdmin}`)
+      .send({
+        nome: "Administrador Consultado",
+        cpf: `11${timestampAdmin}`,
+        id_cargos: 1,
+        email: `admin.busca.${timestampAdmin}@docisis.com`,
+        senha: "SenhaValida123"
+      });
+
+    idAdminCriado = resAdmin.body.resultado;
   });
 
   test("TC-FUNC-01 — Cadastro de novos funcionários", async () => {
-    const timestamp = Date.now().toString().slice(-8);
-    const cpfValido = `999${timestamp}`;
-
+    const timestamp = Date.now().toString().slice(-6);
     const novoFuncionario = {
       nome: "Carlos Eduardo",
-      cpf: cpfValido,
+      cpf: `12${timestamp}`,
       id_cargos: 1,
       email: `carlos.${timestamp}@docisis.com`,
       senha: "SenhaValida123"
@@ -62,13 +76,57 @@ describe("Módulo de Funcionários", () => {
   });
 
   test("TC-FUNC-02 — Acessar um funcionário específico e seus dados", async () => {
-    // Usa o ID criado previamente na pré-condição
     const response = await request(app)
       .get(`/funcionarios/${idFuncionarioCriado}`)
       .set("Authorization", `Bearer ${tokenAdmin}`);
 
-    console.log("Status TC-FUNC-02:", response.status);
-    console.log("Corpo TC-FUNC-02:", response.body);
+    expect(response.status).toBe(200);
+  });
+
+  test("TC-FUNC-03 — Cadastrar um novo administrador", async () => {
+    const timestamp = Date.now().toString().slice(-6);
+    const novoAdmin = {
+      nome: "Fernanda Admin",
+      cpf: `13${timestamp}`,
+      id_cargos: 1,
+      email: `admin.${timestamp}@docisis.com`,
+      senha: "SenhaValida123"
+    };
+
+    const response = await request(app)
+      .post("/funcionarios")
+      .set("Authorization", `Bearer ${tokenAdmin}`)
+      .send(novoAdmin);
+
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty("sucesso", true);
+    expect(response.body).toHaveProperty("resultado");
+  });
+
+  test("TC-FUNC-04 — Acessar um administrador específico e seus dados", async () => {
+    const response = await request(app)
+      .get(`/funcionarios/${idAdminCriado}`)
+      .set("Authorization", `Bearer ${tokenAdmin}`);
+
+    expect(response.status).toBe(200);
+  });
+
+  test("TC-FUNC-05 — Atualização de dados de um funcionário existente", async () => {
+    const timestamp = Date.now().toString().slice(-6);
+    const dadosAtualizados = {
+      nome: "Funcionário Nome Alterado",
+      cpf: Number(`14${timestamp}`),
+      id_cargos: 1,
+      email: `alterado.${timestamp}@docisis.com`
+    };
+
+    const response = await request(app)
+      .put(`/funcionarios/${idFuncionarioCriado}`)
+      .set("Authorization", `Bearer ${tokenAdmin}`)
+      .send(dadosAtualizados);
+
+    console.log("Status TC-FUNC-05:", response.status);
+    console.log("Corpo TC-FUNC-05:", response.body);
 
     expect(response.status).toBe(200);
   });
