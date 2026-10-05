@@ -1,9 +1,9 @@
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
 }
 
 .font-display {
-    font-family: 'Fraunces', serif;
+    font-family: "Fraunces", serif;
 }
 
 /* Estilos isolados para o Modal (Garante funcionamento perfeito sem Tailwind) */
@@ -40,7 +40,7 @@ body {
 }
 
 .modal-title {
-    font-family: 'Fraunces', serif;
+    font-family: "Fraunces", serif;
     font-size: 1.25rem;
     font-weight: 600;
     color: #4a2e1a;
