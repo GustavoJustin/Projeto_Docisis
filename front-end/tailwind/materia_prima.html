@@ -17,11 +17,14 @@
 <body class="min-h-screen bg-stone-50">
   <div class="flex min-h-screen">
 
-    <!-- ===================== SIDEBAR ===================== -->
-    <div id="sidebar-container" data-active="materia_prima" class="w-64 shrink-0"></div>
-    <!-- =================== FIM SIDEBAR =================== -->
+    <!-- Sidebar -->
+    <div id="sidebar-container" data-active="materia-prima" class="w-64 shrink-0"></div>
 
     <main class="flex-1 px-8 py-6">
+
+      <!-- Header principal -->
+      <div id="header-container" class="w-full shrink-0"></div>
+
       <p class="text-sm text-stone-400">Estoque &gt; Matéria-prima</p>
 
       <div class="mt-1 flex items-center justify-between">
@@ -182,7 +185,8 @@
     </main>
   </div>
   <script>lucide.createIcons()</script>
-  <!-- <script src="../src/componentes/sidebar.js" defer></script> -->
+  <script src="../../src/componentes/sidebar.js" defer></script>
+  <script src="../../src/componentes/header.js" defer></script>
   <script src="../src/script/materia-prima.js" defer></script>
 </body>
 

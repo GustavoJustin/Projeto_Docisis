@@ -12,12 +12,15 @@
 
 <body class="min-h-screen bg-stone-50">
   <div class="flex min-h-screen">
-    <!-- ===================== SIDEBAR ===================== -->
-    <div id="sidebar-container" data-active="historico" class="w-64 shrink-0"></div>
-    <!-- =================== FIM SIDEBAR =================== -->
+    <!-- Sidebar -->
+    <div id="sidebar-container" data-active="historico-completo" class="w-64 shrink-0"></div>
 
     <main class="flex-1 px-8 py-6">
       <div class="flex items-center justify-between">
+
+        <!-- Header principal -->
+        <div id="header-container" class="w-full shrink-0"></div>
+
         <div class="relative w-80">
           <i data-lucide="search"
             class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-300"></i>
@@ -246,7 +249,8 @@
     </main>
   </div>
 
-  <!-- <script src="../src/componentes/sidebar.js" defer></script> -->
+  <script src="../../src/componentes/sidebar.js" defer></script>
+  <script src="../../src/componentes/header.js" defer></script>
   <script src="../src/script/historico-completo.js" defer></script>
 </body>
 

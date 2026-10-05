@@ -48,14 +48,18 @@
 
   <link rel="stylesheet" href="../src/css/output.css">
   <link rel="stylesheet" href="../src/css paginas/relatorio_analises.css">
-
 </head>
 
 <body class="bg-[#F5F3EE] text-[#3D2E24] font-sans antialiased min-h-screen flex">
-  <div id="sidebar-container" data-active="relatorios" class="w-64 shrink-0"></div>
+  <!-- Sidebar -->
+  <div id="sidebar-container" data-active="relatorio_analises" class="w-64 shrink-0"></div>
 
   <!-- CONTEÚDO PRINCIPAL -->
   <main id="relatorio-conteudo" class="flex-1 p-4 sm:p-8 overflow-y-auto space-y-6">
+
+    <!-- Header principal -->
+    <div id="header-container" class="w-full shrink-0"></div>
+
     <!-- HEADER DO CONTEÚDO -->
     <header
       class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white md:bg-transparent p-4 md:p-0 rounded-2xl border md:border-none border-[#EAE6DF]">
@@ -675,7 +679,8 @@
   <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- <script src="../src/componentes/sidebar.js" defer></script> -->
+  <script src="../../src/componentes/sidebar.js" defer></script>
+  <script src="../../src/componentes/header.js" defer></script>
   <script src="../src/script/relatorio_analises.js" defer></script>
 </body>
 
