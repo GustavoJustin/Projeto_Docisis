@@ -1,0 +1,367 @@
+function CadastroFuncionario() {
+  return (
+    <div className="cadastro-funcionario" class="min-h-screen bg- text- flex font-sans antialiased">
+      <div id="sidebar-container" data-active="cadastro-funcionario" class="w-64 shrink-0"></div>
+
+
+      <div class="flex-1 flex flex-col h-screen overflow-hidden">
+
+
+        <header class="h-16 flex items-center justify-between px-8 bg-white border-b border-gray-200 shrink-0">
+          <div class="flex items-center gap-2 text-sm">
+            <a href="gestao-equipes.html" class="text-gray-400 hover:text- transition-colors">Gestão de Equipes</a>
+            <span class="text-gray-300">/</span>
+            <span class="text- font-semibold">Cadastrar Funcionário</span>
+          </div>
+
+          <div class="flex items-center gap-4 text-gray-500">
+            <button type="button" class="p-2 rounded-lg hover:bg-gray-100 hover:text- transition-all"
+              onClick="alert('Sem novas notificações no momento.')">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                </path>
+              </svg>
+            </button>
+
+            <div class="h-5 w-1px bg-gray-200"></div>
+
+            <div class="flex items-center gap-3 cursor-pointer">
+              <div
+                class="w-9 h-9 rounded-full bg- text-white font-bold text-sm flex items-center justify-center shadow-sm">
+                A
+              </div>
+              <div class="hidden sm:block text-left">
+                <p class="text-xs font-semibold text-gray-700 leading-none">Admin</p>
+                <p class="text-[10px] text-gray-400 mt-0.5">Gestor</p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+
+        <main class="flex-1 overflow-y-auto p-6 md:p-10">
+          <form id="form-cadastro" class="max-w-4xl mx-auto space-y-6">
+
+
+            <div
+              class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div>
+                <h2 class="text-2xl font-bold text-">Cadastrar Novo Funcionário</h2>
+                <p class="text-xs md:text-sm text-gray-500 mt-1">Preencha as informações para liberar o acesso no sistema.
+                </p>
+              </div>
+              <span
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-/10 text-">
+                <span class="w-1.5 h-1.5 rounded-full bg-"></span>
+                Novo Registro
+              </span>
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+              <div
+                class="md:col-span-4 rounded-2xl border border-gray-200 bg-white p-6 flex flex-col items-center justify-center text-center shadow-sm">
+
+                <div id="photo-dropzone"
+                  class="relative flex flex-col items-center justify-center w-28 h-28 rounded-full border-2 border-dashed border-/40 bg- hover:border- hover:bg- transition-all cursor-pointer mb-3 group overflow-hidden">
+                  <div id="upload-placeholder" class="flex flex-col items-center justify-center">
+                    <svg class="w-7 h-7 text- group-hover:scale-110 transition-transform" fill="none"
+                      stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8"
+                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
+                      </path>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8"
+                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span class="text-[11px] font-semibold text- mt-1">Enviar Foto</span>
+                  </div>
+                  <img id="photo-preview" class="hidden absolute inset-0 w-full h-full object-cover rounded-full"
+                    alt="Preview da Foto" />
+                  <input type="file" id="input-foto" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    accept="image/*" />
+                </div>
+
+                <p class="text-xs font-bold text- tracking-wide uppercase mb-1">UPLOAD DE FOTO</p>
+                <p class="text-[11px] text-gray-400">JPG ou PNG até 2MB</p>
+              </div>
+
+
+              <div
+                class="md:col-span-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm flex flex-col justify-between">
+                <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-gray-100">
+                  <div class="p-2 rounded-lg bg-/10 text-">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8"
+                        d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2">
+                      </path>
+                    </svg>
+                  </div>
+                  <h3 class="text-base font-bold text-">Dados Pessoais</h3>
+                </div>
+
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Nome completo</label>
+                    <input type="text" id="input-nome" required placeholder="Ex: Maria Oliveira"
+                      class="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm placeholder:text-gray-400 focus:bg-white focus:outline-none focus:border- focus:ring-2 focus:ring-/20 transition-all" />
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-xs font-semibold text-gray-700 mb-1.5">CPF</label>
+                      <input type="text" id="input-cpf" required placeholder="000.000.000-00"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm placeholder:text-gray-400 focus:bg-white focus:outline-none focus:border- focus:ring-2 focus:ring-/20 transition-all" />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-semibold text-gray-700 mb-1.5">Idade</label>
+                      <input type="number" id="input-idade" placeholder="25"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm placeholder:text-gray-400 focus:bg-white focus:outline-none focus:border- focus:ring-2 focus:ring-/20 transition-all" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-gray-100">
+                <div class="p-2 rounded-lg bg-/10 text-">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8"
+                      d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
+                    </path>
+                  </svg>
+                </div>
+                <h3 class="text-base font-bold text-">Nível de Acesso</h3>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label id="card-admin"
+                  class="relative flex items-start p-4 rounded-xl border-2 border- bg- cursor-pointer transition-all">
+                  <div class="p-2.5 rounded-lg bg-/10 text- mr-3.5 shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                      </path>
+                    </svg>
+                  </div>
+                  <div class="flex-1 pr-6">
+                    <p class="text-sm font-bold text-">Administrador</p>
+                    <p class="text-xs text-gray-500 mt-1 leading-relaxed">Acesso total ao sistema, relatórios financeiros e
+                      gestão completa de usuários.</p>
+                  </div>
+                  <input type="radio" name="nivel_acesso" value="administrador" checked
+                    class="mt-1 w-4 h-4 accent-" />
+                </label>
+
+                <label id="card-func"
+                  class="relative flex items-start p-4 rounded-xl border border-gray-200 bg-white hover:border-/50 cursor-pointer transition-all">
+                  <div class="p-2.5 rounded-lg bg-gray-100 text-gray-600 mr-3.5 shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                        d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
+                      </path>
+                    </svg>
+                  </div>
+                  <div class="flex-1 pr-6">
+                    <p class="text-sm font-bold text-">Funcionário</p>
+                    <p class="text-xs text-gray-500 mt-1 leading-relaxed">Acesso operacional: controle de estoque e
+                      lançamentos diários.</p>
+                  </div>
+                  <input type="radio" name="nivel_acesso" value="funcionario" class="mt-1 w-4 h-4 accent-" />
+                </label>
+              </div>
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-gray-100">
+                  <div class="p-2 rounded-lg bg-/10 text-">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8"
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                      </path>
+                    </svg>
+                  </div>
+                  <h3 class="text-base font-bold text-">Contato</h3>
+                </div>
+
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">E-mail</label>
+                    <input type="email" id="input-email" required placeholder="maria@confeitaria.com"
+                      class="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm placeholder:text-gray-400 focus:bg-white focus:outline-none focus:border- focus:ring-2 focus:ring-/20 transition-all" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Telefone</label>
+                    <input type="text" id="input-telefone" placeholder="(00) 00000-0000"
+                      class="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm placeholder:text-gray-400 focus:bg-white focus:outline-none focus:border- focus:ring-2 focus:ring-/20 transition-all" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-gray-100">
+                  <div class="p-2 rounded-lg bg-/10 text-">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                      </path>
+                    </svg>
+                  </div>
+                  <h3 class="text-base font-bold text-">Segurança</h3>
+                </div>
+
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Senha</label>
+                    <input type="password" id="input-senha" required placeholder="••••••••"
+                      class="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm placeholder:text-gray-400 focus:bg-white focus:outline-none focus:border- focus:ring-2 focus:ring-/20 transition-all" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1.5">Confirmar senha</label>
+                    <input type="password" id="input-confirma-senha" required placeholder="••••••••"
+                      class="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm placeholder:text-gray-400 focus:bg-white focus:outline-none focus:border- focus:ring-2 focus:ring-/20 transition-all" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="flex items-center justify-end gap-3 pt-2 pb-6">
+              <button type="button" id="btn-cancelar"
+                class="px-6 py-2.5 rounded-xl text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-100 transition-all">
+                Cancelar
+              </button>
+              <button type="submit"
+                class="px-7 py-2.5 rounded-xl text-sm font-semibold bg- text-white hover:bg- transition-all shadow-sm active:scale-[0.98]">
+                Criar Conta
+              </button>
+            </div>
+
+          </form>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default CadastroFuncionario;
+
+
+/*
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('form-cadastro');
+      const inputFoto = document.getElementById('input-foto');
+      const photoPreview = document.getElementById('photo-preview');
+      const uploadPlaceholder = document.getElementById('upload-placeholder');
+      const btnCancelar = document.getElementById('btn-cancelar');
+      const radioNivel = document.querySelectorAll('input[name="nivel_acesso"]');
+      const cardAdmin = document.getElementById('card-admin');
+      const cardFunc = document.getElementById('card-func');
+
+      // Máscara CPF
+      const inputCPF = document.getElementById('input-cpf');
+      if (inputCPF) {
+        inputCPF.addEventListener('input', (e) => {
+          let v = e.target.value.replace(/\D/g, '');
+          if (v.length > 11) v = v.slice(0, 11);
+          v = v.replace(/(\d{3})(\d)/, '$1.$2');
+          v = v.replace(/(\d{3})(\d)/, '$1.$2');
+          v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+          e.target.value = v;
+        });
+      }
+
+      // Máscara Telefone
+      const inputTel = document.getElementById('input-telefone');
+      if (inputTel) {
+        inputTel.addEventListener('input', (e) => {
+          let v = e.target.value.replace(/\D/g, '');
+          if (v.length > 11) v = v.slice(0, 11);
+          v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
+          v = v.replace(/(\d{5})(\d)/, '$1-$2');
+          e.target.value = v;
+        });
+      }
+
+      // Upload de foto
+      inputFoto.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            photoPreview.src = event.target.result;
+            photoPreview.classList.remove('hidden');
+            uploadPlaceholder.classList.add('hidden');
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Cartões de nível de acesso
+      radioNivel.forEach((radio) => {
+        radio.addEventListener('change', (e) => {
+          if (e.target.value === 'administrador') {
+            cardAdmin.className = 'relative flex items-start p-4 rounded-xl border-2 border- bg- cursor-pointer transition-all';
+            cardFunc.className = 'relative flex items-start p-4 rounded-xl border border-gray-200 bg-white hover:border-/50 cursor-pointer transition-all';
+          } else {
+            cardFunc.className = 'relative flex items-start p-4 rounded-xl border-2 border- bg- cursor-pointer transition-all';
+            cardAdmin.className = 'relative flex items-start p-4 rounded-xl border border-gray-200 bg-white hover:border-/50 cursor-pointer transition-all';
+          }
+        });
+      });
+
+      // Validação e Gravação
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const senha = document.getElementById('input-senha').value;
+        const confirmaSenha = document.getElementById('input-confirma-senha').value;
+
+        if (senha !== confirmaSenha) {
+          alert('As senhas digitadas não coincidem. Verifique e tente novamente.');
+          return;
+        }
+
+        const nome = document.getElementById('input-nome').value;
+        const nivelSelecionado = document.querySelector('input[name="nivel_acesso"]:checked').value;
+
+        const novoFunc = {
+          id: Date.now(),
+          nome: nome,
+          cpf: document.getElementById('input-cpf').value,
+          email: document.getElementById('input-email').value,
+          cargo: nivelSelecionado === 'administrador' ? 'Administrador' : 'Funcionário',
+          status: 'Ativo',
+          foto: photoPreview.src && !photoPreview.classList.contains('hidden') ? photoPreview.src : null
+        };
+
+        const equipe = JSON.parse(localStorage.getItem('equipe_docegestao') || '[]');
+        equipe.push(novoFunc);
+        localStorage.setItem('equipe_docegestao', JSON.stringify(equipe));
+
+        alert(`Funcionário ${nome} cadastrado com sucesso!`);
+        window.location.href = 'gestao-equipes.html';
+      });
+
+      // Limpar
+      btnCancelar.addEventListener('click', () => {
+        form.reset();
+        photoPreview.src = '';
+        photoPreview.classList.add('hidden');
+        uploadPlaceholder.classList.remove('hidden');
+      });
+    });
+  </script>
+*/
+
+/*
+<script>lucide.createIcons()</script>
+*/
+
+/*
+<script src="../src/componentes/sidebar.js" defer></script>
+*/

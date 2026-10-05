@@ -10,7 +10,7 @@
   <!-- Ícones (sem precisar instalar nada via npm) -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  
+
   <link rel="stylesheet" href="../src/css/output.css">
 </head>
 
@@ -25,7 +25,7 @@
       <p class="text-sm text-stone-400">Estoque &gt; Matéria-prima</p>
 
       <div class="mt-1 flex items-center justify-between">
-        <h1 class="text-2xl font-semibold text-stone-800">Chocolate Belga 70% Cacau</h1>
+        <h1 id="detalhe-nome" class="text-2xl font-semibold text-stone-800">Chocolate Belga 70% Cacau</h1>
         <div class="flex gap-2">
           <button type="button"
             class="flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-600 hover:bg-stone-50">
@@ -43,9 +43,10 @@
         <section class="rounded-2xl border border-stone-200 bg-white p-6 lg:col-span-2">
           <div class="grid grid-cols-1 gap-6 sm:grid-cols-[220px_1fr]">
             <div class="relative overflow-hidden rounded-xl">
-              <img src="https://images.unsplash.com/photo-1548907040-4baa419e6b62?q=80&w=800&auto=format&fit=crop"
-                alt="Chocolate Belga 70% Cacau" class="h-full min-h-180px w-full object-cover" />
-              <span
+              <img id="detalhe-imagem"
+                src="http://assets.sistemawbuy.com.br/arquivos/6bfdf09f819f98e498029f0aacbf5f44/produtos/646c2225849d3/f82c9dbf6629caff589bb7996bc041a6-646c22270c3f7.jpg"
+                alt="Chocolate Belga 70% Cacau" class="h-full min-h-[180px] w-full object-cover" />
+              <span id="detalhe-badge"
                 class="absolute left-3 top-3 rounded-full bg-emerald-500 px-2.5 py-1 text-xs font-semibold text-white">EM
                 ESTOQUE</span>
             </div>
@@ -53,23 +54,23 @@
             <div class="grid grid-cols-2 gap-y-4 text-sm">
               <div>
                 <p class="text-stone-400">SKU</p>
-                <p class="font-medium text-stone-800">MAT-CHOC-70</p>
+                <p id="detalhe-sku" class="font-medium text-stone-800">MAT-CHOC-70</p>
               </div>
               <div>
                 <p class="text-stone-400">Categoria</p>
-                <p class="font-medium text-stone-800">Chocolates</p>
+                <p id="detalhe-categoria" class="font-medium text-stone-800">Chocolates</p>
               </div>
               <div>
                 <p class="text-stone-400">Fornecedor</p>
-                <p class="font-medium text-stone-800">Cacau Barry</p>
+                <p id="detalhe-fornecedor" class="font-medium text-stone-800">Cacau Barry</p>
               </div>
               <div>
                 <p class="text-stone-400">Preço de Custo</p>
-                <p class="font-medium text-amber-800">R$ 85,00/kg</p>
+                <p id="detalhe-preco" class="font-medium text-amber-800">R$ 85,00/kg</p>
               </div>
               <div class="col-span-2">
                 <p class="text-stone-400">Descrição</p>
-                <p class="mt-1 leading-relaxed text-stone-600">
+                <p id="detalhe-descricao" class="mt-1 leading-relaxed text-stone-600">
                   Chocolate amargo premium com 70% de teor de cacau, ideal para ganaches,
                   mousses e finalizações sofisticadas. Sabor intenso e textura fluida.
                 </p>
@@ -80,11 +81,11 @@
           <div class="mt-6 rounded-xl bg-stone-50 p-4">
             <div class="flex items-baseline justify-between">
               <p class="text-sm text-stone-400">Nível de Estoque</p>
-              <p class="text-sm text-stone-400">Meta: 100 kg</p>
+              <p id="detalhe-meta" class="text-sm text-stone-400">Meta: 100 kg</p>
             </div>
-            <p class="mt-1 text-2xl font-semibold text-stone-800">45 kg</p>
+            <p id="detalhe-estoque-atual" class="mt-1 text-2xl font-semibold text-stone-800">45 kg</p>
             <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-stone-200">
-              <div class="h-full rounded-full bg-amber-800" style="width: 45%"></div>
+              <div id="detalhe-barra" class="h-full rounded-full bg-amber-800" style="width: 45%"></div>
             </div>
           </div>
         </section>
@@ -96,7 +97,7 @@
             <i data-lucide="bar-chart-3" class="h-4 w-4 text-stone-300"></i>
           </div>
 
-          <div class="mt-6 flex h-32 items-end gap-2">
+          <div id="detalhe-giro" class="mt-6 flex h-32 items-end gap-2">
             <div class="flex-1 rounded-t-md bg-stone-100" style="height: 30%"></div>
             <div class="flex-1 rounded-t-md bg-stone-100" style="height: 45%"></div>
             <div class="flex-1 rounded-t-md bg-stone-100" style="height: 55%"></div>
@@ -108,7 +109,7 @@
 
           <div class="mt-6 rounded-xl bg-amber-50 p-4">
             <p class="text-xs font-medium text-stone-500">VELOCIDADE DE VENDA</p>
-            <p class="mt-1 flex items-center gap-1 text-xl font-semibold text-emerald-600">
+            <p id="detalhe-velocidade" class="mt-1 flex items-center gap-1 text-xl font-semibold text-emerald-600">
               +15% <i data-lucide="trending-up" class="h-4 w-4"></i>
             </p>
           </div>
@@ -137,7 +138,7 @@
                 <th class="pb-3 font-medium">Motivo</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="detalhe-movimentacoes">
               <tr class="border-b border-stone-50">
                 <td class="py-3 text-stone-600">22 Mai 2024</td>
                 <td class="py-3"><span
@@ -182,6 +183,205 @@
   </div>
   <script>lucide.createIcons()</script>
   <script src="../src/componentes/sidebar.js" defer></script>
+
+  <!-- ==================== DADOS + LÓGICA DE CARREGAMENTO DINÂMICO ==================== -->
+  <script>
+    // Base de dados das matérias-primas. As chaves batem com o data-id gerado
+    // em estoqueInsumo.html (slug do nome). Quando integrar com backend/API,
+    // basta trocar este objeto por uma chamada fetch() e popular do mesmo jeito.
+    const dadosInsumos = {
+      'acucar-refinado': {
+        nome: 'Açúcar Refinado',
+        sku: 'MAT-ACU-01',
+        categoria: 'Açúcares',
+        fornecedor: 'União',
+        precoCusto: 'R$ 4,20/kg',
+        descricao: 'Açúcar refinado tradicional, usado como base para caldas, coberturas, merengues e massas doces em geral.',
+        imagem: 'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQGGT6WRzr9Asc6EIosGJb07vaoh_qzpEQtZ4UauCL0sJ15juelSEzcLigFtJFWsYv8zK1jqjvAWZeIWEsRcvQTqwSaILKIHT97dDqfQFQfFZXuHEhX81MZK-G0X3lNEZn0S82pCg&usqp=CAc',
+        estoqueAtual: 45,
+        estoqueMeta: 50,
+        unidade: 'kg',
+        giro: [40, 55, 45, 60, 50, 70, 100],
+        velocidade: '+12%',
+        movimentacoes: [
+          { data: '24 Mai 2024', tipo: 'ENTRADA', qtd: '+25 kg', responsavel: 'Marcos Silva', motivo: 'Reposição de estoque (NF #901)' },
+          { data: '22 Mai 2024', tipo: 'SAÍDA', qtd: '-8 kg', responsavel: 'Ana Oliveira', motivo: 'Produção: Lote Bolos de Aniversário' },
+        ],
+      },
+      'farinha-de-trigo': {
+        nome: 'Farinha de Trigo',
+        sku: 'MAT-FAR-01',
+        categoria: 'Farinhas',
+        fornecedor: 'Dona Benta',
+        precoCusto: 'R$ 5,10/kg',
+        descricao: 'Farinha de trigo tradicional para massas, bolos e receitas de confeitaria em geral.',
+        imagem: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdrynqi_fgBBzTeXRKlMYmVqJ48zt1K2OjGX5ef5P5Ig&s=10',
+        estoqueAtual: 8,
+        estoqueMeta: 40,
+        unidade: 'kg',
+        giro: [70, 65, 80, 60, 90, 75, 100],
+        velocidade: '+22%',
+        movimentacoes: [
+          { data: '23 Mai 2024', tipo: 'SAÍDA', qtd: '-12 kg', responsavel: 'Ana Oliveira', motivo: 'Produção: Lote Pães Doces' },
+          { data: '19 Mai 2024', tipo: 'ENTRADA', qtd: '+20 kg', responsavel: 'Marcos Silva', motivo: 'Compra Programada' },
+        ],
+      },
+      'manteiga-com-sal': {
+        nome: 'Manteiga com Sal',
+        sku: 'MAT-MAN-01',
+        categoria: 'Laticínios',
+        fornecedor: 'Itambé',
+        precoCusto: 'R$ 21,90/500g',
+        descricao: 'Manteiga com sal de primeira qualidade, ideal para massas amanteigadas, recheios e finalizações.',
+        imagem: 'https://www.extramercado.com.br/img/uploads/1/901/33320901.png',
+        estoqueAtual: 15,
+        estoqueMeta: 25,
+        unidade: 'un',
+        giro: [35, 40, 50, 45, 55, 48, 100],
+        velocidade: '+9%',
+        movimentacoes: [
+          { data: '21 Mai 2024', tipo: 'SAÍDA', qtd: '-4 un', responsavel: 'Ana Oliveira', motivo: 'Produção: Lote Croissants' },
+          { data: '17 Mai 2024', tipo: 'ENTRADA', qtd: '+10 un', responsavel: 'Marcos Silva', motivo: 'Reposição de estoque (NF #874)' },
+        ],
+      },
+      'chocolate-em-po-100': {
+        nome: 'Chocolate em Pó 100%',
+        sku: 'MAT-CHP-01',
+        categoria: 'Chocolates',
+        fornecedor: 'Sicao',
+        precoCusto: 'R$ 28,50/500g',
+        descricao: 'Chocolate em pó 100% cacau, indicado para brigadeiros, bolos e coberturas de sabor intenso.',
+        imagem: 'https://cdn.awsli.com.br/618/618763/produto/3043115985a0a78a02.jpg',
+        estoqueAtual: 4,
+        estoqueMeta: 20,
+        unidade: 'un',
+        giro: [50, 60, 55, 70, 65, 80, 100],
+        velocidade: '+18%',
+        movimentacoes: [
+          { data: '25 Mai 2024', tipo: 'SAÍDA', qtd: '-6 un', responsavel: 'Ana Oliveira', motivo: 'Produção: Lote Brigadeiros Gourmet' },
+          { data: '16 Mai 2024', tipo: 'ENTRADA', qtd: '+8 un', responsavel: 'Marcos Silva', motivo: 'Compra Programada' },
+        ],
+      },
+      'essencia-de-baunilha': {
+        nome: 'Essência de Baunilha',
+        sku: 'MAT-ESS-01',
+        categoria: 'Essências',
+        fornecedor: 'Dr. Oetker',
+        precoCusto: 'R$ 4,90/30ml',
+        descricao: 'Essência de baunilha para aromatizar massas, cremes e coberturas.',
+        imagem: 'https://m.media-amazon.com/images/I/61QVpUvpL1L._AC_UF894,1000_QL80_.jpg',
+        estoqueAtual: 12,
+        estoqueMeta: 20,
+        unidade: 'un',
+        giro: [30, 35, 40, 38, 45, 42, 100],
+        velocidade: '+6%',
+        movimentacoes: [
+          { data: '20 Mai 2024', tipo: 'SAÍDA', qtd: '-3 un', responsavel: 'Ana Oliveira', motivo: 'Produção: Lote Cupcakes' },
+          { data: '14 Mai 2024', tipo: 'ENTRADA', qtd: '+5 un', responsavel: 'Marcos Silva', motivo: 'Reposição de estoque (NF #860)' },
+        ],
+      },
+      'chocolate-belga-70-cacau': {
+        nome: 'Chocolate Belga 70% Cacau',
+        sku: 'MAT-CHOC-70',
+        categoria: 'Chocolates',
+        fornecedor: 'Cacau Barry',
+        precoCusto: 'R$ 85,00/kg',
+        descricao: 'Chocolate amargo premium com 70% de teor de cacau, ideal para ganaches, mousses e finalizações sofisticadas. Sabor intenso e textura fluida.',
+        imagem: 'http://assets.sistemawbuy.com.br/arquivos/6bfdf09f819f98e498029f0aacbf5f44/produtos/646c2225849d3/f82c9dbf6629caff589bb7996bc041a6-646c22270c3f7.jpg',
+        estoqueAtual: 45,
+        estoqueMeta: 100,
+        unidade: 'kg',
+        giro: [30, 45, 55, 40, 65, 50, 100],
+        velocidade: '+15%',
+        movimentacoes: [
+          { data: '22 Mai 2024', tipo: 'ENTRADA', qtd: '+20 kg', responsavel: 'Marcos Silva', motivo: 'Reposição de estoque (NF #882)' },
+          { data: '21 Mai 2024', tipo: 'SAÍDA', qtd: '-5,5 kg', responsavel: 'Ana Oliveira', motivo: 'Produção: Lote Ovos Gourmet' },
+          { data: '20 Mai 2024', tipo: 'SAÍDA', qtd: '-2,0 kg', responsavel: 'Ana Oliveira', motivo: 'Degustação e Teste de Receita' },
+          { data: '18 Mai 2024', tipo: 'ENTRADA', qtd: '+50 kg', responsavel: 'Marcos Silva', motivo: 'Compra Programada' },
+        ],
+      },
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+
+      // Se o id não vier na URL ou não existir na base, cai no Chocolate Belga
+      // (mesmo conteúdo que já estava fixo no HTML) para a página nunca ficar vazia.
+      const item = dadosInsumos[id] || dadosInsumos['chocolate-belga-70-cacau'];
+
+      const porcentagem = Math.min(100, Math.round((item.estoqueAtual / item.estoqueMeta) * 100));
+      const estoqueBaixo = porcentagem <= 25;
+
+      document.title = `DoceGestão | ${item.nome}`;
+      document.getElementById('detalhe-nome').textContent = item.nome;
+      document.getElementById('detalhe-sku').textContent = item.sku;
+      document.getElementById('detalhe-categoria').textContent = item.categoria;
+      document.getElementById('detalhe-fornecedor').textContent = item.fornecedor;
+      document.getElementById('detalhe-preco').textContent = item.precoCusto;
+      document.getElementById('detalhe-descricao').textContent = item.descricao;
+
+      const img = document.getElementById('detalhe-imagem');
+      img.src = item.imagem;
+      img.alt = item.nome;
+      img.onerror = () => { img.src = 'https://cdn-icons-png.flaticon.com/512/3081/3081986.png'; };
+
+      const badge = document.getElementById('detalhe-badge');
+      badge.textContent = estoqueBaixo ? 'ESTOQUE BAIXO' : 'EM ESTOQUE';
+      badge.classList.remove('bg-emerald-500', 'bg-rose-500');
+      badge.classList.add(estoqueBaixo ? 'bg-rose-500' : 'bg-emerald-500');
+
+      document.getElementById('detalhe-meta').textContent = `Meta: ${item.estoqueMeta} ${item.unidade}`;
+      document.getElementById('detalhe-estoque-atual').textContent = `${item.estoqueAtual} ${item.unidade}`;
+
+      const barra = document.getElementById('detalhe-barra');
+      barra.style.width = `${porcentagem}%`;
+      barra.classList.remove('bg-amber-800', 'bg-rose-500');
+      barra.classList.add(estoqueBaixo ? 'bg-rose-500' : 'bg-amber-800');
+
+      // Giro de vendas: recria as 7 barrinhas com base no array `giro`
+      const giroContainer = document.getElementById('detalhe-giro');
+      giroContainer.innerHTML = '';
+      item.giro.forEach((altura, i) => {
+        const barra = document.createElement('div');
+        const ultima = i === item.giro.length - 1;
+        barra.className = `flex-1 rounded-t-md ${ultima ? 'bg-amber-800' : 'bg-stone-100'}`;
+        barra.style.height = `${altura}%`;
+        giroContainer.appendChild(barra);
+      });
+
+      const velocidadeEl = document.getElementById('detalhe-velocidade');
+      const positiva = !item.velocidade.trim().startsWith('-');
+      velocidadeEl.classList.remove('text-emerald-600', 'text-rose-600');
+      velocidadeEl.classList.add(positiva ? 'text-emerald-600' : 'text-rose-600');
+      velocidadeEl.innerHTML = `${item.velocidade} <i data-lucide="${positiva ? 'trending-up' : 'trending-down'}" class="h-4 w-4"></i>`;
+
+      // Últimas movimentações
+      const tbody = document.getElementById('detalhe-movimentacoes');
+      tbody.innerHTML = '';
+      if (!item.movimentacoes || item.movimentacoes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-stone-400">Nenhuma movimentação registrada ainda.</td></tr>`;
+      } else {
+        item.movimentacoes.forEach((mov, i) => {
+          const entrada = mov.tipo === 'ENTRADA';
+          const isUltima = i === item.movimentacoes.length - 1;
+          const tr = document.createElement('tr');
+          tr.className = isUltima ? '' : 'border-b border-stone-50';
+          tr.innerHTML = `
+            <td class="py-3 text-stone-600">${mov.data}</td>
+            <td class="py-3"><span class="inline-flex rounded-full ${entrada ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-600'} px-2.5 py-1 text-xs font-semibold">${mov.tipo}</span></td>
+            <td class="py-3 font-medium ${entrada ? 'text-emerald-600' : 'text-rose-600'}">${mov.qtd}</td>
+            <td class="py-3 text-stone-600">${mov.responsavel}</td>
+            <td class="py-3 text-stone-500">${mov.motivo}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Recria os ícones lucide para os elementos trocados dinamicamente (ex: trending-up/down)
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
 </body>
 
 </html>

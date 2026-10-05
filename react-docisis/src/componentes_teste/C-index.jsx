@@ -1,0 +1,203 @@
+function Index() {
+  return (
+    <div className="index" class="bg-cream min-h-screen flex items-center justify-center p-4">
+      <div
+        class="w-full max-w-4xl bg-white rounded-2xl shadow-xl shadow-cocoa-800/5 overflow-hidden flex flex-col md:flex-row">
+
+
+        <div class="relative md:w-[45%] min-h-220px md:min-h-560px bg-cocoa-800 flex items-end p-8"
+          style="background-image: linear-gradient(180deg, rgba(74,46,26,0.25) 0%, rgba(74,46,26,0.85) 100%), url('https://images.unsplash.com/photo-1558326567-98ae2405596b?q=80&w=800&auto=format&fit=crop'); background-size: cover; background-position: center;">
+          <div class="relative z-10 text-cream">
+            <p class="font-display italic text-xl md:text-2xl leading-snug">
+              A doçura de uma<br />gestão eficiente.
+            </p>
+            <p class="mt-3 text-sm text-cream/70">
+              Estoque, pedidos e fornecedores da sua doceria, tudo em um só lugar.
+            </p>
+          </div>
+        </div>
+
+
+        <div class="md:w-[55%] px-8 py-10 md:px-12 md:py-14 flex flex-col justify-center">
+
+          <div class="mb-8">
+            <h1 class="font-display text-3xl text-cocoa-700">DoceGestão</h1>
+            <span class="inline-block mt-2 text-xs font-medium text-rose-500 bg-rose-100 px-2.5 py-1 rounded-full">
+              Painel do administrador
+            </span>
+          </div>
+
+          <h2 class="text-lg font-semibold text-cocoa-800 mb-1">Bem-vindo de volta</h2>
+          <p class="text-sm text-cocoa-400 mb-8">Entre com sua conta para continuar.</p>
+
+          <form class="space-y-5" onSubmit="window.location.href = 'splash.html'; return false;">
+            <div>
+              <label htmlFor="email" class="block text-sm font-medium text-cocoa-700 mb-1.5">E-mail</label>
+              <input type="email" id="email" required placeholder="seu@docegestao.com"
+                class="w-full rounded-lg border border-cocoa-200 bg-cream/40 px-4 py-2.5 text-sm text-cocoa-800 placeholder:text-cocoa-400/70 focus:outline-none focus:ring-2 focus:ring-cocoa-400 focus:border-transparent" />
+            </div>
+
+            <div>
+              <label htmlFor="senha" class="block text-sm font-medium text-cocoa-700 mb-1.5">Senha</label>
+              <div class="relative">
+                <input type="password" id="senha" required placeholder="••••••••"
+                  class="w-full rounded-lg border border-cocoa-200 bg-cream/40 px-4 py-2.5 text-sm text-cocoa-800 placeholder:text-cocoa-400/70 focus:outline-none focus:ring-2 focus:ring-cocoa-400 focus:border-transparent" />
+
+                <button type="button"
+                  onClick="const i=document.getElementById('senha'); i.type = i.type==='password' ? 'text' : 'password';"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-cocoa-400 hover:text-cocoa-600 text-xs cursor-pointer">
+                  mostrar
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+              <label class="flex items-center gap-2 text-cocoa-600 cursor-pointer">
+                <input type="checkbox" class="rounded border-cocoa-200 text-cocoa-700 focus:ring-cocoa-400" />
+                Lembrar de mim
+              </label>
+
+              <button type="button" id="btn-abrir-esqueci"
+                class="text-cocoa-600 hover:text-cocoa-800 font-medium transition-colors cursor-pointer">
+                Esqueceu a senha?
+              </button>
+            </div>
+
+            <button type="submit"
+              class="w-full bg-cocoa-700 hover:bg-cocoa-800 transition-colors text-white text-sm font-medium py-3 rounded-lg shadow-sm cursor-pointer">
+              Entrar
+            </button>
+          </form>
+
+          <footer class="mt-8 pt-6 border-t border-cocoa-200/60 text-center">
+            <p class="text-sm text-cocoa-400">
+              Não tem uma conta?
+              <a href="#" class="text-cocoa-700 font-medium hover:underline">Fale com o administrador</a>
+            </p>
+          </footer>
+        </div>
+      </div>
+
+
+      <div id="modal-esqueci" class="modal-overlay">
+
+        <div class="modal-card">
+
+
+          <div class="modal-header">
+            <div>
+              <h3 class="modal-title">Redefinir Senha</h3>
+              <p class="modal-subtitle">Digite seu e-mail e a nova senha desejada</p>
+            </div>
+            <button type="button" id="btn-fechar-esqueci" class="modal-close-btn">&times;</button>
+          </div>
+
+
+          <div id="mensagem-erro" class="alert-msg alert-msg-error"></div>
+          <div id="mensagem-sucesso" class="alert-msg alert-msg-success"></div>
+
+
+          <form id="form-recuperacao">
+            <div class="modal-group">
+              <label htmlFor="email-recuperacao" class="modal-label">E-mail cadastrado</label>
+              <input type="email" id="email-recuperacao" required placeholder="seu@docegestao.com" class="modal-input" />
+            </div>
+
+            <div class="modal-group">
+              <label htmlFor="nova-senha" class="modal-label">Nova senha</label>
+              <input type="password" id="nova-senha" required placeholder="••••••••" class="modal-input" />
+            </div>
+
+            <div class="modal-group">
+              <label htmlFor="confirmar-senha" class="modal-label">Confirmar nova senha</label>
+              <input type="password" id="confirmar-senha" required placeholder="••••••••" class="modal-input" />
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" id="btn-cancelar-esqueci" class="btn-modal-cancel">
+                Cancelar
+              </button>
+              <button type="submit" id="btn-enviar-esqueci" class="btn-modal-submit">
+                Salvar senha
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Index;
+
+
+/*
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById('modal-esqueci');
+      const btnAbrir = document.getElementById('btn-abrir-esqueci');
+      const btnFechar = document.getElementById('btn-fechar-esqueci');
+      const btnCancelar = document.getElementById('btn-cancelar-esqueci');
+      const formRecuperacao = document.getElementById('form-recuperacao');
+      const msgErro = document.getElementById('mensagem-erro');
+      const msgSucesso = document.getElementById('mensagem-sucesso');
+      const btnEnviar = document.getElementById('btn-enviar-esqueci');
+
+      function abrirModal() {
+        modal.style.display = 'flex';
+        msgErro.style.display = 'none';
+        msgSucesso.style.display = 'none';
+        formRecuperacao.reset();
+        btnEnviar.disabled = false;
+        btnEnviar.style.opacity = '1';
+      }
+
+      function fecharModal() {
+        modal.style.display = 'none';
+      }
+
+      btnAbrir.addEventListener('click', abrirModal);
+      btnFechar.addEventListener('click', fecharModal);
+      btnCancelar.addEventListener('click', fecharModal);
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) fecharModal();
+      });
+
+      formRecuperacao.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const novaSenha = document.getElementById('nova-senha').value;
+        const confirmarSenha = document.getElementById('confirmar-senha').value;
+
+        msgErro.style.display = 'none';
+        msgSucesso.style.display = 'none';
+
+        if (novaSenha !== confirmarSenha) {
+          msgErro.innerText = 'As senhas não coincidem. Digite novamente.';
+          msgErro.style.display = 'block';
+          return;
+        }
+
+        if (novaSenha.length < 6) {
+          msgErro.innerText = 'A senha precisa ter pelo menos 6 caracteres.';
+          msgErro.style.display = 'block';
+          return;
+        }
+
+        btnEnviar.disabled = true;
+        btnEnviar.style.opacity = '0.6';
+
+        setTimeout(() => {
+          msgSucesso.innerText = '✓ Senha alterada com sucesso!';
+          msgSucesso.style.display = 'block';
+
+          setTimeout(() => {
+            fecharModal();
+          }, 1800);
+        }, 400);
+      });
+    });
+  </script>
+*/
