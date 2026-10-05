@@ -1,5 +1,5 @@
 // < !--sidebar.html -->
-function sidebar() {
+function Sidebar() {
   return (
     <aside
       class="w-64 h-screen flex flex-col justify-between shrink-0 bg-[#f5f2eb] border-r border-black/5 sticky top-0 font-sans">
@@ -113,7 +113,7 @@ function sidebar() {
   )
 }
 
-
+export default Sidebar
 // // Obs: estilizacao não aparece sem ter uma pagina para aparecer
 // const SIDEBAR_HTML = `
 //   <aside
