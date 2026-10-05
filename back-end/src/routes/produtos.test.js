@@ -15,7 +15,7 @@ describe("Módulo de Produtos", () => {
   let tokenAdmin;
 
   beforeAll(async () => {
-    // 1. Pré-condição: Token do gestor autenticado
+    // 1. Pré-condição: Token do gestor/responsável por estoque autenticado
     tokenAdmin = jwt.sign(
       { id_funcionario: 1, email: "admin@docisis.com", id_cargos: 1 },
       process.env.JWT_SECRET,
@@ -32,5 +32,32 @@ describe("Módulo de Produtos", () => {
     console.log("Corpo TC-PROD-01:", response.body);
 
     expect(response.status).toBe(200);
+  });
+
+  test("TC-PROD-02 — Registrar Novo produto no sistema", async () => {
+    const novoProduto = {
+      marca: "nestle",
+      nome_fornecedor: "distribuidoras de doces ltda",
+      nomeFornecedor: "distribuidoras de doces ltda",
+      fornecedor: "distribuidoras de doces ltda",
+      lote: "12026-10b",
+      tipo: "chocolate em pó 70%",
+      nome: "chocolate em pó 70%",
+      validade: "2027-04-04",
+      id_fornecedor: 1,
+      quantidade: 20,
+      quantidade_minima: 5
+    };
+
+    const response = await request(app)
+      .post("/produtos")
+      .set("Authorization", `Bearer ${tokenAdmin}`)
+      .send(novoProduto);
+
+    console.log("Status TC-PROD-02:", response.status);
+    console.log("Corpo TC-PROD-02:", response.body);
+
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty("sucesso", true);
   });
 });
