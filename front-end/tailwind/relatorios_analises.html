@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Confeitaria Doce Arte - Relatórios e Analytics</title>
 
   <!-- Tailwind CSS CDN -->
@@ -14,30 +14,30 @@
         extend: {
           colors: {
             brand: {
-              bg: '#F5F3EE',
-              text: '#3D2E24',
-              brown: '#684627',
-              brownHover: '#54381F',
-              pink: '#F0B8CB',
-              pinkDark: '#783A4C',
-              cardBg: '#FFFFFF',
-              softBeige: '#F6F2EC',
-              border: '#EAE6DF',
-              borderDark: '#D5CFC5'
-            }
+              bg: "#F5F3EE",
+              text: "#3D2E24",
+              brown: "#684627",
+              brownHover: "#54381F",
+              pink: "#F0B8CB",
+              pinkDark: "#783A4C",
+              cardBg: "#FFFFFF",
+              softBeige: "#F6F2EC",
+              border: "#EAE6DF",
+              borderDark: "#D5CFC5",
+            },
           },
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          }
-        }
-      }
-    }
+            sans: ["Inter", "sans-serif"],
+          },
+        },
+      },
+    };
   </script>
 
   <!-- Google Fonts Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <!-- Ícones Lucide -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -46,111 +46,26 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <style>
-    body {
-      background-color: #F5F3EE;
-      color: #3D2E24;
-      font-family: 'Inter', sans-serif;
-    }
+  <link rel="stylesheet" href="../src/css/output.css">
+  <link rel="stylesheet" href="../src/css paginas/relatorio_analises.css">
 
-    /* Animação suave para Modais e Toasts */
-    .modal-backdrop {
-      background-color: rgba(61, 46, 36, 0.45);
-      backdrop-filter: blur(4px);
-    }
-
-    .modal-enter {
-      animation: modalFadeIn 0.25s ease-out forwards;
-    }
-
-    @keyframes modalFadeIn {
-      from {
-        opacity: 0;
-        transform: scale(0.96) translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    /* Scrollbar personalizada */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #F5F3EE;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #D5CFC5;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #684627;
-    }
-  </style>
 </head>
 
-<body class="bg-[#F5F3EE] text-[#3D2E24] font-sans antialiased min-h-screen flex flex-col md:flex-row">
-
-  <!-- SIDEBAR (MENU LATERAL) -->
-  <aside id="sidebar-container" class="w-full md:w-64 bg-white border-r border-[#EAE6DF] shrink-0 flex flex-col justify-between p-5 md:min-h-screen">
-    <div>
-      <!-- LOGO -->
-      <div class="flex items-center gap-3 px-2 py-3 mb-6 border-b border-[#F6F2EC]">
-        <div class="w-10 h-10 rounded-xl bg-[#684627] text-white flex items-center justify-center font-bold text-lg shadow-sm">
-          🧁
-        </div>
-        <div>
-          <h1 class="font-bold text-[#684627] leading-tight text-base">Doce Arte</h1>
-          <p class="text-[11px] text-[#8C7A6B]">Gestão de Confeitaria</p>
-        </div>
-      </div>
-
-      <!-- NAV LINKS -->
-      <nav class="space-y-1.5 text-xs font-semibold">
-        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 hover:bg-[#F6F2EC] transition">
-          <i data-lucide="layout-dashboard" class="w-4 h-4 text-[#8C7A6B]"></i>
-          <span>Dashboard</span>
-        </a>
-        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 hover:bg-[#F6F2EC] transition">
-          <i data-lucide="package" class="w-4 h-4 text-[#8C7A6B]"></i>
-          <span>Produtos & Insumos</span>
-        </a>
-        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 hover:bg-[#F6F2EC] transition">
-          <i data-lucide="shopping-bag" class="w-4 h-4 text-[#8C7A6B]"></i>
-          <span>Encomendas</span>
-        </a>
-        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#684627] text-white shadow-sm transition">
-          <i data-lucide="bar-chart-3" class="w-4 h-4 text-[#F0B8CB]"></i>
-          <span>Relatórios & Analytics</span>
-        </a>
-        <a href="#" onclick="abrirModalConfiguracoes(event)" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 hover:bg-[#F6F2EC] transition">
-          <i data-lucide="settings" class="w-4 h-4 text-[#8C7A6B]"></i>
-          <span>Configurações</span>
-        </a>
-      </nav>
-    </div>
-
-    <!-- CARD SUPORTE SIDEBAR -->
-    <div class="hidden md:block mt-6 p-4 rounded-2xl bg-[#F6F2EC] border border-[#EAE6DF] text-center">
-      <div class="w-8 h-8 rounded-full bg-[#F0B8CB] text-[#783A4C] flex items-center justify-center mx-auto mb-2 text-xs font-bold">
-        ?
-      </div>
-      <p class="text-xs font-bold text-[#684627]">Precisa de ajuda?</p>
-      <p class="text-[11px] text-[#8C7A6B] mt-0.5">Acesse nosso guia de produção ou contate o suporte.</p>
-    </div>
-  </aside>
+<body class="bg-[#F5F3EE] text-[#3D2E24] font-sans antialiased min-h-screen flex">
+  <div id="sidebar-container" data-active="relatorios" class="w-64 shrink-0"></div>
 
   <!-- CONTEÚDO PRINCIPAL -->
   <main id="relatorio-conteudo" class="flex-1 p-4 sm:p-8 overflow-y-auto space-y-6">
-
     <!-- HEADER DO CONTEÚDO -->
-    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white md:bg-transparent p-4 md:p-0 rounded-2xl border md:border-none border-[#EAE6DF]">
+    <header
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white md:bg-transparent p-4 md:p-0 rounded-2xl border md:border-none border-[#EAE6DF]">
       <div>
-        <h2 class="text-2xl font-bold text-[#684627]">Relatórios e Analytics</h2>
-        <p class="text-sm text-[#8C7A6B]">Visão detalhada do seu desempenho e estoque</p>
+        <h2 class="text-2xl font-bold text-[#684627]">
+          Relatórios e Analytics
+        </h2>
+        <p class="text-sm text-[#8C7A6B]">
+          Visão detalhada do seu desempenho e estoque
+        </p>
       </div>
 
       <div class="flex items-center gap-3">
@@ -170,18 +85,23 @@
 
         <!-- CONTAINER DO PERFIL + DROPDOWN -->
         <div class="relative inline-block">
-          <button id="btn-perfil" type="button" title="Menu do Usuário" aria-expanded="false"
+          <button id="btn-perfil" data-profile-trigger type="button" title="Menu do Usuário" aria-expanded="false"
             class="w-10 h-10 rounded-full bg-[#EBE7DF] border border-[#D5CFC5] hover:bg-[#E0DAD0] flex items-center justify-center text-[#684627] shadow-sm shrink-0 transition focus:outline-none focus:ring-2 focus:ring-[#684627] cursor-pointer overflow-hidden">
-            <img id="avatar-header" src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=150&auto=format&fit=crop&q=80" 
-                 alt="Foto do Confeiteiro" class="w-full h-full object-cover">
+            <img id="avatar-header"
+              src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=150&auto=format&fit=crop&q=80"
+              alt="Foto do Confeiteiro" class="w-full h-full object-cover" />
           </button>
 
           <!-- DROPDOWN DO PERFIL (Descolado da borda com posição ajustada) -->
           <div id="dropdown-perfil"
             class="hidden absolute right-0 sm:right-2 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-[#EAE6DF] py-2 z-50 transition-all duration-200">
             <div class="px-4 py-2.5 border-b border-gray-100 bg-[#F6F2EC]/50 rounded-t-2xl">
-              <p id="dropdown-nome-usuario" class="text-xs font-bold text-[#3D2E24] truncate">Ana Maria</p>
-              <p id="dropdown-email-usuario" class="text-[11px] text-[#8C7A6B] truncate">usuario@confeitaria.com</p>
+              <p id="dropdown-nome-usuario" class="text-xs font-bold text-[#3D2E24] truncate">
+                Ana Maria
+              </p>
+              <p id="dropdown-email-usuario" class="text-[11px] text-[#8C7A6B] truncate">
+                usuario@confeitaria.com
+              </p>
             </div>
 
             <!-- OPÇÕES DO MENU -->
@@ -219,7 +139,9 @@
           <span class="text-[10px] uppercase tracking-wider font-bold text-gray-400">MENSAL</span>
         </div>
         <div>
-          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Valor em Estoque</p>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            Valor em Estoque
+          </p>
           <h3 class="text-2xl font-bold text-[#2C1F16]">R$ 42.850,00</h3>
         </div>
         <p class="text-xs font-semibold text-emerald-600 flex items-center gap-1">
@@ -235,11 +157,14 @@
           <span class="text-[10px] uppercase tracking-wider font-bold text-gray-400">TOTAL</span>
         </div>
         <div>
-          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Itens Cadastrados</p>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            Itens Cadastrados
+          </p>
           <h3 class="text-2xl font-bold text-[#2C1F16]">1.284</h3>
         </div>
         <p class="text-xs text-gray-500 flex items-center gap-1 font-medium">
-          <span class="inline-block w-3.5 h-3.5 text-center leading-none border border-gray-400 rounded-full text-[9px]">i</span>
+          <span
+            class="inline-block w-3.5 h-3.5 text-center leading-none border border-gray-400 rounded-full text-[9px]">i</span>
           24 categorias ativas
         </p>
       </div>
@@ -252,7 +177,9 @@
           <span class="text-[10px] uppercase tracking-wider font-bold text-red-500">ALERTA</span>
         </div>
         <div>
-          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Baixo Estoque</p>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            Baixo Estoque
+          </p>
           <h3 class="text-2xl font-bold text-[#2C1F16]">15</h3>
         </div>
         <p class="text-xs font-semibold text-red-600 flex items-center gap-1">
@@ -268,11 +195,14 @@
           <span class="text-[10px] uppercase tracking-wider font-bold text-gray-400">7 DIAS</span>
         </div>
         <div>
-          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Vencendo em Breve</p>
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            Vencendo em Breve
+          </p>
           <h3 class="text-2xl font-bold text-[#2C1F16]">08</h3>
         </div>
         <p class="text-xs text-gray-500 flex items-center gap-1 font-medium">
-          <span class="inline-block w-3.5 h-3.5 text-center leading-none border border-gray-400 rounded-full text-[9px]">i</span>
+          <span
+            class="inline-block w-3.5 h-3.5 text-center leading-none border border-gray-400 rounded-full text-[9px]">i</span>
           Monitorar validade
         </p>
       </div>
@@ -280,17 +210,30 @@
 
     <!-- GRÁFICOS -->
     <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <div class="lg:col-span-4 bg-white p-6 rounded-2xl border border-[#EAE6DF] shadow-sm flex flex-col justify-between">
+      <div
+        class="lg:col-span-4 bg-white p-6 rounded-2xl border border-[#EAE6DF] shadow-sm flex flex-col justify-between">
         <div class="flex justify-between items-center">
-          <h3 class="font-bold text-gray-800 text-base leading-tight">Estoque por Categoria<br><span
-              class="text-xs text-gray-400 font-normal">(Semanal)</span></h3>
-          <button class="text-gray-400 hover:text-gray-600 font-bold p-1">⋮</button>
+          <h3 class="font-bold text-gray-800 text-base leading-tight">
+            Estoque por Categoria<br /><span class="text-xs text-gray-400 font-normal">(Semanal)</span>
+          </h3>
+          <button class="text-gray-400 hover:text-gray-600 font-bold p-1">
+            ⋮
+          </button>
         </div>
 
         <div class="my-6 flex justify-center items-center">
           <div
             class="w-44 h-44 rounded-full border-[18px] border-transparent relative flex items-center justify-center shadow-inner transition-transform hover:scale-105 duration-300"
-            style="background: conic-gradient(#CD9A67 0% 45%, #7A5877 45% 65%, #684627 65% 100%) padding-box, border-box;">
+            style="
+                background:
+                  conic-gradient(
+                      #cd9a67 0% 45%,
+                      #7a5877 45% 65%,
+                      #684627 65% 100%
+                    )
+                    padding-box,
+                  border-box;
+              ">
             <div class="w-28 h-28 bg-white rounded-full flex flex-col items-center justify-center shadow-sm">
               <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Semana</span>
               <span class="text-sm font-bold text-gray-800">Atual</span>
@@ -301,37 +244,47 @@
         <div class="space-y-2.5 text-xs font-semibold">
           <div class="flex items-center justify-between p-1.5 rounded-lg hover:bg-[#F6F2EC] transition">
             <span class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-[#684627] inline-block"></span> Chocolates
+              <span class="w-3 h-3 rounded-full bg-[#684627] inline-block"></span>
+              Chocolates
             </span>
             <span class="font-bold text-gray-800">35%</span>
           </div>
           <div class="flex items-center justify-between p-1.5 rounded-lg hover:bg-[#F6F2EC] transition">
             <span class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-[#CD9A67] inline-block"></span> Farinhas & Secos
+              <span class="w-3 h-3 rounded-full bg-[#CD9A67] inline-block"></span>
+              Farinhas & Secos
             </span>
             <span class="font-bold text-gray-800">45%</span>
           </div>
           <div class="flex items-center justify-between p-1.5 rounded-lg hover:bg-[#F6F2EC] transition">
             <span class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-[#7A5877] inline-block"></span> Laticínios
+              <span class="w-3 h-3 rounded-full bg-[#7A5877] inline-block"></span>
+              Laticínios
             </span>
             <span class="font-bold text-gray-800">20%</span>
           </div>
         </div>
       </div>
 
-      <div class="lg:col-span-8 bg-white p-6 rounded-2xl border border-[#EAE6DF] shadow-sm flex flex-col justify-between">
+      <div
+        class="lg:col-span-8 bg-white p-6 rounded-2xl border border-[#EAE6DF] shadow-sm flex flex-col justify-between">
         <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-4">
           <div>
-            <h3 class="font-bold text-gray-800 text-base">Fluxo Mensal: Entradas vs Saídas</h3>
-            <p class="text-xs text-gray-400">Comparativo dos últimos 6 meses</p>
+            <h3 class="font-bold text-gray-800 text-base">
+              Fluxo Mensal: Entradas vs Saídas
+            </h3>
+            <p class="text-xs text-gray-400">
+              Comparativo dos últimos 6 meses
+            </p>
           </div>
           <div class="flex items-center gap-4 text-xs font-semibold">
             <span class="flex items-center gap-1.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-[#684627]"></span> Entradas
+              <span class="w-2.5 h-2.5 rounded-full bg-[#684627]"></span>
+              Entradas
             </span>
             <span class="flex items-center gap-1.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-[#F0B8CB]"></span> Saídas
+              <span class="w-2.5 h-2.5 rounded-full bg-[#F0B8CB]"></span>
+              Saídas
             </span>
           </div>
         </div>
@@ -339,8 +292,10 @@
         <div class="h-60 flex items-end justify-between gap-3 pt-8 pb-3 border-b border-gray-100 px-4">
           <div class="flex-1 flex flex-col items-center h-full justify-end gap-2 group">
             <div class="w-full flex items-end justify-center gap-1.5 h-full">
-              <div class="w-1/2 bg-[#684627] rounded-t-sm h-[52%] group-hover:opacity-80 transition-all" title="Entradas JAN: R$ 12.500"></div>
-              <div class="w-1/2 bg-[#F0B8CB] rounded-t-sm h-[38%] group-hover:opacity-80 transition-all" title="Saídas JAN: R$ 8.200"></div>
+              <div class="w-1/2 bg-[#684627] rounded-t-sm h-[52%] group-hover:opacity-80 transition-all"
+                title="Entradas JAN: R$ 12.500"></div>
+              <div class="w-1/2 bg-[#F0B8CB] rounded-t-sm h-[38%] group-hover:opacity-80 transition-all"
+                title="Saídas JAN: R$ 8.200"></div>
             </div>
             <span class="text-[11px] text-gray-400 font-semibold uppercase">JAN</span>
           </div>
@@ -391,7 +346,9 @@
     <!-- TABELA DE PRODUTOS -->
     <section class="bg-white rounded-2xl border border-[#EAE6DF] shadow-sm overflow-hidden">
       <div class="p-5 flex justify-between items-center border-b border-gray-100">
-        <h3 class="font-bold text-gray-800 text-base">Produtos Mais Utilizados</h3>
+        <h3 class="font-bold text-gray-800 text-base">
+          Produtos Mais Utilizados
+        </h3>
         <a href="#" class="text-xs font-semibold text-[#684627] hover:underline">Ver lista completa</a>
       </div>
 
@@ -411,23 +368,27 @@
             <tr class="hover:bg-gray-50/50 transition">
               <td class="py-4 px-6 flex items-center gap-3 font-semibold text-gray-900">
                 <img src="https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=120&auto=format&fit=crop&q=80"
-                  alt="Chocolate Belga" class="w-10 h-10 rounded-lg object-cover border border-gray-100">
+                  alt="Chocolate Belga" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
                 Chocolate Belga 70%
               </td>
-              <td class="py-4 px-6 text-gray-500 font-medium">Matéria-prima</td>
+              <td class="py-4 px-6 text-gray-500 font-medium">
+                Matéria-prima
+              </td>
               <td class="py-4 px-6 font-medium">85 kg</td>
               <td class="py-4 px-6 font-medium">120 kg</td>
               <td class="py-4 px-6">
                 <span
                   class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full font-bold text-[10px] tracking-wide">ESTÁVEL</span>
               </td>
-              <td class="py-4 px-6 text-center text-emerald-600 font-bold text-base">↗</td>
+              <td class="py-4 px-6 text-center text-emerald-600 font-bold text-base">
+                ↗
+              </td>
             </tr>
 
             <tr class="hover:bg-gray-50/50 transition">
               <td class="py-4 px-6 flex items-center gap-3 font-semibold text-gray-900">
                 <img src="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=120&auto=format&fit=crop&q=80"
-                  alt="Creme de Leite" class="w-10 h-10 rounded-lg object-cover border border-gray-100">
+                  alt="Creme de Leite" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
                 Creme de Leite Fresco
               </td>
               <td class="py-4 px-6 text-gray-500 font-medium">Laticínios</td>
@@ -437,13 +398,15 @@
                 <span
                   class="px-3 py-1 bg-red-100 text-red-600 rounded-full font-bold text-[10px] tracking-wide">CRÍTICO</span>
               </td>
-              <td class="py-4 px-6 text-center text-red-500 font-bold text-base">↘</td>
+              <td class="py-4 px-6 text-center text-red-500 font-bold text-base">
+                ↘
+              </td>
             </tr>
 
             <tr class="hover:bg-gray-50/50 transition">
               <td class="py-4 px-6 flex items-center gap-3 font-semibold text-gray-900">
                 <img src="https://images.unsplash.com/photo-1587314168485-3236d6710814?w=120&auto=format&fit=crop&q=80"
-                  alt="Açúcar em pó" class="w-10 h-10 rounded-lg object-cover border border-gray-100">
+                  alt="Açúcar em pó" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
                 Açúcar de Confeiteiro
               </td>
               <td class="py-4 px-6 text-gray-500 font-medium">Secos</td>
@@ -453,7 +416,9 @@
                 <span
                   class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full font-bold text-[10px] tracking-wide">ESTÁVEL</span>
               </td>
-              <td class="py-4 px-6 text-center text-gray-400 font-bold text-base">➔</td>
+              <td class="py-4 px-6 text-center text-gray-400 font-bold text-base">
+                ➔
+              </td>
             </tr>
           </tbody>
         </table>
@@ -471,11 +436,16 @@
             <i data-lucide="user" class="w-4 h-4"></i>
           </div>
           <div>
-            <h3 class="font-bold text-[#684627] text-base leading-tight">Perfil do Confeiteiro</h3>
-            <p class="text-[11px] text-[#8C7A6B]">Gerencie suas informações pessoais</p>
+            <h3 class="font-bold text-[#684627] text-base leading-tight">
+              Perfil do Confeiteiro
+            </h3>
+            <p class="text-[11px] text-[#8C7A6B]">
+              Gerencie suas informações pessoais
+            </p>
           </div>
         </div>
-        <button type="button" onclick="fecharModalPerfil()" class="text-gray-400 hover:text-gray-700 p-1.5 rounded-full hover:bg-gray-200/60 transition">
+        <button type="button" onclick="fecharModalPerfil()"
+          class="text-gray-400 hover:text-gray-700 p-1.5 rounded-full hover:bg-gray-200/60 transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -485,14 +455,16 @@
         <!-- Foto de Perfil Upload Preview -->
         <div class="flex items-center gap-4 bg-[#F5F3EE]/60 p-3.5 rounded-2xl border border-[#EAE6DF]">
           <div class="relative w-16 h-16 rounded-full overflow-hidden border-2 border-[#684627] shrink-0">
-            <img id="modal-avatar-preview" src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=150&auto=format&fit=crop&q=80"
-                 alt="Foto Perfil" class="w-full h-full object-cover">
+            <img id="modal-avatar-preview"
+              src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=150&auto=format&fit=crop&q=80"
+              alt="Foto Perfil" class="w-full h-full object-cover" />
           </div>
           <div class="flex-1">
             <label class="block text-xs font-bold text-[#684627] mb-1">Foto de Exibição</label>
-            <input type="file" id="input-foto-upload" accept="image/*" class="hidden" onchange="previewNovaFoto(event)">
+            <input type="file" id="input-foto-upload" accept="image/*" class="hidden"
+              onchange="previewNovaFoto(event)" />
             <label onclick="document.getElementById('input-foto-upload').click()"
-                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#D5CFC5] rounded-xl text-xs font-semibold text-gray-700 hover:bg-[#F6F2EC] cursor-pointer transition shadow-sm">
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#D5CFC5] rounded-xl text-xs font-semibold text-gray-700 hover:bg-[#F6F2EC] cursor-pointer transition shadow-sm">
               <i data-lucide="camera" class="w-3.5 h-3.5 text-[#684627]"></i>
               <span>Alterar Foto</span>
             </label>
@@ -503,12 +475,12 @@
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1">Nome Completo</label>
             <input type="text" id="perfil-nome" value="Ana Maria Silva" required
-                   class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none bg-white">
+              class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none bg-white" />
           </div>
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1">E-mail Profissional</label>
             <input type="email" id="perfil-email" value="usuario@confeitaria.com" required
-                   class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none bg-white">
+              class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none bg-white" />
           </div>
         </div>
 
@@ -516,29 +488,29 @@
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1">Telefone / WhatsApp</label>
             <input type="text" id="perfil-telefone" value="(11) 98765-4321"
-                   class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none bg-white">
+              class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none bg-white" />
           </div>
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1">Nome da Confeitaria</label>
             <input type="text" id="perfil-confeitaria" value="Doce Arte Confeitaria"
-                   class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none bg-white">
+              class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none bg-white" />
           </div>
         </div>
 
         <div>
           <label class="block text-xs font-semibold text-gray-700 mb-1">Especialidades</label>
           <input type="text" id="perfil-especialidades" value="Bolos Artísticos, Macarons, Tortas Finas"
-                 class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none bg-white">
+            class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none bg-white" />
         </div>
 
         <!-- Buttons -->
         <div class="pt-3 border-t border-[#EAE6DF] flex justify-end gap-2">
           <button type="button" onclick="fecharModalPerfil()"
-                  class="px-4 py-2 rounded-xl border border-[#D5CFC5] text-xs font-semibold text-gray-600 hover:bg-[#F6F2EC] transition">
+            class="px-4 py-2 rounded-xl border border-[#D5CFC5] text-xs font-semibold text-gray-600 hover:bg-[#F6F2EC] transition">
             Cancelar
           </button>
           <button type="submit"
-                  class="px-4 py-2 rounded-xl bg-[#684627] hover:bg-[#54381F] text-white text-xs font-semibold shadow-sm transition active:scale-95 flex items-center gap-1.5">
+            class="px-4 py-2 rounded-xl bg-[#684627] hover:bg-[#54381F] text-white text-xs font-semibold shadow-sm transition active:scale-95 flex items-center gap-1.5">
             <i data-lucide="save" class="w-3.5 h-3.5"></i>
             <span>Salvar Alterações</span>
           </button>
@@ -557,11 +529,16 @@
             <i data-lucide="settings" class="w-4 h-4"></i>
           </div>
           <div>
-            <h3 class="font-bold text-[#684627] text-base leading-tight">Configurações do Sistema</h3>
-            <p class="text-[11px] text-[#8C7A6B]">Ajuste preferências, alertas e segurança</p>
+            <h3 class="font-bold text-[#684627] text-base leading-tight">
+              Configurações do Sistema
+            </h3>
+            <p class="text-[11px] text-[#8C7A6B]">
+              Ajuste preferências, alertas e segurança
+            </p>
           </div>
         </div>
-        <button type="button" onclick="fecharModalConfiguracoes()" class="text-gray-400 hover:text-gray-700 p-1.5 rounded-full hover:bg-gray-200/60 transition">
+        <button type="button" onclick="fecharModalConfiguracoes()"
+          class="text-gray-400 hover:text-gray-700 p-1.5 rounded-full hover:bg-gray-200/60 transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -569,11 +546,11 @@
       <!-- Tab Navigation -->
       <div class="flex border-b border-gray-100 bg-gray-50/60 px-6 pt-2 gap-2 text-xs font-semibold">
         <button type="button" id="tab-btn-geral" onclick="mudarAbaConfig('geral')"
-                class="px-3 py-2 border-b-2 border-[#684627] text-[#684627] transition">
+          class="px-3 py-2 border-b-2 border-[#684627] text-[#684627] transition">
           Notificações & Alertas
         </button>
         <button type="button" id="tab-btn-seguranca" onclick="mudarAbaConfig('seguranca')"
-                class="px-3 py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-800 transition">
+          class="px-3 py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-800 transition">
           Segurança & Senha
         </button>
       </div>
@@ -584,34 +561,52 @@
         <div id="tab-content-geral" class="space-y-4">
           <div class="flex items-center justify-between p-3 bg-[#F6F2EC]/60 rounded-2xl border border-[#EAE6DF]">
             <div>
-              <p class="text-xs font-bold text-[#3D2E24]">Alertas de Baixo Estoque</p>
-              <p class="text-[11px] text-[#8C7A6B]">Receba avisos quando insumos atingirem nível crítico</p>
+              <p class="text-xs font-bold text-[#3D2E24]">
+                Alertas de Baixo Estoque
+              </p>
+              <p class="text-[11px] text-[#8C7A6B]">
+                Receba avisos quando insumos atingirem nível crítico
+              </p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" checked class="sr-only peer">
-              <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#684627]"></div>
+              <input type="checkbox" checked class="sr-only peer" />
+              <div
+                class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#684627]">
+              </div>
             </label>
           </div>
 
           <div class="flex items-center justify-between p-3 bg-[#F6F2EC]/60 rounded-2xl border border-[#EAE6DF]">
             <div>
-              <p class="text-xs font-bold text-[#3D2E24]">Lembrete de Validade</p>
-              <p class="text-[11px] text-[#8C7A6B]">Notificar 7 dias antes da data de expiração dos produtos</p>
+              <p class="text-xs font-bold text-[#3D2E24]">
+                Lembrete de Validade
+              </p>
+              <p class="text-[11px] text-[#8C7A6B]">
+                Notificar 7 dias antes da data de expiração dos produtos
+              </p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" checked class="sr-only peer">
-              <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#684627]"></div>
+              <input type="checkbox" checked class="sr-only peer" />
+              <div
+                class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#684627]">
+              </div>
             </label>
           </div>
 
           <div class="flex items-center justify-between p-3 bg-[#F6F2EC]/60 rounded-2xl border border-[#EAE6DF]">
             <div>
-              <p class="text-xs font-bold text-[#3D2E24]">Relatório Semanal no E-mail</p>
-              <p class="text-[11px] text-[#8C7A6B]">Resumo automático de vendas e insumos toda segunda-feira</p>
+              <p class="text-xs font-bold text-[#3D2E24]">
+                Relatório Semanal no E-mail
+              </p>
+              <p class="text-[11px] text-[#8C7A6B]">
+                Resumo automático de vendas e insumos toda segunda-feira
+              </p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" class="sr-only peer">
-              <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#684627]"></div>
+              <input type="checkbox" class="sr-only peer" />
+              <div
+                class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#684627]">
+              </div>
             </label>
           </div>
         </div>
@@ -620,29 +615,29 @@
         <div id="tab-content-seguranca" class="space-y-3.5 hidden">
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1">Senha Atual</label>
-            <input type="password" placeholder="••••••••" 
-                   class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none">
+            <input type="password" placeholder="••••••••"
+              class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none" />
           </div>
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1">Nova Senha</label>
-            <input type="password" placeholder="Mínimo 8 caracteres" 
-                   class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none">
+            <input type="password" placeholder="Mínimo 8 caracteres"
+              class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none" />
           </div>
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1">Confirmar Nova Senha</label>
-            <input type="password" placeholder="Repita a nova senha" 
-                   class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none">
+            <input type="password" placeholder="Repita a nova senha"
+              class="w-full px-3.5 py-2 rounded-xl border border-[#D5CFC5] text-xs font-medium focus:ring-2 focus:ring-[#684627] focus:outline-none" />
           </div>
         </div>
 
         <!-- Footer Buttons -->
         <div class="pt-5 mt-4 border-t border-[#EAE6DF] flex justify-end gap-2">
           <button type="button" onclick="fecharModalConfiguracoes()"
-                  class="px-4 py-2 rounded-xl border border-[#D5CFC5] text-xs font-semibold text-gray-600 hover:bg-[#F6F2EC] transition">
+            class="px-4 py-2 rounded-xl border border-[#D5CFC5] text-xs font-semibold text-gray-600 hover:bg-[#F6F2EC] transition">
             Cancelar
           </button>
           <button type="submit"
-                  class="px-4 py-2 rounded-xl bg-[#684627] hover:bg-[#54381F] text-white text-xs font-semibold shadow-sm transition active:scale-95 flex items-center gap-1.5">
+            class="px-4 py-2 rounded-xl bg-[#684627] hover:bg-[#54381F] text-white text-xs font-semibold shadow-sm transition active:scale-95 flex items-center gap-1.5">
             <i data-lucide="check" class="w-3.5 h-3.5"></i>
             <span>Salvar Configurações</span>
           </button>
@@ -653,20 +648,24 @@
 
   <!-- MODAL: SAIR / LOGOUT CONFIRMAÇÃO -->
   <div id="modal-logout" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl border border-[#EAE6DF] shadow-2xl w-full max-w-sm overflow-hidden modal-enter text-center p-6">
+    <div
+      class="bg-white rounded-3xl border border-[#EAE6DF] shadow-2xl w-full max-w-sm overflow-hidden modal-enter text-center p-6">
       <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3">
         <i data-lucide="log-out" class="w-6 h-6"></i>
       </div>
       <h3 class="text-base font-bold text-gray-800 mb-1">Encerrar Sessão</h3>
-      <p class="text-xs text-gray-500 mb-6">Tem certeza que deseja sair da sua conta da confeitaria? Você precisará fazer login novamente para acessar.</p>
-      
+      <p class="text-xs text-gray-500 mb-6">
+        Tem certeza que deseja sair da sua conta da confeitaria? Você
+        precisará fazer login novamente para acessar.
+      </p>
+
       <div class="flex items-center gap-2">
         <button type="button" onclick="fecharModalLogout()"
-                class="flex-1 py-2.5 rounded-xl border border-[#D5CFC5] text-xs font-semibold text-gray-700 hover:bg-[#F6F2EC] transition">
+          class="flex-1 py-2.5 rounded-xl border border-[#D5CFC5] text-xs font-semibold text-gray-700 hover:bg-[#F6F2EC] transition">
           Cancelar
         </button>
         <button type="button" onclick="confirmarLogout()"
-                class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow-sm transition active:scale-95">
+          class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold shadow-sm transition active:scale-95">
           Sim, Sair
         </button>
       </div>
@@ -676,233 +675,8 @@
   <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- SCRIPTS DA PÁGINA -->
-  <script>
-    // Inicialização dos ícones Lucide
-    if (window.lucide) {
-      lucide.createIcons();
-    }
-
-    // VARIÁVEIS DE ESTADO
-    const state = {
-      nome: "Ana Maria",
-      email: "usuario@confeitaria.com",
-      fotoUrl: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=150&auto=format&fit=crop&q=80"
-    };
-
-    // SISTEMA DE TOAST NOTIFICATIONS
-    function mostrarToast(mensagem, tipo = 'sucesso') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      
-      const isSuccess = tipo === 'sucesso';
-      const bgColor = isSuccess ? 'bg-[#684627]' : 'bg-red-600';
-      const icon = isSuccess ? 'check-circle' : 'alert-circle';
-
-      toast.className = `pointer-events-auto flex items-center gap-2.5 ${bgColor} text-white px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold modal-enter transition-all`;
-      toast.innerHTML = `
-        <i data-lucide="${icon}" class="w-4 h-4 text-[#F0B8CB]"></i>
-        <span>${mensagem}</span>
-      `;
-
-      container.appendChild(toast);
-      if (window.lucide) lucide.createIcons();
-
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(10px)';
-        setTimeout(() => toast.remove(), 300);
-      }, 3500);
-    }
-
-    // MANIPULAÇÃO DO DROPDOWN
-    document.addEventListener('DOMContentLoaded', () => {
-      const btnPerfil = document.getElementById('btn-perfil');
-      const dropdownPerfil = document.getElementById('dropdown-perfil');
-
-      const menuOptPerfil = document.getElementById('menu-opt-perfil');
-      const menuOptConfig = document.getElementById('menu-opt-configuracoes');
-      const menuOptSair = document.getElementById('menu-opt-sair');
-
-      // Toggle Dropdown
-      if (btnPerfil && dropdownPerfil) {
-        btnPerfil.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const isHidden = dropdownPerfil.classList.contains('hidden');
-          dropdownPerfil.classList.toggle('hidden');
-          btnPerfil.setAttribute('aria-expanded', !isHidden);
-        });
-
-        // Clique fora fecha o dropdown
-        document.addEventListener('click', (e) => {
-          if (!dropdownPerfil.contains(e.target) && !btnPerfil.contains(e.target)) {
-            dropdownPerfil.classList.add('hidden');
-            btnPerfil.setAttribute('aria-expanded', 'false');
-          }
-        });
-      }
-
-      // VINCULAÇÃO DE AÇÕES DO MENU DROPDOWN
-      if (menuOptPerfil) {
-        menuOptPerfil.addEventListener('click', (e) => {
-          e.preventDefault();
-          dropdownPerfil.classList.add('hidden');
-          abrirModalPerfil();
-        });
-      }
-
-      if (menuOptConfig) {
-        menuOptConfig.addEventListener('click', (e) => {
-          e.preventDefault();
-          dropdownPerfil.classList.add('hidden');
-          abrirModalConfiguracoes();
-        });
-      }
-
-      if (menuOptSair) {
-        menuOptSair.addEventListener('click', (e) => {
-          e.preventDefault();
-          dropdownPerfil.classList.add('hidden');
-          abrirModalLogout();
-        });
-      }
-
-      // SUBMIT DO FORMULÁRIO DE PERFIL
-      const formPerfil = document.getElementById('form-perfil');
-      if (formPerfil) {
-        formPerfil.addEventListener('submit', (e) => {
-          e.preventDefault();
-          
-          const novoNome = document.getElementById('perfil-nome').value.trim();
-          const novoEmail = document.getElementById('perfil-email').value.trim();
-
-          if (novoNome) state.nome = novoNome;
-          if (novoEmail) state.email = novoEmail;
-
-          // Atualizar elementos na tela
-          document.getElementById('dropdown-nome-usuario').textContent = state.nome;
-          document.getElementById('dropdown-email-usuario').textContent = state.email;
-
-          fecharModalPerfil();
-          mostrarToast('Perfil atualizado com sucesso!');
-        });
-      }
-
-      // EXPORTAÇÃO PDF
-      const btnPdf = document.getElementById('btn-export-pdf');
-      if (btnPdf) {
-        btnPdf.addEventListener('click', () => {
-          const conteudo = document.getElementById('relatorio-conteudo');
-          mostrarToast('Gerando relatório em PDF...');
-          const opcoes = {
-            margin: 0.3,
-            filename: 'relatorio-confeitaria-doce-arte.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
-          };
-          html2pdf().set(opcoes).from(conteudo).save().then(() => {
-            mostrarToast('PDF baixado com sucesso!');
-          });
-        });
-      }
-
-      // EXPORTAÇÃO EXCEL
-      const btnExcel = document.getElementById('btn-export-excel');
-      if (btnExcel) {
-        btnExcel.addEventListener('click', () => {
-          const tabela = document.getElementById('tabela-produtos');
-          const wb = XLSX.utils.table_to_book(tabela, { sheet: "Produtos Mais Utilizados" });
-          XLSX.writeFile(wb, 'relatorio-produtos-confeitaria.xlsx');
-          mostrarToast('Planilha Excel exportada!');
-        });
-      }
-    });
-
-    // FUNÇÕES DOS MODAIS
-    function abrirModalPerfil() {
-      document.getElementById('modal-perfil').classList.remove('hidden');
-    }
-
-    function fecharModalPerfil() {
-      document.getElementById('modal-perfil').classList.add('hidden');
-    }
-
-    function abrirModalConfiguracoes(e) {
-      if (e) e.preventDefault();
-      document.getElementById('modal-configuracoes').classList.remove('hidden');
-    }
-
-    function fecharModalConfiguracoes() {
-      document.getElementById('modal-configuracoes').classList.add('hidden');
-    }
-
-    function abrirModalLogout() {
-      document.getElementById('modal-logout').classList.remove('hidden');
-    }
-
-    function fecharModalLogout() {
-      document.getElementById('modal-logout').classList.add('hidden');
-    }
-
-    function confirmarLogout() {
-      fecharModalLogout();
-      mostrarToast('Sessão encerrada com sucesso!');
-      setTimeout(() => {
-        mostrarToast('Redirecionando para a tela de login...', 'sucesso');
-      }, 1000);
-    }
-
-    // ALTERAÇÃO DE ABAS NAS CONFIGURAÇÕES
-    function mudarAbaConfig(aba) {
-      const btnGeral = document.getElementById('tab-btn-geral');
-      const btnSeguranca = document.getElementById('tab-btn-seguranca');
-      const contentGeral = document.getElementById('tab-content-geral');
-      const contentSeguranca = document.getElementById('tab-content-seguranca');
-
-      if (aba === 'geral') {
-        btnGeral.className = "px-3 py-2 border-b-2 border-[#684627] text-[#684627] font-semibold transition";
-        btnSeguranca.className = "px-3 py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-800 font-semibold transition";
-        contentGeral.classList.remove('hidden');
-        contentSeguranca.classList.add('hidden');
-      } else {
-        btnSeguranca.className = "px-3 py-2 border-b-2 border-[#684627] text-[#684627] font-semibold transition";
-        btnGeral.className = "px-3 py-2 border-b-2 border-transparent text-gray-500 hover:text-gray-800 font-semibold transition";
-        contentSeguranca.classList.remove('hidden');
-        contentGeral.classList.add('hidden');
-      }
-    }
-
-    function salvarConfiguracoes(e) {
-      e.preventDefault();
-      fecharModalConfiguracoes();
-      mostrarToast('Configurações salvas com sucesso!');
-    }
-
-    // PREVIEW DE FOTO DE PERFIL
-    function previewNovaFoto(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          const novaUrl = evt.target.result;
-          document.getElementById('modal-avatar-preview').src = novaUrl;
-          document.getElementById('avatar-header').src = novaUrl;
-          mostrarToast('Foto de perfil atualizada!');
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    // FECHAR MODAIS COM A TECLA ESC
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        fecharModalPerfil();
-        fecharModalConfiguracoes();
-        fecharModalLogout();
-      }
-    });
-  </script>
+  <script src="../src/componentes/sidebar.js" defer></script>
+  <script src="../src/script/relatorio_analises.js" defer></script>
 </body>
 
 </html>

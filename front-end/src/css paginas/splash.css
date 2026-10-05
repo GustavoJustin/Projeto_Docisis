@@ -1,0 +1,25 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.font-display {
+    font-family: 'Fraunces', serif;
+}
+
+@keyframes carregando {
+    0% {
+        width: 0%;
+    }
+
+    70% {
+        width: 100%;
+    }
+
+    100% {
+        width: 100%;
+    }
+}
+
+.barra-carregando {
+    animation: carregando 1.8s ease-in-out infinite;
+}
