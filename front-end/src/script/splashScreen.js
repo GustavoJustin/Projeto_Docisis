@@ -1,81 +1,71 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
-import { colors } from '../theme/colors';
+function initializeSplashScreen() {
+  const elements = {
+    body: document.body,
+    decorationTop: document.getElementById('splash-decoration-top'),
+    decorationBottom: document.getElementById('splash-decoration-bottom'),
+    content: document.getElementById('splash-content'),
+    iconCircle: document.getElementById('splash-icon-circle'),
+    iconSquare: document.getElementById('splash-icon-square'),
+    iconDiamond: document.getElementById('splash-icon-diamond'),
+    title: document.getElementById('splash-title'),
+    subtitle: document.getElementById('splash-subtitle'),
+    loading: document.getElementById('splash-loading'),
+    loadingText: document.getElementById('splash-loading-text'),
+    progressTrack: document.getElementById('splash-progress-track'),
+    progressBar: document.getElementById('splash-progress-bar'),
+  };
 
-export default function SplashScreen({ navigation }) {
-  const progressAnim = useRef(new Animated.Value(0)).current;
+  for (const [name, element] of Object.entries(elements)) {
+    if (!element) {
+      throw new Error(`Elemento obrigatório da tela splash não encontrado: ${name}`);
+    }
+  }
 
-  useEffect(() => {
-    // Animação de carregando em loop
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(progressAnim, {
-          toValue: 1,
-          duration: 1800,
-          useNativeDriver: false,
-        }),
-        Animated.timing(progressAnim, {
-          toValue: 0,
-          duration: 0,
-          useNativeDriver: false,
-        }),
-      ])
-    ).start();
+  const styles = {
+    body: 'relative bg-cream min-h-screen flex items-center justify-center overflow-hidden font-sans',
+    decorationTop: 'pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full bg-rose-100/60 blur-3xl',
+    decorationBottom: 'pointer-events-none absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-cocoa-200/50 blur-3xl',
+    content: 'relative z-10 flex flex-col items-center text-center px-6',
+    iconCircle: 'w-20 h-20 rounded-full border border-dashed border-cocoa-200 flex items-center justify-center mb-6',
+    iconSquare: 'w-11 h-11 rounded-xl bg-linear-to-br from-cocoa-400 to-cocoa-600 flex items-center justify-center shadow-sm',
+    iconDiamond: 'w-3 h-3 bg-cream rotate-45 rounded-sm',
+    title: 'font-display text-3xl font-bold text-cocoa-700',
+    subtitle: 'mt-1 text-[11px] tracking-widest text-cocoa-400 font-medium',
+    loading: 'mt-16 flex flex-col items-center gap-2',
+    loadingText: 'text-xs text-cocoa-400',
+    progressTrack: 'w-32 h-1 rounded-full bg-cocoa-200/60 overflow-hidden',
+    progressBar: 'h-full rounded-full bg-cocoa-500',
+  };
 
-    // Redirecionamento de tela após 2.5s (splash_2.html)
-    const timer = setTimeout(() => {
-      navigation.replace('MainDrawer');
-    }, 2500);
+  for (const [name, classNames] of Object.entries(styles)) {
+    elements[name].classList.add(...classNames.split(' '));
+  }
 
-    return () => clearTimeout(timer);
-  }, []);
+  const animationDuration = 1800;
+  const startedAt = performance.now();
+  let animationFrame;
+  const timer = window.setTimeout(() => {
+    window.location.href = 'estoqueInsumo.html';
+  }, 2500);
 
-  const widthInterpolate = progressAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0%', '100%'],
-  });
+  function animateProgress(now) {
+    const cycleProgress = ((now - startedAt) % animationDuration) / animationDuration;
+    const progress = Math.min(cycleProgress / 0.7, 1);
+    elements.progressBar.style.width = `${progress * 100}%`;
+    elements.progressTrack.setAttribute('aria-valuenow', String(Math.round(progress * 100)));
+    animationFrame = window.requestAnimationFrame(animateProgress);
+  }
 
-  return (
-    <View style={styles.container}>
-      {/* Elementos Decorativos de Fundo */}
-      <View style={[styles.blob, styles.blobTopLeft]} />
-      <View style={[styles.blob, styles.blobBottomRight]} />
+  animationFrame = window.requestAnimationFrame(animateProgress);
 
-      <View style={styles.content}>
-        {/* Logo Icon */}
-        <View style={styles.iconCircle}>
-          <View style={styles.iconSquare}>
-            <View style={styles.rhombus} />
-          </View>
-        </View>
-
-        <Text style={styles.brandTitle}>Docisis</Text>
-        <Text style={styles.brandSubtitle}>GESTÃO DE ESTOQUE</Text>
-
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Carregando seus dados…</Text>
-          <View style={styles.track}>
-            <Animated.View style={[styles.bar, { width: widthInterpolate }]} />
-          </View>
-        </View>
-      </View>
-    </View>
-  );
+  window.addEventListener('pagehide', () => {
+    window.cancelAnimationFrame(animationFrame);
+    window.clearTimeout(timer);
+  }, { once: true });
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.cream, justifyContent: 'center', alignItems: 'center' },
-  blob: { position: 'absolute', width: 288, height: 288, borderRadius: 144, opacity: 0.5 },
-  blobTopLeft: { top: -96, left: -96, backgroundColor: colors.blush[100] },
-  blobBottomRight: { bottom: -96, right: -96, backgroundColor: colors.cocoa[200] },
-  content: { alignItems: 'center', zIndex: 10 },
-  iconCircle: { width: 80, height: 80, borderRadius: 40, borderWidth: 1, borderColor: colors.cocoa[200], borderStyle: 'dashed', justifyContent: 'center', alignItems: 'center', marginBottom: 24 },
-  iconSquare: { width: 44, height: 44, borderRadius: 12, backgroundColor: colors.cocoa[500], justifyContent: 'center', alignItems: 'center' },
-  rhombus: { width: 12, height: 12, backgroundColor: colors.cream, transform: [{ rotate: '45deg' }], borderRadius: 2 },
-  brandTitle: { fontSize: 28, fontWeight: '700', color: colors.cocoa[700] },
-  brandSubtitle: { fontSize: 11, letterSpacing: 2, color: colors.cocoa[400], fontWeight: '500', marginTop: 4 },
-  loadingContainer: { marginTop: 64, alignItems: 'center', gap: 8 },
-  loadingText: { fontSize: 12, color: colors.cocoa[400] },
-  track: { width: 128, height: 4, borderRadius: 2, backgroundColor: colors.cocoa[200], overflow: 'hidden' },
-  bar: { height: '100%', backgroundColor: colors.cocoa[500], borderRadius: 2 },
-});
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeSplashScreen, { once: true });
+} else {
+  initializeSplashScreen();
+}

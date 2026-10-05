@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
-@source "../tailwind/*.html";
-@source "../src/**/*.html";
-@source "../src/**/*.js";
+@source "../../tailwind/**/*.html";
+@source "../**/*.html";
+@source "../script/**/*.js";
 
 @theme {
   --color-brand-bg: #EBE7E1;
