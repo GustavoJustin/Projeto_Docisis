@@ -78,6 +78,26 @@ const SIDEBAR_SCRIPT_URL = document.currentScript?.src
   ? new URL(document.currentScript.src)
   : null;
 
+const TOKEN_KEY = "docegestao_token";
+
+function isPublicPage() {
+  const pageName = window.location.pathname.split("/").pop();
+  const cadastroPublico =
+    new URLSearchParams(window.location.search).get("cadastro-publico") === "1";
+
+  return (
+    pageName === "index.html" ||
+    (pageName === "cadastro-funcionario.html" && cadastroPublico)
+  );
+}
+
+if (window.location.protocol !== "file:" && !isPublicPage()) {
+  const hasToken = Boolean(localStorage.getItem(TOKEN_KEY));
+  if (!hasToken) {
+    window.location.replace("/tailwind/index.html");
+  }
+}
+
 async function carregarSidebar() {
   const container = document.getElementById("sidebar-container");
   if (!container) return;

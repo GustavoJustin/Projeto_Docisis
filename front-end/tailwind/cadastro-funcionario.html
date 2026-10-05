@@ -23,6 +23,22 @@
       <!-- Main Scrollável -->
       <main class="flex-1 overflow-y-auto p-6 md:p-10">
         <form id="form-cadastro" class="max-w-4xl mx-auto space-y-6">
+          <div
+            id="cadastro-alert"
+            class="hidden rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+            role="alert"
+            aria-live="polite"
+          >
+            <span id="cadastro-alert-text"></span>
+            <a
+              id="cadastro-alert-link"
+              href="index.html"
+              class="ml-1 font-semibold underline"
+            >
+              Voltar ao login
+            </a>
+          </div>
+
           <!-- Banner Superior -->
           <div
             class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
