@@ -1,205 +1,438 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DoceGestão | Histórico de Movimentações</title>
+    <link rel="stylesheet" href="../src/css/output.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../src/css/output.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DoceGestão | Histórico de Movimentações</title>
-  <link rel="stylesheet" href="../src/css/output.css" />
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="../src/css/output.css">
-</head>
-
-<body class="min-h-screen bg-stone-50">
-  <div class="flex min-h-screen">
-
-    <!-- ===================== SIDEBAR ===================== -->
-    <div id="sidebar-container" data-active="historico" class="w-64 shrink-0"></div>
-    <!-- =================== FIM SIDEBAR =================== -->
-
-    <main class="flex-1 px-8 py-6">
-      <div class="flex items-center justify-between">
-        <div class="relative w-80">
-          <i data-lucide="search"
-            class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-300"></i>
-          <input type="text" placeholder="Buscar no histórico..."
-            class="w-full rounded-lg border border-stone-200 bg-white py-2 pl-9 pr-3 text-sm text-stone-600 placeholder:text-stone-300 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800" />
-        </div>
-        <div class="flex items-center gap-4">
-          <i data-lucide="bell" class="h-5 w-5 text-stone-400"></i>
-          <div class="h-8 w-8 rounded-full bg-stone-200"></div>
-        </div>
-      </div>
-
-      <div class="mt-6 flex items-start justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold text-stone-800">Histórico de Movimentações</h1>
-          <p class="mt-1 text-sm text-stone-400">Acompanhe todas as entradas e saídas do estoque em tempo real.</p>
-        </div>
-        <button type="button"
-          class="flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-600 hover:bg-stone-50">
-          <i data-lucide="file-down" class="h-4 w-4"></i> Exportar PDF
-        </button>
-      </div>
-
-      <!-- Filtros -->
+  <body class="min-h-screen bg-stone-50">
+    <div class="flex min-h-screen">
+      <!-- ===================== SIDEBAR ===================== -->
       <div
-        class="mt-6 grid grid-cols-1 gap-4 rounded-2xl border border-stone-200 bg-white p-5 sm:grid-cols-[1fr_1fr_1fr_auto]">
-        <div>
-          <label for="data-inicio" class="mb-1 block text-xs font-medium text-stone-500">Data Início</label>
-          <input id="data-inicio" type="date"
-            class="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-600 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800" />
-        </div>
-        <div>
-          <label for="data-fim" class="mb-1 block text-xs font-medium text-stone-500">Data Fim</label>
-          <input id="data-fim" type="date"
-            class="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-600 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800" />
-        </div>
-        <div>
-          <label for="filtro-tipo" class="mb-1 block text-xs font-medium text-stone-500">Tipo</label>
-          <select id="filtro-tipo"
-            class="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-600 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800">
-            <option value="todos">Todos os tipos</option>
-            <option value="ENTRADA">Entrada</option>
-            <option value="SAÍDA">Saída</option>
-          </select>
-        </div>
-        <div class="flex items-end">
-          <button id="btn-aplicar-filtros" type="button"
-            class="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-900 px-4 py-2 text-sm font-medium text-white hover:bg-amber-950 sm:w-auto">
-            <i data-lucide="sliders-horizontal" class="h-4 w-4"></i> Aplicar Filtros
-          </button>
-        </div>
-      </div>
+        id="sidebar-container"
+        data-active="historico"
+        class="w-64 shrink-0"
+      ></div>
+      <!-- =================== FIM SIDEBAR =================== -->
 
-      <!-- Tabela -->
-      <div class="mt-6 overflow-x-auto rounded-2xl border border-stone-200 bg-white p-5">
-        <table class="w-full text-left text-sm">
-          <thead>
-            <tr class="border-b border-stone-100 text-xs uppercase tracking-wide text-stone-400">
-              <th class="pb-3 font-medium">Data/Hora</th>
-              <th class="pb-3 font-medium">Usuário</th>
-              <th class="pb-3 font-medium">Tipo</th>
-              <th class="pb-3 font-medium">Produto</th>
-              <th class="pb-3 font-medium">Quantidade</th>
-              <th class="pb-3 font-medium">Motivo</th>
-            </tr>
-          </thead>
-          <tbody id="tabela-movimentacoes">
-            <tr class="border-b border-stone-50" data-tipo="ENTRADA">
-              <td class="py-3 text-stone-600">24/05/2024 14:32</td>
-              <td class="py-3">
-                <div class="flex items-center gap-2"><span
-                    class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-800">AM</span><span
-                    class="text-stone-600">Ana Maria</span></div>
-              </td>
-              <td class="py-3"><span
-                  class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">ENTRADA</span>
-              </td>
-              <td class="py-3 font-medium text-stone-800">Cacau em Pó 100%</td>
-              <td class="py-3 font-medium text-emerald-600">+ 15.0 kg</td>
-              <td class="py-3 text-stone-500">Reposição Mensal</td>
-            </tr>
-            <tr class="border-b border-stone-50" data-tipo="SAÍDA">
-              <td class="py-3 text-stone-600">24/05/2024 11:15</td>
-              <td class="py-3">
-                <div class="flex items-center gap-2"><span
-                    class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-800">CS</span><span
-                    class="text-stone-600">Carlos Silva</span></div>
-              </td>
-              <td class="py-3"><span
-                  class="inline-flex rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600">SAÍDA</span>
-              </td>
-              <td class="py-3 font-medium text-stone-800">Farinha de Trigo Premium</td>
-              <td class="py-3 font-medium text-rose-600">- 5.0 kg</td>
-              <td class="py-3 text-stone-500">Produção - Encomenda #452</td>
-            </tr>
-            <tr class="border-b border-stone-50" data-tipo="SAÍDA">
-              <td class="py-3 text-stone-600">23/05/2024 17:45</td>
-              <td class="py-3">
-                <div class="flex items-center gap-2"><span
-                    class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-800">AM</span><span
-                    class="text-stone-600">Ana Maria</span></div>
-              </td>
-              <td class="py-3"><span
-                  class="inline-flex rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600">SAÍDA</span>
-              </td>
-              <td class="py-3 font-medium text-stone-800">Manteiga sem Sal</td>
-              <td class="py-3 font-medium text-rose-600">- 1.2 kg</td>
-              <td class="py-3 text-stone-500">Vencimento Próximo</td>
-            </tr>
-            <tr class="border-b border-stone-50" data-tipo="ENTRADA">
-              <td class="py-3 text-stone-600">23/05/2024 09:20</td>
-              <td class="py-3">
-                <div class="flex items-center gap-2"><span
-                    class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-800">RB</span><span
-                    class="text-stone-600">Roberto B.</span></div>
-              </td>
-              <td class="py-3"><span
-                  class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">ENTRADA</span>
-              </td>
-              <td class="py-3 font-medium text-stone-800">Essência de Baunilha</td>
-              <td class="py-3 font-medium text-emerald-600">+ 2.0 L</td>
-              <td class="py-3 text-stone-500">Compra Emergencial</td>
-            </tr>
-            <tr data-tipo="SAÍDA">
-              <td class="py-3 text-stone-600">22/05/2024 15:10</td>
-              <td class="py-3">
-                <div class="flex items-center gap-2"><span
-                    class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-800">CS</span><span
-                    class="text-stone-600">Carlos Silva</span></div>
-              </td>
-              <td class="py-3"><span
-                  class="inline-flex rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600">SAÍDA</span>
-              </td>
-              <td class="py-3 font-medium text-stone-800">Leite Condensado</td>
-              <td class="py-3 font-medium text-rose-600">- 24 latas</td>
-              <td class="py-3 text-stone-500">Produção diária</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="mt-4 flex items-center justify-between text-sm text-stone-400">
-          <p>Mostrando 1-10 de 156 registros</p>
-          <div class="flex items-center gap-1">
-            <button type="button" class="rounded-md px-2 py-1 hover:bg-stone-50">&lt;</button>
-            <button type="button" class="h-7 w-7 rounded-md bg-amber-900 text-sm text-white">1</button>
-            <button type="button" class="h-7 w-7 rounded-md text-sm text-stone-500 hover:bg-stone-50">2</button>
-            <button type="button" class="h-7 w-7 rounded-md text-sm text-stone-500 hover:bg-stone-50">3</button>
-            <button type="button" class="rounded-md px-2 py-1 hover:bg-stone-50">&gt;</button>
+      <main class="flex-1 px-8 py-6">
+        <div class="flex items-center justify-between">
+          <div class="relative w-80">
+            <i
+              data-lucide="search"
+              class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-300"
+            ></i>
+            <input
+              id="busca-historico"
+              type="text"
+              placeholder="Buscar no histórico..."
+              class="w-full rounded-lg border border-stone-200 bg-white py-2 pl-9 pr-3 text-sm text-stone-600 placeholder:text-stone-300 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800"
+            />
+          </div>
+          <div class="flex items-center gap-4">
+            <i data-lucide="bell" class="h-5 w-5 text-stone-400"></i>
+            <div
+              data-profile-trigger
+              data-profile-initials
+              class="h-8 w-8 rounded-full bg-stone-200 flex items-center justify-center text-xs font-semibold text-stone-700"
+            ></div>
           </div>
         </div>
-      </div>
 
-      <!-- Cartões de resumo -->
-      <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div class="rounded-2xl bg-amber-50 p-5">
-          <i data-lucide="trending-up" class="h-5 w-5 text-amber-700"></i>
-          <p class="mt-3 text-xs font-medium text-amber-700">+12% este mês</p>
-          <p class="mt-1 text-sm text-stone-500">Total de Entradas</p>
-          <p class="text-3xl font-semibold text-stone-800">452</p>
-          <p class="mt-1 text-xs text-stone-400">Movimentações de abastecimento</p>
+        <div class="mt-6 flex items-start justify-between">
+          <div>
+            <h1 class="text-2xl font-semibold text-stone-800">
+              Histórico de Movimentações
+            </h1>
+            <p class="mt-1 text-sm text-stone-400">
+              Acompanhe todas as entradas e saídas do estoque em tempo real.
+            </p>
+          </div>
+          <button
+            id="btn-exportar-pdf"
+            type="button"
+            class="flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-600 hover:bg-stone-50"
+          >
+            <i data-lucide="file-down" class="h-4 w-4"></i> Exportar PDF
+          </button>
         </div>
 
-        <div class="rounded-2xl bg-orange-50 p-5">
-          <i data-lucide="trending-down" class="h-5 w-5 text-orange-700"></i>
-          <p class="mt-3 text-xs font-medium text-orange-700">-5% este mês</p>
-          <p class="mt-1 text-sm text-stone-500">Total de Saídas</p>
-          <p class="text-3xl font-semibold text-stone-800">829</p>
-          <p class="mt-1 text-xs text-stone-400">Consumo para produção e perdas</p>
+        <!-- Filtros -->
+        <div
+          class="mt-6 grid grid-cols-1 gap-4 rounded-2xl border border-stone-200 bg-white p-5 sm:grid-cols-[1fr_1fr_1fr_auto]"
+        >
+          <div>
+            <label
+              for="data-inicio"
+              class="mb-1 block text-xs font-medium text-stone-500"
+              >Data Início</label
+            >
+            <input
+              id="data-inicio"
+              type="date"
+              class="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-600 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800"
+            />
+          </div>
+          <div>
+            <label
+              for="data-fim"
+              class="mb-1 block text-xs font-medium text-stone-500"
+              >Data Fim</label
+            >
+            <input
+              id="data-fim"
+              type="date"
+              class="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-600 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800"
+            />
+          </div>
+          <div>
+            <label
+              for="filtro-tipo"
+              class="mb-1 block text-xs font-medium text-stone-500"
+              >Tipo</label
+            >
+            <select
+              id="filtro-tipo"
+              class="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-600 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800"
+            >
+              <option value="todos">Todos os tipos</option>
+              <option value="ENTRADA">Entrada</option>
+              <option value="SAÍDA">Saída</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <button
+              id="btn-aplicar-filtros"
+              type="button"
+              class="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-900 px-4 py-2 text-sm font-medium text-white hover:bg-amber-950 sm:w-auto"
+            >
+              <i data-lucide="sliders-horizontal" class="h-4 w-4"></i> Aplicar
+              Filtros
+            </button>
+          </div>
         </div>
 
-        <div class="rounded-2xl bg-rose-50 p-5">
-          <i data-lucide="user" class="h-5 w-5 text-rose-700"></i>
-          <p class="mt-3 text-xs font-medium text-rose-700">Responsável por 65% das ações hoje</p>
-          <p class="mt-1 text-sm text-stone-500">Usuário Ativo</p>
-          <p class="text-3xl font-semibold text-stone-800">Ana M.</p>
-        </div>
-      </div>
-    </main>
-  </div>
-  <script>lucide.createIcons()</script>
-  <script src="../src/componentes/sidebar.js" defer></script>
-</body>
+        <!-- Tabela -->
+        <div
+          class="mt-6 overflow-x-auto rounded-2xl border border-stone-200 bg-white p-5"
+        >
+          <table class="w-full text-left text-sm">
+            <thead>
+              <tr
+                class="border-b border-stone-100 text-xs uppercase tracking-wide text-stone-400"
+              >
+                <th class="pb-3 font-medium">Data/Hora</th>
+                <th class="pb-3 font-medium">Usuário</th>
+                <th class="pb-3 font-medium">Tipo</th>
+                <th class="pb-3 font-medium">Produto</th>
+                <th class="pb-3 font-medium">Quantidade</th>
+                <th class="pb-3 font-medium">Motivo</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-movimentacoes">
+              <tr class="border-b border-stone-50" data-tipo="ENTRADA">
+                <td class="py-3 text-stone-600">24/05/2024 14:32</td>
+                <td class="py-3">
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-800"
+                      >AM</span
+                    ><span class="text-stone-600">Ana Maria</span>
+                  </div>
+                </td>
+                <td class="py-3">
+                  <span
+                    class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700"
+                    >ENTRADA</span
+                  >
+                </td>
+                <td class="py-3 font-medium text-stone-800">
+                  Cacau em Pó 100%
+                </td>
+                <td class="py-3 font-medium text-emerald-600">+ 15.0 kg</td>
+                <td class="py-3 text-stone-500">Reposição Mensal</td>
+              </tr>
+              <tr class="border-b border-stone-50" data-tipo="SAÍDA">
+                <td class="py-3 text-stone-600">24/05/2024 11:15</td>
+                <td class="py-3">
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-800"
+                      >CS</span
+                    ><span class="text-stone-600">Carlos Silva</span>
+                  </div>
+                </td>
+                <td class="py-3">
+                  <span
+                    class="inline-flex rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600"
+                    >SAÍDA</span
+                  >
+                </td>
+                <td class="py-3 font-medium text-stone-800">
+                  Farinha de Trigo Premium
+                </td>
+                <td class="py-3 font-medium text-rose-600">- 5.0 kg</td>
+                <td class="py-3 text-stone-500">Produção - Encomenda #452</td>
+              </tr>
+              <tr class="border-b border-stone-50" data-tipo="SAÍDA">
+                <td class="py-3 text-stone-600">23/05/2024 17:45</td>
+                <td class="py-3">
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-800"
+                      >AM</span
+                    ><span class="text-stone-600">Ana Maria</span>
+                  </div>
+                </td>
+                <td class="py-3">
+                  <span
+                    class="inline-flex rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600"
+                    >SAÍDA</span
+                  >
+                </td>
+                <td class="py-3 font-medium text-stone-800">
+                  Manteiga sem Sal
+                </td>
+                <td class="py-3 font-medium text-rose-600">- 1.2 kg</td>
+                <td class="py-3 text-stone-500">Vencimento Próximo</td>
+              </tr>
+              <tr class="border-b border-stone-50" data-tipo="ENTRADA">
+                <td class="py-3 text-stone-600">23/05/2024 09:20</td>
+                <td class="py-3">
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-800"
+                      >RB</span
+                    ><span class="text-stone-600">Roberto B.</span>
+                  </div>
+                </td>
+                <td class="py-3">
+                  <span
+                    class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700"
+                    >ENTRADA</span
+                  >
+                </td>
+                <td class="py-3 font-medium text-stone-800">
+                  Essência de Baunilha
+                </td>
+                <td class="py-3 font-medium text-emerald-600">+ 2.0 L</td>
+                <td class="py-3 text-stone-500">Compra Emergencial</td>
+              </tr>
+              <tr data-tipo="SAÍDA">
+                <td class="py-3 text-stone-600">22/05/2024 15:10</td>
+                <td class="py-3">
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-800"
+                      >CS</span
+                    ><span class="text-stone-600">Carlos Silva</span>
+                  </div>
+                </td>
+                <td class="py-3">
+                  <span
+                    class="inline-flex rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600"
+                    >SAÍDA</span
+                  >
+                </td>
+                <td class="py-3 font-medium text-stone-800">
+                  Leite Condensado
+                </td>
+                <td class="py-3 font-medium text-rose-600">- 24 latas</td>
+                <td class="py-3 text-stone-500">Produção diária</td>
+              </tr>
+            </tbody>
+          </table>
 
+          <div
+            class="mt-4 flex items-center justify-between text-sm text-stone-400"
+          >
+            <p id="resumo-paginacao">Mostrando 1-10 de 156 registros</p>
+            <div id="paginacao-historico" class="flex items-center gap-1">
+              <button
+                type="button"
+                data-page="prev"
+                class="rounded-md px-2 py-1 hover:bg-stone-50"
+              >
+                &lt;
+              </button>
+              <button
+                type="button"
+                data-page="1"
+                class="h-7 w-7 rounded-md bg-amber-900 text-sm text-white"
+              >
+                1
+              </button>
+              <button
+                type="button"
+                data-page="2"
+                class="h-7 w-7 rounded-md text-sm text-stone-500 hover:bg-stone-50"
+              >
+                2
+              </button>
+              <button
+                type="button"
+                data-page="3"
+                class="h-7 w-7 rounded-md text-sm text-stone-500 hover:bg-stone-50"
+              >
+                3
+              </button>
+              <button
+                type="button"
+                data-page="next"
+                class="rounded-md px-2 py-1 hover:bg-stone-50"
+              >
+                &gt;
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cartões de resumo -->
+        <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div class="rounded-2xl bg-amber-50 p-5">
+            <i data-lucide="trending-up" class="h-5 w-5 text-amber-700"></i>
+            <p class="mt-3 text-xs font-medium text-amber-700">+12% este mês</p>
+            <p class="mt-1 text-sm text-stone-500">Total de Entradas</p>
+            <p class="text-3xl font-semibold text-stone-800">452</p>
+            <p class="mt-1 text-xs text-stone-400">
+              Movimentações de abastecimento
+            </p>
+          </div>
+
+          <div class="rounded-2xl bg-orange-50 p-5">
+            <i data-lucide="trending-down" class="h-5 w-5 text-orange-700"></i>
+            <p class="mt-3 text-xs font-medium text-orange-700">-5% este mês</p>
+            <p class="mt-1 text-sm text-stone-500">Total de Saídas</p>
+            <p class="text-3xl font-semibold text-stone-800">829</p>
+            <p class="mt-1 text-xs text-stone-400">
+              Consumo para produção e perdas
+            </p>
+          </div>
+
+          <div class="rounded-2xl bg-rose-50 p-5">
+            <i data-lucide="user" class="h-5 w-5 text-rose-700"></i>
+            <p class="mt-3 text-xs font-medium text-rose-700">
+              Responsável por 65% das ações hoje
+            </p>
+            <p class="mt-1 text-sm text-stone-500">Usuário Ativo</p>
+            <p class="text-3xl font-semibold text-stone-800">Ana M.</p>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script>
+      lucide.createIcons();
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const rows = [...document.querySelectorAll("#tabela-movimentacoes tr")];
+        const searchInput = document.getElementById("busca-historico");
+        const startInput = document.getElementById("data-inicio");
+        const endInput = document.getElementById("data-fim");
+        const typeSelect = document.getElementById("filtro-tipo");
+        const summary = document.getElementById("resumo-paginacao");
+        const pageButtons = [
+          ...document.querySelectorAll("#paginacao-historico [data-page]"),
+        ];
+        const pageSize = 2;
+        let currentPage = 1;
+        let filteredRows = rows;
+
+        function rowDate(row) {
+          const [day, month, year] = row.cells[0].textContent
+            .trim()
+            .split(/\s+/)[0]
+            .split("/");
+          return new Date(Number(year), Number(month) - 1, Number(day));
+        }
+
+        function renderRows() {
+          const query = searchInput.value.trim().toLowerCase();
+          const selectedType = typeSelect.value.toLowerCase();
+          const startDate = startInput.value
+            ? new Date(`${startInput.value}T00:00:00`)
+            : null;
+          const endDate = endInput.value
+            ? new Date(`${endInput.value}T23:59:59`)
+            : null;
+
+          filteredRows = rows.filter((row) => {
+            const date = rowDate(row);
+            const type = row.dataset.tipo.toLowerCase();
+            return (
+              row.textContent.toLowerCase().includes(query) &&
+              (selectedType === "todos" || type === selectedType) &&
+              (!startDate || date >= startDate) &&
+              (!endDate || date <= endDate)
+            );
+          });
+
+          const pageCount = Math.max(
+            1,
+            Math.ceil(filteredRows.length / pageSize),
+          );
+          currentPage = Math.min(currentPage, pageCount);
+          const firstIndex = (currentPage - 1) * pageSize;
+          const visibleRows = new Set(
+            filteredRows.slice(firstIndex, firstIndex + pageSize),
+          );
+
+          rows.forEach((row) => {
+            row.style.display = visibleRows.has(row) ? "" : "none";
+          });
+
+          const firstRecord = filteredRows.length ? firstIndex + 1 : 0;
+          const lastRecord = Math.min(
+            firstIndex + pageSize,
+            filteredRows.length,
+          );
+          summary.textContent = `Mostrando ${firstRecord}-${lastRecord} de ${filteredRows.length} registros`;
+
+          pageButtons.forEach((button) => {
+            const page = Number(button.dataset.page);
+            const selected = Number.isInteger(page) && page === currentPage;
+            button.classList.toggle("bg-amber-900", selected);
+            button.classList.toggle("text-white", selected);
+            button.classList.toggle(
+              "text-stone-500",
+              !selected && Number.isInteger(page),
+            );
+            button.disabled =
+              (button.dataset.page === "prev" && currentPage === 1) ||
+              (button.dataset.page === "next" && currentPage === pageCount) ||
+              (Number.isInteger(page) && page > pageCount);
+          });
+        }
+
+        document
+          .getElementById("btn-aplicar-filtros")
+          .addEventListener("click", () => {
+            currentPage = 1;
+            renderRows();
+          });
+        searchInput.addEventListener("input", () => {
+          currentPage = 1;
+          renderRows();
+        });
+        document
+          .getElementById("btn-exportar-pdf")
+          .addEventListener("click", () => window.print());
+        pageButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            const page = button.dataset.page;
+            if (page === "prev") currentPage -= 1;
+            else if (page === "next") currentPage += 1;
+            else currentPage = Number(page);
+            renderRows();
+          });
+        });
+
+        renderRows();
+      });
+    </script>
+    <script src="../src/componentes/sidebar.js" defer></script>
+  </body>
 </html>
