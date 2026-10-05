@@ -3,6 +3,7 @@
 @source "../../tailwind/**/*.html";
 @source "../**/*.html";
 @source "../script/**/*.js";
+@source "../componentes/**/*.jsx";
 
 @theme {
   --color-brand-bg: #EBE7E1;
