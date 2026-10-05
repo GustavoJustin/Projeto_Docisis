@@ -26,6 +26,11 @@ CREATE TABLE tbl_cargos (
     jornada TIME NOT NULL
 );
 
+INSERT INTO tbl_cargos (nivel_acesso_1, nivel_acesso_2, nome_cargo, departamento, jornada)
+VALUES
+    (1, 1, 'Administrador', 'Administração', '08:00:00'),
+    (1, 1, 'Funcionário', 'Operação', '08:00:00');
+
 -- -----------------------------------------------------
 -- 2. Funcionários
 -- -----------------------------------------------------
