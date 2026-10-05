@@ -36,80 +36,20 @@
         </a>
       </div>
 
-      <!-- Item 4 (Layout Expandido): Indicadores e Métricas Rápidas -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
-          <div>
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total da Equipe</p>
-            <p id="total-count" class="text-2xl font-bold text-gray-800 mt-1">4</p>
-          </div>
-          <div class="p-3 bg-[#F5ECE5] text-[#875C46] rounded-xl">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z">
-              </path>
-            </svg>
-          </div>
-        </div>
-        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
-          <div>
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Acessos Ativos</p>
-            <p id="active-count" class="text-2xl font-bold text-emerald-600 mt-1">3</p>
-          </div>
-          <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
-        </div>
-        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
-          <div>
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Bloqueados / Inativos</p>
-            <p id="inactive-count" class="text-2xl font-bold text-rose-500 mt-1">1</p>
-          </div>
-          <div class="p-3 bg-rose-50 text-rose-500 rounded-xl">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
-              </path>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- Barra de Busca e Filtros -->
-      <div class="bg-white rounded-xl border border-gray-200 p-3 flex flex-wrap gap-3 shadow-sm items-center">
-        <div class="relative flex-1 min-w-240px">
-          <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none"
-            stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-          </svg>
-          <input id="search-input" type="text" placeholder="Buscar por nome ou cargo..."
-            class="w-full pl-10 pr-4 py-2 bg-[#FAFAFA] border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#D8A87D]" />
-        </div>
-        <select id="filter-status"
-          class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none cursor-pointer">
-          <option value="all">Todos os Status</option>
-          <option value="active">Apenas Ativos</option>
-          <option value="inactive">Apenas Inativos</option>
-        </select>
-      </div>
-
-      <!-- Grid de Cartões dos Funcionários -->
-      <div id="employee-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-
-        <!-- Card 1: Mario Silva -->
-        <div
-          class="employee-card bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm flex flex-col justify-between"
-          data-name="mario silva" data-role="chef confeiteira" data-status="active">
-          <div class="p-6 text-center flex flex-col items-center">
-            <div class="relative mb-3">
-              <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=150" alt="Mario Silva"
-                class="w-20 h-20 rounded-full object-cover border-2 border-white shadow-sm" />
-              <span
-                class="status-dot absolute bottom-1 right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+        <!-- Indicadores e Métricas Rápidas -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div
+            class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between"
+          >
+            <div>
+              <p
+                class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
+              >
+                Total da Equipe
+              </p>
+              <p id="total-count" class="text-2xl font-bold text-gray-800 mt-1">
+                4
+              </p>
             </div>
             <div class="p-3 bg-[#F5ECE5] text-[#875C46] rounded-xl">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -269,11 +209,132 @@
       </div>
   </main>
 
-  <script>
-    lucide.createIcons();
-  </script>
-  <script src="../src/componentes/sidebar.js" defer></script>
-  <script src="../src/script/gestao-equipes.js" defer></script>
-</body>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const tableBody = document.getElementById("team-table-body");
+        const searchInput = document.getElementById("search-member");
+        const roleButtons = document.querySelectorAll(".filter-role");
+        const removedMembers = new Set(
+          JSON.parse(
+            localStorage.getItem("equipe_docegestao_removida") || "[]",
+          ),
+        );
+        let selectedRole = "all";
 
+        document.querySelectorAll(".member-row").forEach((row) => {
+          const email = row.querySelector(".member-email").innerText.trim();
+          if (removedMembers.has(email)) row.remove();
+        });
+
+        const equipeSalva = JSON.parse(
+          localStorage.getItem("equipe_docegestao") || "[]",
+        );
+        equipeSalva.forEach((func) => {
+          if (removedMembers.has(func.email)) return;
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-gray-50/50 transition-colors member-row";
+          tr.dataset.role = func.cargo;
+          tr.dataset.status = func.status || "Ativo";
+          const avatar = func.foto
+            ? `<img src="${func.foto}" class="w-9 h-9 rounded-full object-cover" alt="${func.nome}" />`
+            : `<div class="w-9 h-9 rounded-full bg-[#875C46] text-white font-bold flex items-center justify-center">${func.nome.charAt(0).toUpperCase()}</div>`;
+
+          tr.innerHTML = `
+            <td class="py-4 px-6 flex items-center gap-3">
+              ${avatar}
+              <div>
+                <p class="font-bold text-gray-800 member-name">${func.nome}</p>
+                <p class="text-[10px] text-gray-400">CPF: ${func.cpf || "Não informado"}</p>
+              </div>
+            </td>
+            <td class="py-4 px-6 text-gray-600 member-email">${func.email}</td>
+            <td class="py-4 px-6"><span class="px-2.5 py-1 rounded-full font-semibold">${func.cargo}</span></td>
+            <td class="py-4 px-6">${func.status || "Ativo"}</td>
+            <td class="py-4 px-6 text-right"><button onclick="deleteMember(this)" class="text-rose-500 hover:text-rose-700 font-semibold">Remover</button></td>
+          `;
+          tableBody.appendChild(tr);
+        });
+
+        function updateCounts() {
+          const rows = [...document.querySelectorAll(".member-row")];
+          const activeCount = rows.filter(
+            (row) => row.dataset.status.toLowerCase() === "ativo",
+          ).length;
+          const adminCount = rows.filter(
+            (row) => row.dataset.role === "Administrador",
+          ).length;
+
+          const totalCount = document.getElementById("total-count");
+          if (totalCount) totalCount.innerText = rows.length;
+          document.querySelectorAll('[id="active-count"]').forEach((count) => {
+            count.innerText = activeCount;
+          });
+          document.querySelectorAll('[id="admin-count"]').forEach((count) => {
+            count.innerText = adminCount;
+          });
+        }
+
+        function applyTableFilters() {
+          const query = searchInput.value.trim().toLowerCase();
+
+          document.querySelectorAll(".member-row").forEach((row) => {
+            const name = row
+              .querySelector(".member-name")
+              .innerText.toLowerCase();
+            const email = row
+              .querySelector(".member-email")
+              .innerText.toLowerCase();
+            row.style.display =
+              (name.includes(query) || email.includes(query)) &&
+              (selectedRole === "all" || row.dataset.role === selectedRole)
+                ? ""
+                : "none";
+          });
+        }
+
+        updateCounts();
+        searchInput.addEventListener("input", applyTableFilters);
+
+        roleButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            selectedRole = btn.dataset.filter;
+            roleButtons.forEach((button) => {
+              const selected = button === btn;
+              button.classList.toggle("bg-[#875C46]", selected);
+              button.classList.toggle("text-white", selected);
+              button.classList.toggle("bg-gray-100", !selected);
+              button.classList.toggle("text-gray-600", !selected);
+            });
+            applyTableFilters();
+          });
+        });
+
+        window.deleteMember = (btn) => {
+          if (
+            !confirm("Tem certeza de que deseja remover este membro da equipe?")
+          )
+            return;
+          const row = btn.closest(".member-row");
+          const email = row.querySelector(".member-email").innerText.trim();
+          removedMembers.add(email);
+          localStorage.setItem(
+            "equipe_docegestao_removida",
+            JSON.stringify([...removedMembers]),
+          );
+          const savedTeam = JSON.parse(
+            localStorage.getItem("equipe_docegestao") || "[]",
+          ).filter((member) => member.email !== email);
+          localStorage.setItem("equipe_docegestao", JSON.stringify(savedTeam));
+          row.remove();
+          updateCounts();
+          applyTableFilters();
+        };
+      });
+    </script>
+
+    <script>
+      lucide.createIcons();
+    </script>
+    <script src="../src/componentes/sidebar.js" defer></script>
+  </body>
 </html>
