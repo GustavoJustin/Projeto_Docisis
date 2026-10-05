@@ -1,446 +1,213 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gestão de Equipe - DoceGestão</title>
-    <link rel="stylesheet" href="../src/css/output.css" />
-    <script src="https://unpkg.com/lucide@latest"></script>
-  </head>
 
-  <body
-    class="min-h-screen bg-[#FAFAFA] text-[#4A3F39] flex font-sans antialiased"
-  >
-    <!-- Sidebar -->
-    <div
-      id="sidebar-container"
-      data-active="gestao-equipes"
-      class="w-64 shrink-0"
-    ></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestão de Equipe - DoceGestão</title>
+  <link rel="stylesheet" href="../src/css/output.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
 
-    <!-- Conteúdo Principal -->
-    <main class="flex-1 overflow-y-auto p-10">
-      <div class="max-w-6xl mx-auto space-y-6">
-        <!-- Cabeçalho -->
-        <div class="flex items-center justify-between">
+<body class="min-h-screen bg-[#FAFAFA] text-[#4A3F39] flex font-sans antialiased">
+  <!-- Sidebar -->
+  <div id="sidebar-container" data-active="gestao-equipes" class="w-64 shrink-0"></div>
+
+  <!-- Conteúdo Principal -->
+  <main class="flex-1 overflow-y-auto p-10">
+    <div class="max-w-6xl mx-auto space-y-6">
+      <!-- Cabeçalho -->
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-[#6D4936]">
+            Gestão de Funcionários
+          </h2>
+          <p class="text-sm text-gray-500 mt-0.5">
+            Controle de acessos, permissões e atividades da equipe.
+          </p>
+        </div>
+        <a href="cadastro-funcionario.html"
+          class="bg-[#875C46] hover:bg-[#6D4936] text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+          </svg>
+          Novo Funcionário
+        </a>
+      </div>
+
+      <!-- Indicadores e Métricas Rápidas -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
           <div>
-            <h2 class="text-2xl font-bold text-[#6D4936]">
-              Gestão de Funcionários
-            </h2>
-            <p class="text-sm text-gray-500 mt-0.5">
-              Controle de acessos, permissões e atividades da equipe.
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Total da Equipe
+            </p>
+            <p id="total-count" class="text-2xl font-bold text-gray-800 mt-1">
+              4
             </p>
           </div>
-          <a
-            href="cadastro-funcionario.html"
-            class="bg-[#875C46] hover:bg-[#6D4936] text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors"
-          >
-            <svg
-              class="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-              ></path>
-            </svg>
-            Novo Funcionário
-          </a>
-        </div>
-
-        <!-- Indicadores e Métricas Rápidas -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div
-            class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between"
-          >
-            <div>
-              <p
-                class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
-              >
-                Total da Equipe
-              </p>
-              <p id="total-count" class="text-2xl font-bold text-gray-800 mt-1">
-                4
-              </p>
-            </div>
-            <div class="p-3 bg-[#F5ECE5] text-[#875C46] rounded-xl">
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-                ></path>
-              </svg>
-            </div>
-          </div>
-
-          <div
-            class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between"
-          >
-            <div>
-              <p
-                class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
-              >
-                Acessos Ativos
-              </p>
-              <p
-                id="active-count"
-                class="text-2xl font-bold text-emerald-600 mt-1"
-              >
-                3
-              </p>
-            </div>
-            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-            </div>
-          </div>
-
-          <div
-            class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between"
-          >
-            <div>
-              <p
-                class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
-              >
-                Administradores
-              </p>
-              <p
-                id="admin-count"
-                class="text-2xl font-bold text-[#875C46] mt-1"
-              >
-                2
-              </p>
-            </div>
-            <div class="p-3 bg-[#F5ECE5] text-[#875C46] rounded-xl">
-              <svg
-                class="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                ></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- Filtros e Busca -->
-        <div
-          class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center"
-        >
-          <div class="relative w-full md:w-80">
-            <input
-              type="text"
-              id="search-member"
-              placeholder="Buscar por nome ou e-mail..."
-              class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#875C46]"
-            />
-            <svg
-              class="w-4 h-4 text-gray-400 absolute left-3 top-2.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              ></path>
+          <div class="p-3 bg-[#F5ECE5] text-[#875C46] rounded-xl">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z">
+              </path>
             </svg>
           </div>
+        </div>
 
-          <div class="flex items-center gap-2 text-xs">
-            <button
-              data-filter="all"
-              class="filter-role bg-[#875C46] text-white px-3 py-1.5 rounded-lg font-medium transition-colors"
-            >
-              Todos
-            </button>
-            <button
-              data-filter="Administrador"
-              class="filter-role bg-gray-100 text-gray-600 hover:bg-gray-200 px-3 py-1.5 rounded-lg font-medium transition-colors"
-            >
-              Admins
-            </button>
-            <button
-              data-filter="Funcionário"
-              class="filter-role bg-gray-100 text-gray-600 hover:bg-gray-200 px-3 py-1.5 rounded-lg font-medium transition-colors"
-            >
-              Funcionários
-            </button>
+        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Acessos Ativos
+            </p>
+            <p id="active-count" class="text-2xl font-bold text-emerald-600 mt-1">
+              3
+            </p>
+          </div>
+          <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
           </div>
         </div>
 
-        <!-- Tabela de Membros -->
-        <div
-          class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
-        >
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr
-                class="bg-gray-50 border-b border-gray-200 text-gray-500 font-semibold uppercase tracking-wider"
-              >
-                <th class="py-3.5 px-6">Funcionário</th>
-                <th class="py-3.5 px-6">E-mail</th>
-                <th class="py-3.5 px-6">Nível de Acesso</th>
-                <th class="py-3.5 px-6">Status</th>
-                <th class="py-3.5 px-6 text-right">Ações</th>
-              </tr>
-            </thead>
-            <tbody id="team-table-body" class="divide-y divide-gray-100">
-              <!-- Linha Padrão 1 -->
-              <tr
-                class="hover:bg-gray-50/50 transition-colors member-row"
-                data-role="Administrador"
-                data-status="Ativo"
-              >
-                <td class="py-4 px-6 flex items-center gap-3">
-                  <div
-                    class="w-9 h-9 rounded-full bg-[#875C46] text-white font-bold flex items-center justify-center"
-                  >
-                    A
-                  </div>
-                  <div>
-                    <p class="font-bold text-gray-800 member-name">Ana Silva</p>
-                    <p class="text-[10px] text-gray-400">CPF: 123.456.789-00</p>
-                  </div>
-                </td>
-                <td class="py-4 px-6 text-gray-600 member-email">
-                  ana.silva@docegestao.com
-                </td>
-                <td class="py-4 px-6">
-                  <span
-                    class="px-2.5 py-1 rounded-full font-semibold bg-[#875C46]/10 text-[#875C46]"
-                    >Administrador</span
-                  >
-                </td>
-                <td class="py-4 px-6">
-                  <span
-                    class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-medium bg-emerald-50 text-emerald-600"
-                  >
-                    <span
-                      class="w-1.5 h-1.5 rounded-full bg-emerald-500"
-                    ></span>
-                    Ativo
-                  </span>
-                </td>
-                <td class="py-4 px-6 text-right">
-                  <button
-                    onclick="deleteMember(this)"
-                    class="text-rose-500 hover:text-rose-700 font-semibold"
-                  >
-                    Remover
-                  </button>
-                </td>
-              </tr>
-
-              <!-- Linha Padrão 2 -->
-              <tr
-                class="hover:bg-gray-50/50 transition-colors member-row"
-                data-role="Funcionário"
-                data-status="Ativo"
-              >
-                <td class="py-4 px-6 flex items-center gap-3">
-                  <div
-                    class="w-9 h-9 rounded-full bg-amber-600 text-white font-bold flex items-center justify-center"
-                  >
-                    C
-                  </div>
-                  <div>
-                    <p class="font-bold text-gray-800 member-name">
-                      Carlos Eduardo
-                    </p>
-                    <p class="text-[10px] text-gray-400">CPF: 987.654.321-11</p>
-                  </div>
-                </td>
-                <td class="py-4 px-6 text-gray-600 member-email">
-                  carlos@docegestao.com
-                </td>
-                <td class="py-4 px-6">
-                  <span
-                    class="px-2.5 py-1 rounded-full font-semibold bg-gray-100 text-gray-700"
-                    >Funcionário</span
-                  >
-                </td>
-                <td class="py-4 px-6">
-                  <span
-                    class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-medium bg-emerald-50 text-emerald-600"
-                  >
-                    <span
-                      class="w-1.5 h-1.5 rounded-full bg-emerald-500"
-                    ></span>
-                    Ativo
-                  </span>
-                </td>
-                <td class="py-4 px-6 text-right">
-                  <button
-                    onclick="deleteMember(this)"
-                    class="text-rose-500 hover:text-rose-700 font-semibold"
-                  >
-                    Remover
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Administradores
+            </p>
+            <p id="admin-count" class="text-2xl font-bold text-[#875C46] mt-1">
+              2
+            </p>
+          </div>
+          <div class="p-3 bg-[#F5ECE5] text-[#875C46] rounded-xl">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+              </path>
+            </svg>
+          </div>
         </div>
       </div>
-    </main>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const tableBody = document.getElementById("team-table-body");
-        const searchInput = document.getElementById("search-member");
-        const roleButtons = document.querySelectorAll(".filter-role");
-        const removedMembers = new Set(
-          JSON.parse(
-            localStorage.getItem("equipe_docegestao_removida") || "[]",
-          ),
-        );
-        let selectedRole = "all";
+      <!-- Filtros e Busca -->
+      <div
+        class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center">
+        <div class="relative w-full md:w-80">
+          <input type="text" id="search-member" placeholder="Buscar por nome ou e-mail..."
+            class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#875C46]" />
+          <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
 
-        document.querySelectorAll(".member-row").forEach((row) => {
-          const email = row.querySelector(".member-email").innerText.trim();
-          if (removedMembers.has(email)) row.remove();
-        });
+        <div class="flex items-center gap-2 text-xs">
+          <button data-filter="all"
+            class="filter-role bg-[#875C46] text-white px-3 py-1.5 rounded-lg font-medium transition-colors">
+            Todos
+          </button>
+          <button data-filter="Administrador"
+            class="filter-role bg-gray-100 text-gray-600 hover:bg-gray-200 px-3 py-1.5 rounded-lg font-medium transition-colors">
+            Admins
+          </button>
+          <button data-filter="Funcionário"
+            class="filter-role bg-gray-100 text-gray-600 hover:bg-gray-200 px-3 py-1.5 rounded-lg font-medium transition-colors">
+            Funcionários
+          </button>
+        </div>
+      </div>
 
-        const equipeSalva = JSON.parse(
-          localStorage.getItem("equipe_docegestao") || "[]",
-        );
-        equipeSalva.forEach((func) => {
-          if (removedMembers.has(func.email)) return;
-          const tr = document.createElement("tr");
-          tr.className = "hover:bg-gray-50/50 transition-colors member-row";
-          tr.dataset.role = func.cargo;
-          tr.dataset.status = func.status || "Ativo";
-          const avatar = func.foto
-            ? `<img src="${func.foto}" class="w-9 h-9 rounded-full object-cover" alt="${func.nome}" />`
-            : `<div class="w-9 h-9 rounded-full bg-[#875C46] text-white font-bold flex items-center justify-center">${func.nome.charAt(0).toUpperCase()}</div>`;
+      <!-- Tabela de Membros -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 font-semibold uppercase tracking-wider">
+              <th class="py-3.5 px-6">Funcionário</th>
+              <th class="py-3.5 px-6">E-mail</th>
+              <th class="py-3.5 px-6">Nível de Acesso</th>
+              <th class="py-3.5 px-6">Status</th>
+              <th class="py-3.5 px-6 text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="team-table-body" class="divide-y divide-gray-100">
+            <!-- Linha Padrão 1 -->
+            <tr class="hover:bg-gray-50/50 transition-colors member-row" data-role="Administrador" data-status="Ativo">
+              <td class="py-4 px-6 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-[#875C46] text-white font-bold flex items-center justify-center">
+                  A
+                </div>
+                <div>
+                  <p class="font-bold text-gray-800 member-name">Ana Silva</p>
+                  <p class="text-[10px] text-gray-400">CPF: 123.456.789-00</p>
+                </div>
+              </td>
+              <td class="py-4 px-6 text-gray-600 member-email">
+                ana.silva@docegestao.com
+              </td>
+              <td class="py-4 px-6">
+                <span class="px-2.5 py-1 rounded-full font-semibold bg-[#875C46]/10 text-[#875C46]">Administrador</span>
+              </td>
+              <td class="py-4 px-6">
+                <span
+                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-medium bg-emerald-50 text-emerald-600">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Ativo
+                </span>
+              </td>
+              <td class="py-4 px-6 text-right">
+                <button onclick="deleteMember(this)" class="text-rose-500 hover:text-rose-700 font-semibold">
+                  Remover
+                </button>
+              </td>
+            </tr>
 
-          tr.innerHTML = `
-            <td class="py-4 px-6 flex items-center gap-3">
-              ${avatar}
-              <div>
-                <p class="font-bold text-gray-800 member-name">${func.nome}</p>
-                <p class="text-[10px] text-gray-400">CPF: ${func.cpf || "Não informado"}</p>
-              </div>
-            </td>
-            <td class="py-4 px-6 text-gray-600 member-email">${func.email}</td>
-            <td class="py-4 px-6"><span class="px-2.5 py-1 rounded-full font-semibold">${func.cargo}</span></td>
-            <td class="py-4 px-6">${func.status || "Ativo"}</td>
-            <td class="py-4 px-6 text-right"><button onclick="deleteMember(this)" class="text-rose-500 hover:text-rose-700 font-semibold">Remover</button></td>
-          `;
-          tableBody.appendChild(tr);
-        });
+            <!-- Linha Padrão 2 -->
+            <tr class="hover:bg-gray-50/50 transition-colors member-row" data-role="Funcionário" data-status="Ativo">
+              <td class="py-4 px-6 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-amber-600 text-white font-bold flex items-center justify-center">
+                  C
+                </div>
+                <div>
+                  <p class="font-bold text-gray-800 member-name">
+                    Carlos Eduardo
+                  </p>
+                  <p class="text-[10px] text-gray-400">CPF: 987.654.321-11</p>
+                </div>
+              </td>
+              <td class="py-4 px-6 text-gray-600 member-email">
+                carlos@docegestao.com
+              </td>
+              <td class="py-4 px-6">
+                <span class="px-2.5 py-1 rounded-full font-semibold bg-gray-100 text-gray-700">Funcionário</span>
+              </td>
+              <td class="py-4 px-6">
+                <span
+                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-medium bg-emerald-50 text-emerald-600">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Ativo
+                </span>
+              </td>
+              <td class="py-4 px-6 text-right">
+                <button onclick="deleteMember(this)" class="text-rose-500 hover:text-rose-700 font-semibold">
+                  Remover
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
 
-        function updateCounts() {
-          const rows = [...document.querySelectorAll(".member-row")];
-          const activeCount = rows.filter(
-            (row) => row.dataset.status.toLowerCase() === "ativo",
-          ).length;
-          const adminCount = rows.filter(
-            (row) => row.dataset.role === "Administrador",
-          ).length;
+  <script>
+    lucide.createIcons();
+  </script>
+  <script src="../src/componentes/sidebar.js" defer></script>
+  <script src="../src/script/gestao-equipes.js" defer></script>
+</body>
 
-          const totalCount = document.getElementById("total-count");
-          if (totalCount) totalCount.innerText = rows.length;
-          document.querySelectorAll('[id="active-count"]').forEach((count) => {
-            count.innerText = activeCount;
-          });
-          document.querySelectorAll('[id="admin-count"]').forEach((count) => {
-            count.innerText = adminCount;
-          });
-        }
-
-        function applyTableFilters() {
-          const query = searchInput.value.trim().toLowerCase();
-
-          document.querySelectorAll(".member-row").forEach((row) => {
-            const name = row
-              .querySelector(".member-name")
-              .innerText.toLowerCase();
-            const email = row
-              .querySelector(".member-email")
-              .innerText.toLowerCase();
-            row.style.display =
-              (name.includes(query) || email.includes(query)) &&
-              (selectedRole === "all" || row.dataset.role === selectedRole)
-                ? ""
-                : "none";
-          });
-        }
-
-        updateCounts();
-        searchInput.addEventListener("input", applyTableFilters);
-
-        roleButtons.forEach((btn) => {
-          btn.addEventListener("click", () => {
-            selectedRole = btn.dataset.filter;
-            roleButtons.forEach((button) => {
-              const selected = button === btn;
-              button.classList.toggle("bg-[#875C46]", selected);
-              button.classList.toggle("text-white", selected);
-              button.classList.toggle("bg-gray-100", !selected);
-              button.classList.toggle("text-gray-600", !selected);
-            });
-            applyTableFilters();
-          });
-        });
-
-        window.deleteMember = (btn) => {
-          if (
-            !confirm("Tem certeza de que deseja remover este membro da equipe?")
-          )
-            return;
-          const row = btn.closest(".member-row");
-          const email = row.querySelector(".member-email").innerText.trim();
-          removedMembers.add(email);
-          localStorage.setItem(
-            "equipe_docegestao_removida",
-            JSON.stringify([...removedMembers]),
-          );
-          const savedTeam = JSON.parse(
-            localStorage.getItem("equipe_docegestao") || "[]",
-          ).filter((member) => member.email !== email);
-          localStorage.setItem("equipe_docegestao", JSON.stringify(savedTeam));
-          row.remove();
-          updateCounts();
-          applyTableFilters();
-        };
-      });
-    </script>
-
-    <script>
-      lucide.createIcons();
-    </script>
-    <script src="../src/componentes/sidebar.js" defer></script>
-  </body>
 </html>
