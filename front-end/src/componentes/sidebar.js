@@ -73,47 +73,14 @@ const SIDEBAR_HTML = `
     </div>
   </aside>
 `
-
-const SIDEBAR_SCRIPT_URL = document.currentScript?.src
-  ? new URL(document.currentScript.src)
-  : null;
-
-async function carregarSidebar() {
+function carregarSidebar() {
   const container = document.getElementById("sidebar-container");
   if (!container) return;
 
-  const cadastroPublico =
-    new URLSearchParams(window.location.search).get("cadastro-publico") === "1";
-  if (cadastroPublico) {
-    container.remove();
-    return;
-  }
+  container.innerHTML = SIDEBAR_HTML;
 
-  try {
-    container.innerHTML = SIDEBAR_HTML;
-
-    if (window.lucide?.createIcons) {
-      window.lucide.createIcons();
-    }
-
-    const paginaAtiva = container.getAttribute("data-active");
-    if (paginaAtiva) {
-      const linkAtivo = container.querySelector(`[data-page="${paginaAtiva}"]`);
-      linkAtivo?.classList.add("bg-amber-50", "text-amber-800", "font-medium");
-    }
-
-    if (
-      window.location.protocol !== "file:" &&
-      SIDEBAR_SCRIPT_URL &&
-      !document.querySelector("script[data-sidebar-profile]")
-    ) {
-      const perfilScript = document.createElement("script");
-      perfilScript.src = new URL("./perfil.js", SIDEBAR_SCRIPT_URL).href;
-      perfilScript.dataset.sidebarProfile = "true";
-      document.head.appendChild(perfilScript);
-    }
-  } catch (error) {
-    console.error("Erro ao carregar o sidebar:", error);
+  if (window.lucide?.createIcons) {
+    window.lucide.createIcons();
   }
 }
 
