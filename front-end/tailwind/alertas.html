@@ -140,6 +140,7 @@
                         </div>
                         <span class="text-xs font-bold text-gray-800">12%</span>
                       </div>
+                      <span class="text-xs font-bold text-gray-800">12%</span>
                     </div>
                   </div>
                 </div>
@@ -184,6 +185,7 @@
                   </div>
                 </div>
               </div>
+            </div>
 
               <div class="flex flex-col gap-2 w-full sm:w-32 shrink-0">
                 <button onclick="
@@ -202,6 +204,7 @@
               </div>
             </div>
           </div>
+        </div>
 
           <!-- Column 3: Summary Sidebar -->
           <div>
@@ -224,6 +227,11 @@
                   produção.
                 </p>
               </div>
+              <p class="text-xs text-rose-800/70 mt-1 leading-relaxed">
+                Sua atenção é necessária para evitar perdas e manter a
+                produção.
+              </p>
+            </div>
 
               <div class="space-y-3 pt-2 text-xs border-t border-pink-200/50">
                 <div class="flex justify-between items-center text-rose-900 font-medium">
@@ -235,6 +243,11 @@
                   <span class="font-bold">01</span>
                 </div>
               </div>
+              <div class="flex justify-between items-center text-rose-900 font-medium">
+                <span>Abaixo do Mínimo</span>
+                <span class="font-bold">01</span>
+              </div>
+            </div>
 
               <button onclick="
                   showToast(
@@ -248,7 +261,8 @@
             </div>
           </div>
         </div>
-      </main>
+      </div>
+    </main>
 
       <!-- Toast Notification Overlay -->
       <div id="toastNotification"

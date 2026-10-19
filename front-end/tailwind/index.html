@@ -57,12 +57,37 @@
         Entre com sua conta para continuar.
       </p>
 
-      <form id="form-login" class="space-y-5">
-        <div>
-          <label for="email" class="block text-sm font-medium text-cocoa-700 mb-1.5">E-mail</label>
-          <input type="email" id="email" required placeholder="seu@docegestao.com"
-            class="w-full rounded-lg border border-cocoa-200 bg-cream/40 px-4 py-2.5 text-sm text-cocoa-800 placeholder:text-cocoa-400/70 focus:outline-none focus:ring-2 focus:ring-cocoa-400 focus:border-transparent" />
-        </div>
+        <form id="form-login" class="space-y-5">
+          <div
+            id="login-alert"
+            class="hidden rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800"
+            role="alert"
+            aria-live="polite"
+          >
+            <span id="login-alert-text"></span>
+            <a
+              id="login-alert-link"
+              href="cadastro-funcionario.html?cadastro-publico=1"
+              class="ml-1 font-semibold underline"
+            >
+              Cadastre-se
+            </a>
+          </div>
+
+          <div>
+            <label
+              for="email"
+              class="block text-sm font-medium text-cocoa-700 mb-1.5"
+              >E-mail</label
+            >
+            <input
+              type="email"
+              id="email"
+              required
+              placeholder="seu@docegestao.com"
+              class="w-full rounded-lg border border-cocoa-200 bg-cream/40 px-4 py-2.5 text-sm text-cocoa-800 placeholder:text-cocoa-400/70 focus:outline-none focus:ring-2 focus:ring-cocoa-400 focus:border-transparent"
+            />
+          </div>
 
         <div>
           <label for="senha" class="block text-sm font-medium text-cocoa-700 mb-1.5">Senha</label>
@@ -115,46 +140,72 @@
     </div>
   </div>
 
-  <div id="modal-contato" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="titulo-contato">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div>
-          <h3 id="titulo-contato" class="modal-title">
-            Contato do administrador
-          </h3>
-          <p id="contato-status" class="modal-subtitle" aria-live="polite">
-            Buscando contato cadastrado...
-          </p>
-        </div>
-        <button type="button" id="btn-fechar-contato" class="modal-close-btn" aria-label="Fechar">
-          &times;
-        </button>
-      </div>
-      <div id="contato-info" class="modal-group" style="display: none">
-        <p id="contato-nome" class="text-sm font-semibold text-cocoa-800"></p>
-        <a id="contato-email" class="text-sm text-cocoa-700 hover:underline break-all"></a>
-        <div class="grid gap-2 mt-3">
-          <div class="rounded-lg border border-cocoa-200 px-3 py-2">
-            <p class="text-[10px] font-semibold uppercase text-cocoa-400">
-              Telefone / WhatsApp
+    <div
+      id="modal-contato"
+      class="modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="titulo-contato"
+    >
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <h3 id="titulo-contato" class="modal-title">
+              Contato do administrador
+            </h3>
+            <p id="contato-status" class="modal-subtitle" aria-live="polite">
+              Buscando contato cadastrado...
             </p>
-            <a id="contato-telefone" class="text-sm font-medium text-cocoa-700">Não configurado</a>
           </div>
-          <div class="rounded-lg border border-cocoa-200 px-3 py-2">
-            <p class="text-[10px] font-semibold uppercase text-cocoa-400">
-              Instagram
-            </p>
-            <a id="contato-instagram" class="text-sm font-medium text-cocoa-700">Não configurado</a>
+          <button
+            type="button"
+            id="btn-fechar-contato"
+            class="modal-close-btn"
+            aria-label="Fechar"
+          >
+            &times;
+          </button>
+        </div>
+        <div id="contato-info" class="modal-group" style="display: none">
+          <p id="contato-nome" class="text-sm font-semibold text-cocoa-800"></p>
+          <a
+            id="contato-email"
+            class="text-sm text-cocoa-700 hover:underline break-all"
+          ></a>
+          <div class="grid gap-2 mt-3">
+            <div class="rounded-lg border border-cocoa-200 px-3 py-2">
+              <p class="text-[10px] font-semibold uppercase text-cocoa-400">
+                Telefone / WhatsApp
+              </p>
+              <a
+                id="contato-telefone"
+                class="text-sm font-medium text-cocoa-700"
+                >Não configurado</a
+              >
+            </div>
+            <div class="rounded-lg border border-cocoa-200 px-3 py-2">
+              <p class="text-[10px] font-semibold uppercase text-cocoa-400">
+                Instagram
+              </p>
+              <a
+                id="contato-instagram"
+                class="text-sm font-medium text-cocoa-700"
+                >Não configurado</a
+              >
+            </div>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" id="btn-fechar-contato-footer" class="btn-modal-cancel">
-          Fechar
-        </button>
+        <div class="modal-footer">
+          <button
+            type="button"
+            id="btn-fechar-contato-footer"
+            class="btn-modal-cancel"
+          >
+            Fechar
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
   <!-- ==================== MODAL REDEFINIR SENHA ==================== -->
   <div id="modal-esqueci" class="modal-overlay">

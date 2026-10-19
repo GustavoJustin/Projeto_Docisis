@@ -78,29 +78,26 @@ const SIDEBAR_SCRIPT_URL = document.currentScript?.src
   ? new URL(document.currentScript.src)
   : null;
 
-// const TOKEN_KEY = "docegestao_token";
+async function carregarSidebar() {
+  const container = document.getElementById("sidebar-container");
+  if (!container) return;
 
-// function isPublicPage() {
-//   const pageName = window.location.pathname.split("/").pop();
-//   const cadastroPublico =
-//     new URLSearchParams(window.location.search).get("cadastro-publico") === "1";
+  const cadastroPublico =
+    new URLSearchParams(window.location.search).get("cadastro-publico") === "1";
+  if (cadastroPublico) {
+    container.remove();
+    return;
+  }
 
-//   return (
-//     pageName === "index.html" ||
-//     (pageName === "cadastro-funcionario.html" && cadastroPublico)
-//   );
-// }
+  try {
+    container.innerHTML = SIDEBAR_HTML;
 
-// if (window.location.protocol !== "file:" && !isPublicPage()) {
-//   const hasToken = Boolean(localStorage.getItem(TOKEN_KEY));
-//   if (!hasToken) {
-//     window.location.replace("/tailwind/index.html");
-//   }
-// }
+    if (window.lucide?.createIcons) {
+      window.lucide.createIcons();
+    }
 
-// async function carregarSidebar() {
-//   const container = document.getElementById("sidebar-container");
-//   if (!container) return;
+    const btnHistorico = container.querySelector("#btn-historico");
+    const submenuHistorico = container.querySelector("#submenu-historico");
 
   const cadastroPublico =
     new URLSearchParams(window.location.search).get("cadastro-publico") === "1";
@@ -193,3 +190,4 @@ if (
 }
 
 document.addEventListener("DOMContentLoaded", carregarSidebar);
+  
