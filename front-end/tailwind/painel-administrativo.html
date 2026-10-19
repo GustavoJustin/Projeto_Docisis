@@ -73,10 +73,10 @@
         <div id="view-visao-geral" class="hidden space-y-6">
           <div>
             <h2 class="text-2xl font-bold text-[#6D4936]">
-              Visão Geral da Confeitaria
+              Painel Administrativo
             </h2>
             <p class="text-xs text-gray-400 mt-1">
-              Acompanhamento de vendas, produção e entregas.
+              Gestão técnica, auditoria de logs e segurança do sistema.
             </p>
           </div>
 
@@ -123,16 +123,14 @@
           </div>
         </div>
 
-        <!-- ABA 2: PAINEL ADMIN -->
-        <div id="view-painel-admin" class="space-y-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-2xl font-bold text-[#6D4936]">
-                Painel Administrativo
-              </h2>
-              <p class="text-xs text-gray-400 mt-1">
-                Gestão técnica, auditoria de logs e segurança do sistema.
-              </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm">
+            <h3 class="font-bold text-gray-700 text-sm mb-3">
+              Parâmetros de Estoque
+            </h3>
+            <div class="flex justify-between items-center text-xs mb-2">
+              <span class="text-gray-500">Limite Crítico</span>
+              <span class="font-bold text-red-500">15%</span>
             </div>
             <div class="flex items-center gap-3">
               <button id="btn-exportar"
@@ -187,6 +185,8 @@
                 Abrir Chamado
               </button>
             </div>
+            <span class="bg-[#FDF3E7] text-[#C67D35] text-[10px] font-bold px-2.5 py-1 rounded-md">REABASTECIMENTO
+              ATIVO</span>
           </div>
 
           <div class="bg-white rounded-2xl border border-gray-200/80 p-6 shadow-sm">
@@ -233,6 +233,18 @@
                 </tbody>
               </table>
             </div>
+            <span class="text-xs font-bold text-gray-700">SERVIDOR & SSL OK</span>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex flex-col justify-between">
+            <h3 class="font-bold text-gray-800 text-sm">Suporte Técnico</h3>
+            <p class="text-xs text-gray-400 mt-1 mb-4">
+              Abertura de chamados diretos com o time de TI.
+            </p>
+            <button id="btn-chamado"
+              class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs py-2.5 rounded-xl uppercase transition-colors">
+              Abrir Chamado
+            </button>
           </div>
         </div>
       </div>

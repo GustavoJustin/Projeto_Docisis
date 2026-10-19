@@ -82,10 +82,18 @@ function carregarSidebar() {
   if (window.lucide?.createIcons) {
     window.lucide.createIcons();
   }
-}
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", carregarSidebar, { once: true });
-} else {
-  carregarSidebar();
+
+  if (
+    document.getElementById("sidebar-container") &&
+    new URLSearchParams(window.location.search).get("cadastro-publico") !== "1"
+  ) {
+    document.documentElement.style.display = "none";
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", carregarSidebar, { once: true });
+  } else {
+    carregarSidebar();
+  }
 }
