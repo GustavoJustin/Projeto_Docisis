@@ -19,63 +19,42 @@ const SIDEBAR_HTML = `
 
         <!-- Navegação Principal -->
         <nav class="space-y-1 text-sm font-semibold text-[#334155]">
-          <!-- Dashboard -->
-          <a href="#" data-page="dashboard"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
-            <i data-lucide="layout-grid" class="w-5 h-5"></i>
-            <span>Dashboard</span>
-          </a>
-
           <!-- Estoque -->
-          <a href="#" data-page="estoque"
+          <a href="./estoqueInsumo.html" data-page="estoque"
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
             <i data-lucide="package" class="w-5 h-5"></i>
             <span>Estoque</span>
           </a>
 
-          <!-- Entrada -->
-          <a href="#" data-page="entrada"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
-            <i data-lucide="log-in" class="w-5 h-5"></i>
-            <span>Entrada</span>
-          </a>
-
-          <!-- Saída -->
-          <a href="#" data-page="saida"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
-            <i data-lucide="log-out" class="w-5 h-5"></i>
-            <span>Saída</span>
-          </a>
-
           <!-- Alertas -->
-          <a href="#" data-page="alertas"
+          <a href="./alertas.html" data-page="alertas"
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
             <i data-lucide="bell" class="w-5 h-5"></i>
             <span>Alertas</span>
           </a>
 
-          <a href="#" data-page="relatorios"
+          <a href="./relatorios_analises.html" data-page="relatorios"
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
             <i data-lucide="chart-no-axes-combined" class="w-5 h-5"></i>
             <span>Relatórios</span>
           </a>
 
           <!-- Historico -->
-          <a href="#" data-page="historico"
+          <a href="./historico-completo.html" data-page="historico"
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
             <i data-lucide="clock" class="w-5 h-5"></i>
             <span>Historico</span>
           </a>
 
           <!-- Funcionários -->
-          <a href="#" data-page="funcionarios"
+          <a href="./gestao-equipes.html" data-page="funcionarios"
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
             <i data-lucide="users" class="w-5 h-5"></i>
             <span>Funcionários</span>
           </a>
 
           <!-- Admin -->
-          <a href="#" data-page="admin"
+          <a href="./painel-administrativo.html" data-page="admin"
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
             <i data-lucide="shield-check" class="w-5 h-5"></i>
             <span>Admin</span>
