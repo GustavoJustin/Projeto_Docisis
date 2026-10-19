@@ -26,18 +26,14 @@
   <!-- SIDEBAR Componente -->
   <div id="sidebar-container" data-active="estoqueInsumos" class="w-64 shrink-0"></div>
 
-  <div id="Conteudo centralizado">
+  <div id="conteudo-centralizado" class="flex min-h-screen min-w-0 flex-1 flex-col">
     <!-- HEADER Componente -->
     <div id="header-container" class="w-full shrink-0 sticky z-50 top-0"></div>
 
     <!-- CONTEUDO PRINCIPAL -->
     <main
-      class="flex-1 m-0 bg-white rounded-r-2xl flex flex-col overflow-hidden shadow-sm border border-black/5 border-l-0 p-10 h-screen">
-
-      <!-- Header principal -->
-      <div id="header-container" class="w-full shrink-0"></div>
-
-      <div class="flex-1 overflow-y-auto space-y-6">
+      class="min-w-0 flex-1 m-0 bg-white rounded-r-2xl shadow-sm border border-black/5 border-l-0 p-10">
+      <div class="space-y-6">
         <!-- Categorias -->
         <div id="filtros-categoria" class="flex items-center gap-2 overflow-x-auto pb-1">
           <button data-categoria="Tudo"
@@ -109,10 +105,6 @@
                   </div>
                 </div>
               </div>
-              <p class="text-[10px] text-brand-text-muted">
-                Categoria: Açúcares
-              </p>
-
             <div class="flex items-center justify-between pt-4 px-1">
               <span class="qtd-valor text-base font-bold text-brand-text-dark">45
                 <span class="text-xs font-normal text-brand-text-muted">kg</span></span>
@@ -127,6 +119,7 @@
                 </button>
               </div>
             </div>
+          </div>
           </div>
 
           <!-- Card 2: Farinha de Trigo -->
@@ -169,10 +162,6 @@
                   </div>
                 </div>
               </div>
-              <p class="text-[10px] text-brand-text-muted">
-                Categoria: Farinhas
-              </p>
-
             <div class="flex items-center justify-between pt-4 px-1">
               <span class="qtd-valor text-base font-bold text-rose-500">8
                 <span class="text-xs font-normal text-rose-400">kg</span></span>
@@ -187,6 +176,7 @@
                 </button>
               </div>
             </div>
+          </div>
           </div>
 
           <!-- Card 3: Manteiga com Sal -->
@@ -228,10 +218,6 @@
                   </div>
                 </div>
               </div>
-              <p class="text-[10px] text-brand-text-muted">
-                Categoria: Laticínios
-              </p>
-
             <div class="flex items-center justify-between pt-4 px-1">
               <span class="qtd-valor text-base font-bold text-brand-text-dark">15
                 <span class="text-xs font-normal text-brand-text-muted">un</span></span>
@@ -246,6 +232,7 @@
                 </button>
               </div>
             </div>
+          </div>
           </div>
 
           <!-- Card 4: Chocolate em Pó -->
@@ -288,10 +275,6 @@
                   </div>
                 </div>
               </div>
-              <p class="text-[10px] text-brand-text-muted">
-                Categoria: Chocolates
-              </p>
-
             <div class="flex items-center justify-between pt-4 px-1">
               <span class="qtd-valor text-base font-bold text-rose-500">4
                 <span class="text-xs font-normal text-rose-400">un</span></span>
@@ -306,6 +289,7 @@
                 </button>
               </div>
             </div>
+          </div>
           </div>
 
           <!-- Card 5: Essência de Baunilha -->
@@ -347,10 +331,6 @@
                   </div>
                 </div>
               </div>
-              <p class="text-[10px] text-brand-text-muted">
-                Categoria: Essências
-              </p>
-
             <div class="flex items-center justify-between pt-4 px-1">
               <span class="qtd-valor text-base font-bold text-brand-text-dark">12
                 <span class="text-xs font-normal text-brand-text-muted">un</span></span>
@@ -365,6 +345,7 @@
                 </button>
               </div>
             </div>
+          </div>
           </div>
 
           <!-- Card 6: Chocolate Belga 70% Cacau (NOVO) -->
@@ -548,7 +529,7 @@
     </div>
 
     <!-- FOOTER Componente -->
-    <div id="footer-container" class="w-full shrink-0 sticky z-50 bottom-0"></div>
+    <div id="footer-container" class="w-full shrink-0 mt-auto"></div>
   </div>
 
   <script> lucide.createIcons(); </script>

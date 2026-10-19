@@ -1,6 +1,6 @@
 const HEADER_HTML = `
   <header
-    class="bg-cocoa-800 border-b border-[#6B4E3B]/60 text-[#F7F1EA] px-4 sm:px-8 py-3 flex flex-wrap justify-between items-center gap-4 shadow-md">
+    class="bg-cocoa-800 border-l border-cocoa-800 text-[#F7F1EA] px-4 sm:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
     <div>
       <p class="text-xs text-[#D9C6B4] font-medium">
       Gestão <span class="mx-1">/</span> <span data-header-page-name>Estoque</span>
