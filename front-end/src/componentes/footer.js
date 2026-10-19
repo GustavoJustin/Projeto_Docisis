@@ -1,5 +1,5 @@
 const FOOTER_HTML = `
-  <footer class="bg-cocoa-900 text-cocoa-100 border-t border-cocoa-700">
+  <footer class="bg-cocoa-800 text-cocoa-100 border-t border-cocoa-700">
     <div class="mx-auto max-w-7xl px-6 py-10 sm:px-8 lg:px-10">
       <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
         <div>

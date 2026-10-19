@@ -1,10 +1,10 @@
 const SIDEBAR_HTML = `
   <aside
-    class="w-64 h-screen flex flex-col justify-between shrink-0 bg-[#f5f2eb] border-r border-black/5 sticky top-0 font-sans">
+    class="w-64 h-screen flex flex-col justify-between shrink-0 bg-cocoa-400 border-r border-black/5 sticky top-0 font-sans">
     <div>
       <!-- Cabeçalho Topo (Branco) -->
-      <div class="bg-white px-6 py-5">
-        <h1 class="text-xl font-bold text-[#8c5a3e] tracking-tight">
+      <div class="bg-cocoa-800 px-6 py-5">
+        <h1 class="text-xl font-bold text-white tracking-tight">
           DoceGestão
         </h1>
       </div>
@@ -21,41 +21,41 @@ const SIDEBAR_HTML = `
         <nav class="space-y-1 text-sm font-semibold text-[#334155]">
           <!-- Estoque -->
           <a href="./estoqueInsumo.html" data-page="estoque"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
+            class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
             <i data-lucide="package" class="w-5 h-5"></i>
             <span>Estoque</span>
           </a>
 
           <!-- Alertas -->
           <a href="./alertas.html" data-page="alertas"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
+            class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
             <i data-lucide="bell" class="w-5 h-5"></i>
             <span>Alertas</span>
           </a>
 
           <a href="./relatorios_analises.html" data-page="relatorios"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
+            class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
             <i data-lucide="chart-no-axes-combined" class="w-5 h-5"></i>
             <span>Relatórios</span>
           </a>
 
           <!-- Historico -->
           <a href="./historico-completo.html" data-page="historico"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
+            class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
             <i data-lucide="clock" class="w-5 h-5"></i>
             <span>Historico</span>
           </a>
 
           <!-- Funcionários -->
           <a href="./gestao-equipes.html" data-page="funcionarios"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
+            class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
             <i data-lucide="users" class="w-5 h-5"></i>
             <span>Funcionários</span>
           </a>
 
           <!-- Admin -->
           <a href="./painel-administrativo.html" data-page="admin"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-black/5 transition-all">
+            class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
             <i data-lucide="shield-check" class="w-5 h-5"></i>
             <span>Admin</span>
           </a>
@@ -66,7 +66,7 @@ const SIDEBAR_HTML = `
     <!-- Rodapé: Botão Novo Item -->
     <div class="p-5">
       <a href="./historico-materias_prima.html" id="btn-novo-sidebar"
-        class="w-full bg-[#8c5a3e] hover:bg-[#784c33] text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer text-sm">
+        class="w-full bg-cocoa-700 hover:bg-cocoa-800 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer text-sm">
         <span class="text-base font-normal">+</span>
         <span>Nova Movimentação</span>
       </a>
