@@ -83,17 +83,32 @@ function carregarSidebar() {
     window.lucide.createIcons();
   }
 
+  const paginasPorLink = {
+    estoque: ["estoque", "estoqueinsumos", "materia_prima"],
+    alertas: ["alertas"],
+    relatorios: ["relatorios", "relatorios_analises"],
+    historico: ["historico", "historico-completo"],
+    funcionarios: ["funcionarios", "gestao-equipes", "cadastro-funcionario"],
+    admin: ["admin", "painel-administrativo"],
+  };
+  const paginaAtiva = container.dataset.active?.trim().toLowerCase();
+  const linkAtivo = [...container.querySelectorAll("[data-page]")].find((link) =>
+    paginasPorLink[link.dataset.page]?.includes(paginaAtiva),
+  );
 
-  if (
-    document.getElementById("sidebar-container") &&
-    new URLSearchParams(window.location.search).get("cadastro-publico") !== "1"
-  ) {
-    document.documentElement.style.display = "none";
+  if (linkAtivo) {
+    linkAtivo.classList.add(
+      "bg-cocoa-200/60",
+      "text-cocoa-800",
+      "font-bold",
+      "shadow-sm",
+    );
+    linkAtivo.setAttribute("aria-current", "page");
   }
+}
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", carregarSidebar, { once: true });
-  } else {
-    carregarSidebar();
-  }
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", carregarSidebar, { once: true });
+} else {
+  carregarSidebar();
 }
