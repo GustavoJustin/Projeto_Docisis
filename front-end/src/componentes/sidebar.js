@@ -78,29 +78,29 @@ const SIDEBAR_SCRIPT_URL = document.currentScript?.src
   ? new URL(document.currentScript.src)
   : null;
 
-const TOKEN_KEY = "docegestao_token";
+// const TOKEN_KEY = "docegestao_token";
 
-function isPublicPage() {
-  const pageName = window.location.pathname.split("/").pop();
-  const cadastroPublico =
-    new URLSearchParams(window.location.search).get("cadastro-publico") === "1";
+// function isPublicPage() {
+//   const pageName = window.location.pathname.split("/").pop();
+//   const cadastroPublico =
+//     new URLSearchParams(window.location.search).get("cadastro-publico") === "1";
 
-  return (
-    pageName === "index.html" ||
-    (pageName === "cadastro-funcionario.html" && cadastroPublico)
-  );
-}
+//   return (
+//     pageName === "index.html" ||
+//     (pageName === "cadastro-funcionario.html" && cadastroPublico)
+//   );
+// }
 
-if (window.location.protocol !== "file:" && !isPublicPage()) {
-  const hasToken = Boolean(localStorage.getItem(TOKEN_KEY));
-  if (!hasToken) {
-    window.location.replace("/tailwind/index.html");
-  }
-}
+// if (window.location.protocol !== "file:" && !isPublicPage()) {
+//   const hasToken = Boolean(localStorage.getItem(TOKEN_KEY));
+//   if (!hasToken) {
+//     window.location.replace("/tailwind/index.html");
+//   }
+// }
 
-async function carregarSidebar() {
-  const container = document.getElementById("sidebar-container");
-  if (!container) return;
+// async function carregarSidebar() {
+//   const container = document.getElementById("sidebar-container");
+//   if (!container) return;
 
   const cadastroPublico =
     new URLSearchParams(window.location.search).get("cadastro-publico") === "1";
@@ -109,36 +109,87 @@ async function carregarSidebar() {
     return;
   }
 
-  try {
-    container.innerHTML = SIDEBAR_HTML;
+  const paginaAtiva = container.getAttribute("data-active");
 
-    if (window.lucide?.createIcons) {
-      window.lucide.createIcons();
+  try {
+    let htmlSidebar = SIDEBAR_HTML;
+
+    if (window.location.protocol !== "file:") {
+      const resposta = await fetch(
+        "../src/componentes/sidebar.html?v=" + new Date().getTime(),
+      );
+      if (!resposta.ok) throw new Error(`Erro: ${resposta.statusText}`);
+      htmlSidebar = await resposta.text();
     }
 
-    const paginaAtiva = container.getAttribute("data-active");
+    container.innerHTML = htmlSidebar;
+
+    if (typeof lucide !== "undefined" && lucide.createIcons) {
+      lucide.createIcons();
+    }
+
+    const btnHistorico = container.querySelector("#btn-historico");
+    const submenuHistorico = container.querySelector("#submenu-historico");
+
+    if (submenuHistorico) {
+      submenuHistorico.style.display = "none";
+    }
+
+    if (btnHistorico && submenuHistorico) {
+      btnHistorico.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        const setaHistorico = container.querySelector("#seta-historico");
+        const estaFechado =
+          submenuHistorico.style.display === "none" ||
+          submenuHistorico.style.display === "";
+
+        if (estaFechado) {
+          submenuHistorico.style.display = "block";
+          if (setaHistorico) setaHistorico.style.transform = "rotate(180deg)";
+        } else {
+          submenuHistorico.style.display = "none";
+          if (setaHistorico) setaHistorico.style.transform = "rotate(0deg)";
+        }
+      });
+    }
+
     if (paginaAtiva) {
       const linkAtivo = container.querySelector(`[data-page="${paginaAtiva}"]`);
-      linkAtivo?.classList.add("bg-amber-50", "text-amber-800", "font-medium");
+      if (linkAtivo) {
+        linkAtivo.classList.remove(
+          "text-stone-500",
+          "hover:bg-stone-50",
+          "hover:text-stone-700",
+        );
+        linkAtivo.classList.add("bg-amber-50", "text-amber-800", "font-medium");
+      }
+
+      if (
+        paginaAtiva === "historico-movimentacoes" ||
+        paginaAtiva === "historico-materia-prima"
+      ) {
+        const setaHistorico = container.querySelector("#seta-historico");
+        if (submenuHistorico) submenuHistorico.style.display = "block";
+        if (setaHistorico) setaHistorico.style.transform = "rotate(180deg)";
+        if (btnHistorico)
+          btnHistorico.classList.add("text-amber-800", "font-medium");
+      }
     }
 
-    if (
-      window.location.protocol !== "file:" &&
-      SIDEBAR_SCRIPT_URL &&
-      !document.querySelector("script[data-sidebar-profile]")
-    ) {
-      const perfilScript = document.createElement("script");
-      perfilScript.src = new URL("./perfil.js", SIDEBAR_SCRIPT_URL).href;
-      perfilScript.dataset.sidebarProfile = "true";
-      document.head.appendChild(perfilScript);
-    }
-  } catch (error) {
-    console.error("Erro ao carregar o sidebar:", error);
+    const perfilScript = document.createElement("script");
+    perfilScript.src = "../src/componentes/perfil.js";
+    document.head.appendChild(perfilScript);
+  } catch (erro) {
+    console.error("Erro ao carregar menu lateral:", erro);
   }
+
+
+if (
+  document.getElementById("sidebar-container") &&
+  new URLSearchParams(window.location.search).get("cadastro-publico") !== "1"
+) {
+  document.documentElement.style.display = "none";
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", carregarSidebar, { once: true });
-} else {
-  carregarSidebar();
-}
+document.addEventListener("DOMContentLoaded", carregarSidebar);
