@@ -1,4 +1,6 @@
 function initializeSplashScreen() {
+  if (!document.getElementById('splash-content')) return;
+
   const elements = {
     body: document.body,
     decorationTop: document.getElementById('splash-decoration-top'),
@@ -45,7 +47,7 @@ function initializeSplashScreen() {
   const startedAt = performance.now();
   let animationFrame;
   const timer = window.setTimeout(() => {
-    window.location.href = 'estoqueInsumo.html';
+    window.navegarDemo('estoque');
   }, 2500);
 
   function animateProgress(now) {
@@ -58,14 +60,17 @@ function initializeSplashScreen() {
 
   animationFrame = window.requestAnimationFrame(animateProgress);
 
-  window.addEventListener('pagehide', () => {
+  window.__splashCleanup = () => {
     window.cancelAnimationFrame(animationFrame);
     window.clearTimeout(timer);
-  }, { once: true });
+    delete window.__splashCleanup;
+  };
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeSplashScreen, { once: true });
-} else {
-  initializeSplashScreen();
-}
+document.addEventListener('demo:before-page-change', () => {
+  window.__splashCleanup?.();
+});
+
+document.addEventListener('demo:page-loaded', (event) => {
+  if (event.detail?.pagina === 'splash') initializeSplashScreen();
+});

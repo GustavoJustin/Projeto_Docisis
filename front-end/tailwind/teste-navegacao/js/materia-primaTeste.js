@@ -114,7 +114,8 @@ const dadosInsumos = {
     },
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+function inicializarMateriaPrima() {
+    if (!document.getElementById('detalhe-nome')) return;
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
 
@@ -192,4 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Recria os ícones lucide para os elementos trocados dinamicamente (ex: trending-up/down)
     if (window.lucide) lucide.createIcons();
-});
+}
+
+window.inicializarMateriaPrima = inicializarMateriaPrima;

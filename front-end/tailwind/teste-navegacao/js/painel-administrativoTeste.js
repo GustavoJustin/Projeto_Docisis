@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("demo:page-loaded", () => {
     // --- Funcao Toast Personalizada (Visual Escuro com Ícone Verde idêntico à foto) ---
     function showToast(title, message) {
         const container = document.getElementById("toast-container");
@@ -29,23 +29,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const viewVisaoGeral = document.getElementById("view-visao-geral");
     const viewPainelAdmin = document.getElementById("view-painel-admin");
 
-    tabVisaoGeral.addEventListener("click", () => {
-        viewVisaoGeral.classList.remove("hidden");
-        viewPainelAdmin.classList.add("hidden");
-        tabVisaoGeral.className =
-            "text-[#875C46] font-bold border-b-2 border-[#875C46] h-full transition-all";
-        tabPainelAdmin.className =
-            "text-gray-400 font-medium hover:text-[#875C46] h-full border-b-2 border-transparent transition-all";
-    });
+    if (tabVisaoGeral && tabPainelAdmin && viewVisaoGeral && viewPainelAdmin) {
+        tabVisaoGeral.addEventListener("click", () => {
+            viewVisaoGeral.classList.remove("hidden");
+            viewPainelAdmin.classList.add("hidden");
+            tabVisaoGeral.className =
+                "text-[#875C46] font-bold border-b-2 border-[#875C46] h-full transition-all";
+            tabPainelAdmin.className =
+                "text-gray-400 font-medium hover:text-[#875C46] h-full border-b-2 border-transparent transition-all";
+        });
 
-    tabPainelAdmin.addEventListener("click", () => {
-        viewPainelAdmin.classList.remove("hidden");
-        viewVisaoGeral.classList.add("hidden");
-        tabPainelAdmin.className =
-            "text-[#875C46] font-bold border-b-2 border-[#875C46] h-full transition-all";
-        tabVisaoGeral.className =
-            "text-gray-400 font-medium hover:text-[#875C46] h-full border-b-2 border-transparent transition-all";
-    });
+        tabPainelAdmin.addEventListener("click", () => {
+            viewPainelAdmin.classList.remove("hidden");
+            viewVisaoGeral.classList.add("hidden");
+            tabPainelAdmin.className =
+                "text-[#875C46] font-bold border-b-2 border-[#875C46] h-full transition-all";
+            tabVisaoGeral.className =
+                "text-gray-400 font-medium hover:text-[#875C46] h-full border-b-2 border-transparent transition-all";
+        });
+    }
 
     // --- 2. Correção do Botão BACKUP ---
     const btnBackup = document.getElementById("btn-backup");

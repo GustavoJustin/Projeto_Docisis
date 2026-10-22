@@ -1,12 +1,13 @@
 lucide.createIcons();
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("demo:page-loaded", () => {
     const rows = [...document.querySelectorAll("#tabela-movimentacoes tr")];
     const searchInput = document.getElementById("busca-historico");
     const startInput = document.getElementById("data-inicio");
     const endInput = document.getElementById("data-fim");
     const typeSelect = document.getElementById("filtro-tipo");
     const summary = document.getElementById("resumo-paginacao");
+    if (!searchInput || !startInput || !endInput || !typeSelect || !summary) return;
     const pageButtons = [
         ...document.querySelectorAll("#paginacao-historico [data-page]"),
     ];

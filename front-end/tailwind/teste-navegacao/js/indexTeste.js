@@ -1,5 +1,5 @@
 
-(() => {
+function inicializarLogin() {
     const modal = document.getElementById("modal-esqueci");
     const btnAbrir = document.getElementById("btn-abrir-esqueci");
     const btnFechar = document.getElementById("btn-fechar-esqueci");
@@ -112,9 +112,16 @@
     modalContato.addEventListener("click", (event) => {
         if (event.target === modalContato) fecharContato();
     });
-    window.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") fecharContato();
-    });
+    if (!window.__loginEscapeHandler) {
+        window.addEventListener("keydown", (event) => {
+            if (event.key !== "Escape") return;
+            const contato = document.getElementById("modal-contato");
+            const recuperacao = document.getElementById("modal-esqueci");
+            if (contato) contato.style.display = "none";
+            if (recuperacao) recuperacao.style.display = "none";
+        });
+        window.__loginEscapeHandler = true;
+    }
 
     formLogin.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -143,7 +150,7 @@
                 "docegestao_funcionario",
                 JSON.stringify(resultado.funcionario),
             );
-            window.location.href = "splash.html";
+            window.navegarDemo("splash");
         } catch (erro) {
             alert(erro.message || "Não foi possível conectar à API.");
         } finally {
@@ -198,4 +205,8 @@
             "A recuperação de senha ainda não está conectada ao servidor. Entre em contato com o administrador.";
         msgErro.style.display = "block";
     });
-})();
+}
+
+document.addEventListener("demo:page-loaded", (event) => {
+    if (event.detail?.pagina === "login") inicializarLogin();
+});

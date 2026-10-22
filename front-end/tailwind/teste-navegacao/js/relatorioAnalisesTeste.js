@@ -66,7 +66,7 @@ function confirmarLogout() {
   fecharModalLogout();
   localStorage.removeItem("docegestao_token");
   localStorage.removeItem("docegestao_funcionario");
-  window.location.href = "../index.html";
+  window.navegarDemo("login");
 }
 
 function mudarAbaConfig(aba) {

@@ -1,7 +1,8 @@
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("demo:page-loaded", () => {
     const tableBody = document.getElementById("team-table-body");
     const searchInput = document.getElementById("search-member");
+    if (!tableBody || !searchInput) return;
     const roleButtons = document.querySelectorAll(".filter-role");
     const removedMembers = new Set(
         JSON.parse(

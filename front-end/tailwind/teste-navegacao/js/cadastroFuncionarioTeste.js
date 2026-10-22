@@ -1,9 +1,9 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const cadastroPublico =
-        new URLSearchParams(window.location.search).get(
-            "cadastro-publico",
-        ) === "1";
+function inicializarCadastroFuncionario() {
     const form = document.getElementById("form-cadastro");
+    if (!form) return;
+    const cadastroPublico =
+        form.dataset.cadastroPublico === "true" ||
+        new URLSearchParams(window.location.search).get("cadastro-publico") === "1";
     const inputFoto = document.getElementById("input-foto");
     const photoPreview = document.getElementById("photo-preview");
     const uploadPlaceholder = document.getElementById("upload-placeholder");
@@ -15,17 +15,33 @@ document.addEventListener("DOMContentLoaded", () => {
     const cardFunc = document.getElementById("card-func");
 
     if (cadastroPublico) {
-        const breadcrumb = document.getElementById("breadcrumb-gestao");
-        breadcrumb.href = "index.html";
-        breadcrumb.textContent = "Voltar ao login";
-        document.getElementById("header-user-profile").style.display = "none";
-        form.querySelector("h2").textContent = "Criar conta de funcionário";
-        cardAdmin.style.display = "none";
-        cardAdmin.querySelector('input[name="nivel_acesso"]').disabled = true;
-        document.querySelector(
-            'input[name="nivel_acesso"][value="funcionario"]',
-        ).checked = true;
-        cardAdmin.parentElement.classList.remove("md:grid-cols-2");
+        const loginLink = document.getElementById("cadastro-alert-link");
+        if (loginLink) {
+            loginLink.href = "../painel.html?pagina=login";
+            loginLink.textContent = "Voltar ao login";
+        }
+        const headerUserProfile = document.getElementById("header-user-profile");
+        if (headerUserProfile) headerUserProfile.style.display = "none";
+        const titulo = form.querySelector("h2");
+        if (titulo) titulo.textContent = "Criar conta de funcionário";
+        if (cardAdmin) {
+            cardAdmin.style.display = "none";
+            const radioAdmin = cardAdmin.querySelector('input[name="nivel_acesso"]');
+            if (radioAdmin) radioAdmin.disabled = true;
+            const radioFuncionario = document.querySelector(
+                'input[name="nivel_acesso"][value="funcionario"]',
+            );
+            if (radioFuncionario) radioFuncionario.checked = true;
+            cardAdmin.parentElement.classList.remove("md:grid-cols-2");
+        }
+    }
+
+    function voltarAoLogin() {
+        if (typeof window.navegarDemo === "function") {
+            window.navegarDemo("login");
+        } else {
+            window.location.href = "../painel.html?pagina=login";
+        }
     }
 
     // Máscara CPF
@@ -54,9 +70,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Upload de foto
-    inputFoto.addEventListener("change", (e) => {
+    inputFoto?.addEventListener("change", (e) => {
         const file = e.target.files[0];
-        if (file) {
+        if (file && photoPreview && uploadPlaceholder) {
             const reader = new FileReader();
             reader.onload = (event) => {
                 photoPreview.src = event.target.result;
@@ -70,6 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Cartões de nível de acesso
     radioNivel.forEach((radio) => {
         radio.addEventListener("change", (e) => {
+            if (!cardAdmin || !cardFunc) return;
             if (e.target.value === "administrador") {
                 cardAdmin.className =
                     "relative flex items-start p-4 rounded-xl border-2 border-[#875C46] bg-[#FDFBF7] cursor-pointer transition-all";
@@ -127,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert(
                     "Conta de funcionário criada. Entre com seu e-mail e senha.",
                 );
-                window.location.href = "index.html";
+                voltarAoLogin();
             } catch (erro) {
                 alert(erro.message || "Não foi possível conectar ao servidor.");
             } finally {
@@ -151,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     : "Funcionário",
             status: "Ativo",
             foto:
-                photoPreview.src && !photoPreview.classList.contains("hidden")
+                photoPreview?.src && !photoPreview.classList.contains("hidden")
                     ? photoPreview.src
                     : null,
         };
@@ -163,18 +180,27 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("equipe_docegestao", JSON.stringify(equipe));
 
         alert(`Funcionário ${nome} cadastrado com sucesso!`);
-        window.location.href = "gestao-equipes.html";
+        window.navegarDemo("funcionarios");
     });
 
     // Limpar
-    btnCancelar.addEventListener("click", () => {
+    btnCancelar?.addEventListener("click", () => {
         if (cadastroPublico) {
-            window.location.href = "index.html";
+            voltarAoLogin();
             return;
         }
         form.reset();
-        photoPreview.src = "";
-        photoPreview.classList.add("hidden");
-        uploadPlaceholder.classList.remove("hidden");
+        if (photoPreview) {
+            photoPreview.src = "";
+            photoPreview.classList.add("hidden");
+        }
+        uploadPlaceholder?.classList.remove("hidden");
     });
-});
+}
+
+document.addEventListener("demo:page-loaded", inicializarCadastroFuncionario);
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", inicializarCadastroFuncionario, { once: true });
+} else {
+    inicializarCadastroFuncionario();
+}
