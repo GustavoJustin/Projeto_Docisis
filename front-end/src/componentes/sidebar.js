@@ -1,6 +1,6 @@
 const SIDEBAR_HTML = `
   <aside
-    class="w-64 h-screen flex flex-col justify-between shrink-0 bg-cocoa-400 border-r border-black/5 sticky top-0 font-sans">
+    class="w-64 h-screen flex flex-col justify-between shrink-0 border-r border-black/5 sticky top-0 font-sans" style="background-color: #f5f0e8">
     <div>
       <!-- Cabeçalho Topo (Branco) -->
       <div class="bg-cocoa-800 px-6 py-5">
