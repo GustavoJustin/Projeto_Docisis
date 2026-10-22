@@ -1,30 +1,3 @@
-<!doctype html>
-<html lang="pt-BR">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#3A2A1A" />
-  <meta name="description" content="DoceGestão: gestão prática para sua confeitaria." />
-  <title>DoceGestão | Relatórios e Analises</title>
-
-  <!-- Fontes usadas pelas páginas do projeto -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-    rel="stylesheet" />
-
-  <!-- Estilos e ícones compartilhados -->
-  <link rel="stylesheet" href="../src/css/output.css" />
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- Dependências específicas: copie e ative apenas as necessárias para a página. -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <link rel="stylesheet" href="../src/css paginas/relatorio_analises.css">
-</head>
-
 <body class="min-h-screen bg-[#FAFAFA] text-[#4A3F39] flex">
   <!-- SIDEBAR Componente -->
   <div id="sidebar-container" data-active="relatorios_analises" class="w-64 shrink-0"></div>
@@ -60,6 +33,10 @@
 
           <!-- CONTAINER DO PERFIL + DROPDOWN -->
           <div class="relative inline-block">
+            <button id="btn-perfil" type="button" aria-expanded="false" aria-label="Abrir menu do perfil"
+              class="rounded-xl border border-[#EAE6DF] bg-white p-2.5 text-[#684627] shadow-sm transition hover:bg-[#F6F2EC]">
+              <i data-lucide="user-round" class="h-4 w-4"></i>
+            </button>
 
             <!-- DROPDOWN DO PERFIL (Descolado da borda com posição ajustada) -->
             <div id="dropdown-perfil"
@@ -98,6 +75,7 @@
         </div>
       </div>
 
+      <div id="relatorio-conteudo" class="flex flex-col gap-4">
       <!-- CARDS DE RESUMO DA CONFEITARIA -->
       <div class="flex flex-col gap-4">
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -397,6 +375,7 @@
           </div>
         </section>
       </div>
+      </div>
 
       <!-- MODAL: VER PERFIL -->
       <div id="modal-perfil" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
@@ -659,9 +638,8 @@
   </div>
 
   <script> lucide.createIcons(); </script>
-  <script src="../src/componentes/footer.js" defer></script>
-  <script src="../src/componentes/sidebar.js" defer></script>
-  <script src="../src/componentes/header.js" defer></script>
+  <script src="../../src/componentes/footer.js" defer></script>
+  <script src="../../src/componentes/sidebar.js" defer></script>
+  <script src="../../src/componentes/header.js" defer></script>
+  <script src="testeRe.js" defer></script>
 </body>
-
-</html>

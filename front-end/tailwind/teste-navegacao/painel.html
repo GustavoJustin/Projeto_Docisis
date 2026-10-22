@@ -16,6 +16,8 @@
   <link rel="stylesheet" href="../../src/css/output.css" />
   <link id="relatorios-css" rel="stylesheet" href="../../src/css%20paginas/relatorio_analises.css" disabled />
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
 
   <style>
     body {
@@ -31,21 +33,14 @@
     <div id="header-container" class="w-full shrink-0 sticky z-50 top-0"></div>
 
     <main id="conteudo-principal" class="relative flex min-w-0 flex-1 flex-col p-10">
-      <section class="m-auto max-w-xl text-center">
-        <h2 class="text-2xl font-bold text-cocoa-800">Demonstração de navegação</h2>
-        <p class="mt-3 text-sm text-[#64748B]">
-          Clique em Alertas ou Relatórios no menu. O conteúdo muda sem recriar o sidebar ou o header.
-        </p>
-        <a href="?pagina=alertas" data-demo-nav="alertas"
-          class="mt-6 inline-flex rounded-lg bg-cocoa-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-cocoa-800">
-          Abrir demonstração de Alertas
-        </a>
-      </section>
+      <p class="m-auto text-sm text-[#64748B]" role="status">Carregando Estoque...</p>
     </main>
 
     <div id="footer-container" class="w-full shrink-0 mt-auto"></div>
   </div>
 
+  <script src="../../src/script/estoqueinsumos.js" defer></script>
+  <script src="testeRe.js" defer></script>
   <script src="../../src/componentes/footer.js" defer></script>
   <script src="../../src/componentes/sidebar.js" defer></script>
   <script src="../../src/componentes/header.js" defer></script>

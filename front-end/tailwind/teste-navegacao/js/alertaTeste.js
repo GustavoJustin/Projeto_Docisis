@@ -1,6 +1,10 @@
 const conteudoPrincipal = document.getElementById("conteudo-principal");
-const paginaInicial = conteudoPrincipal.innerHTML;
 const paginasDemo = {
+  estoque: {
+    arquivo: "../estoqueInsumo.html",
+    titulo: "Estoque Insumos",
+    modais: ["modal-insumo", "modal-excluir"],
+  },
   alertas: {
     arquivo: "teste.html",
     titulo: "Painel de Alertas",
@@ -59,15 +63,12 @@ function exibirErro(mensagem) {
 
 async function carregarPaginaAtual() {
   const navegacao = ++navegacaoAtual;
-  const pagina = new URL(window.location.href).searchParams.get("pagina");
+  let pagina = new URL(window.location.href).searchParams.get("pagina");
   const cssRelatorios = document.getElementById("relatorios-css");
 
   if (!pagina) {
-    cssRelatorios.disabled = true;
-    atualizarSidebar("");
-    atualizarHeader("Painel de Demonstração");
-    conteudoPrincipal.innerHTML = paginaInicial;
-    return;
+    window.history.replaceState({}, "", "?pagina=estoque");
+    pagina = "estoque";
   }
 
   const configuracao = paginasDemo[pagina];
@@ -103,7 +104,7 @@ async function carregarPaginaAtual() {
     fragmento.innerHTML = conteudoPagina.innerHTML;
     configuracao.modais.forEach((id) => {
       const modal = documento.getElementById(id);
-      if (modal) fragmento.append(modal);
+      if (modal && !conteudoPagina.contains(modal)) fragmento.append(modal);
     });
 
     conteudoPrincipal.replaceChildren(...fragmento.childNodes);
@@ -112,6 +113,10 @@ async function carregarPaginaAtual() {
       buscaAlertaAtiva = "";
       atualizarContadores();
       aplicarFiltrosAlertas();
+    } else if (pagina === "estoque") {
+      window.inicializarEstoque();
+    } else if (pagina === "relatorios") {
+      window.inicializarRelatorios();
     }
 
     if (window.lucide?.createIcons) {
@@ -214,7 +219,7 @@ Object.assign(window, {
 
 document.addEventListener("click", (event) => {
   const link = event.target.closest(
-    "#sidebar-container [data-page='alertas'], #sidebar-container [data-page='relatorios'], [data-demo-nav='alertas']",
+    "#sidebar-container [data-page='estoque'], #sidebar-container [data-page='alertas'], #sidebar-container [data-page='relatorios'], [data-demo-nav='alertas']",
   );
   if (link && !event.defaultPrevented && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
     event.preventDefault();
