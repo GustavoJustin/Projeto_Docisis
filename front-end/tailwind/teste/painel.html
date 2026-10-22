@@ -5,21 +5,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#3A2A1A" />
-  <meta name="description" content="DoceGestão: gestão prática para sua confeitaria." />
-  <title>DoceGestão | Painel de Alertas</title>
+  <meta name="description" content="Demonstração de navegação sem recarregar o menu." />
+  <title>DoceGestão | Painel de Demonstração</title>
 
-  <!-- Fontes usadas pelas páginas do projeto -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
-
-  <!-- Estilos e ícones compartilhados -->
-  <link rel="stylesheet" href="../src/css/output.css" />
+  <link rel="stylesheet" href="../../src/css/output.css" />
+  <link id="relatorios-css" rel="stylesheet" href="../../src/css%20paginas/relatorio_analises.css" disabled />
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Dependências específicas: copie e ative apenas as necessárias para a página. -->
   <style>
     body {
       font-family: "Plus Jakarta Sans", sans-serif;
@@ -28,24 +25,31 @@
 </head>
 
 <body class="min-h-screen bg-[#FAFAFA] text-[#4A3F39] flex">
-  <!-- SIDEBAR Componente -->
-  <div id="sidebar-container" data-active="alertas" class="w-64 shrink-0"></div>
+  <div id="sidebar-container" data-active="" class="w-64 shrink-0"></div>
 
-  <div id="conteudo-centralizado" class="flex min-h-screen min-w-0 flex-1 flex-col">
-    <!-- HEADER Componente -->
-    <div id="header-container" class="w-full shrink-0 sticky z-50 top-0" style="box-shadow: 10px rgba(0, 0, 0, 10)"></div>
+  <div class="flex min-h-screen min-w-0 flex-1 flex-col">
+    <div id="header-container" class="w-full shrink-0 sticky z-50 top-0"></div>
 
-    
+    <main id="conteudo-principal" class="relative flex min-w-0 flex-1 flex-col p-10">
+      <section class="m-auto max-w-xl text-center">
+        <h2 class="text-2xl font-bold text-cocoa-800">Demonstração de navegação</h2>
+        <p class="mt-3 text-sm text-[#64748B]">
+          Clique em Alertas ou Relatórios no menu. O conteúdo muda sem recriar o sidebar ou o header.
+        </p>
+        <a href="?pagina=alertas" data-demo-nav="alertas"
+          class="mt-6 inline-flex rounded-lg bg-cocoa-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-cocoa-800">
+          Abrir demonstração de Alertas
+        </a>
+      </section>
+    </main>
 
-    <!-- FOOTER Base -->
     <div id="footer-container" class="w-full shrink-0 mt-auto"></div>
   </div>
 
-  <script> lucide.createIcons(); </script>
-  <script src="../src/componentes/footer.js" defer></script>
-  <script src="../src/componentes/sidebar.js" defer></script>
-  <script src="../src/componentes/header.js" defer></script>
-  <script src="../src/script/alertas.js" defer></script>
+  <script src="../../src/componentes/footer.js" defer></script>
+  <script src="../../src/componentes/sidebar.js" defer></script>
+  <script src="../../src/componentes/header.js" defer></script>
+  <script src="teste.js" defer></script>
 </body>
 
 </html>
