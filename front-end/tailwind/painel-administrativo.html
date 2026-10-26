@@ -60,10 +60,10 @@
         <div id="view-visao-geral" class="hidden space-y-6">
           <div>
             <h2 class="text-2xl font-bold text-[#6D4936]">
-              Painel Administrativo
+              Visão Geral da Confeitaria
             </h2>
             <p class="text-xs text-gray-400 mt-1">
-              Gestão técnica, auditoria de logs e segurança do sistema.
+              Acompanhamento de vendas, produção e entregas.
             </p>
           </div>
 
@@ -110,14 +110,45 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm">
-            <h3 class="font-bold text-gray-700 text-sm mb-3">
-              Parâmetros de Estoque
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm">
+              <span class="text-xs font-semibold text-gray-400 uppercase">Vendas Hoje</span>
+              <div class="text-2xl font-bold text-[#875C46] mt-1">
+                R$ 2.840,00
+              </div>
+              <span class="text-[10px] text-emerald-600 font-bold mt-2 inline-block">↑ +14% vs ontem</span>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm">
+              <span class="text-xs font-semibold text-gray-400 uppercase">Encomendas Entregues</span>
+              <div class="text-2xl font-bold text-gray-800 mt-1">
+                48 pedidos
+              </div>
+              <span class="text-[10px] text-gray-400 mt-2 inline-block">Média: 12 p/ hora</span>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm">
+              <span class="text-xs font-semibold text-gray-400 uppercase">Mais Vendido</span>
+              <div class="text-base font-bold text-gray-800 mt-1 truncate">
+                Bolo de Cenoura c/ Brigadeiro
+              </div>
+              <span class="text-[10px] text-amber-600 font-bold mt-2 inline-block">32 un. preparadas</span>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm">
+              <span class="text-xs font-semibold text-gray-400 uppercase">Cozinha / Produção</span>
+              <div class="text-2xl font-bold text-emerald-600 mt-1">Em Dia</div>
+              <span class="text-[10px] text-gray-400 mt-2 inline-block">Sem atrasos nas entregas</span>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
+            <h3 class="font-bold text-gray-800 text-sm mb-4">
+              Volume de Pedidos da Semana
             </h3>
-            <div class="flex justify-between items-center text-xs mb-2">
-              <span class="text-gray-500">Limite Crítico</span>
-              <span class="font-bold text-red-500">15%</span>
+            <div
+              class="h-48 bg-[#F8F6F2] rounded-xl border border-dashed border-gray-300 flex items-center justify-center text-xs text-gray-400 font-medium">
+              [ Gráfico de Desempenho de Vendas ]
             </div>
             <div class="flex items-center gap-3">
               <button id="btn-exportar"
