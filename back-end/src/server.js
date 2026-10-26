@@ -16,5 +16,5 @@ app.use("/api", routes);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT} | Link: http://localhost:3000/tailwind/painel.html?pagina=login | Login inicial: npm run criar-admin-inicial`);
+  console.log(`Servidor rodando na porta ${PORT} | Link: http://localhost:3000/tailwind/painel.html?pagina=login | Código criar conta: npm run criar-admin-inicial | Email: admin@gamil.com, Senha: 123456`);
 });
