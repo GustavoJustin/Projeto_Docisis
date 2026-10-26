@@ -615,6 +615,9 @@
   .h-screen {
     height: 100vh;
   }
+  .min-h-0 {
+    min-height: 0;
+  }
   .min-h-\[180px\] {
     min-height: 180px;
   }

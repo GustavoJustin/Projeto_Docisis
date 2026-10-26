@@ -190,6 +190,7 @@ function atualizarEstruturaPagina(pagina, documento, configuracao) {
   const sidebar = document.getElementById("sidebar-container");
   const header = document.getElementById("header-container");
   const footer = document.getElementById("footer-container");
+  const colunaConteudo = document.getElementById("coluna-conteudo");
   const principal = document.getElementById("conteudo-principal");
   const cssLogin = document.getElementById("login-css");
   const cssRelatorios = document.getElementById("relatorios-css");
@@ -213,13 +214,20 @@ function atualizarEstruturaPagina(pagina, documento, configuracao) {
     return;
   }
 
-  document.body.className = "min-h-screen bg-[#FAFAFA] text-[#4A3F39] flex";
+  document.body.className =
+    "h-screen overflow-hidden bg-[#FAFAFA] text-[#4A3F39] flex";
   const mainOriginal = documento.querySelector("main");
   const classesOriginais = (mainOriginal.getAttribute("class") || "")
     .replace(/\bh-screen\b/g, "")
-    .replace(/\boverflow-hidden\b/g, "")
     .trim();
-  principal.className = `${classesOriginais} min-w-0 flex-1`.trim();
+  const classesPrincipais = new Set(classesOriginais.split(/\s+/).filter(Boolean));
+  classesPrincipais.delete("min-h-0");
+  classesPrincipais.delete("overflow-hidden");
+  classesPrincipais.delete("overflow-y-auto");
+  classesPrincipais.add("min-w-0");
+  classesPrincipais.add("flex-1");
+  principal.className = [...classesPrincipais].join(" ");
+  colunaConteudo.classList.add("overflow-y-auto");
 }
 
 async function carregarPaginaAtual() {
@@ -262,6 +270,7 @@ async function carregarPaginaAtual() {
 
     atualizarEstruturaPagina(pagina, documento, configuracao);
     conteudoPrincipal.replaceChildren(fragmento);
+    document.getElementById("coluna-conteudo").scrollTop = 0;
     document.body.style.visibility = "visible";
 
     if (pagina === "alertas") {
