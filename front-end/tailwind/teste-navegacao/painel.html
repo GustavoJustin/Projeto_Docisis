@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#3A2A1A" />
+  <meta name="description" content="Demonstração de navegação sem recarregar o menu." />
+  <title>DoceGestão | Painel de Demonstração</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="../../src/css/output.css" />
+  <link id="login-css" rel="stylesheet" href="../../src/css%20paginas/index.css" disabled />
+  <link id="relatorios-css" rel="stylesheet" href="../../src/css%20paginas/relatorio_analises.css" disabled />
+  <link id="splash-css" rel="stylesheet" href="../../src/css%20paginas/splash.css" disabled />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+
+  <style>
+    body {
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-[#FAFAFA] text-[#4A3F39] flex" style="visibility: hidden">
+  <div id="sidebar-container" data-active="" class="w-64 shrink-0"></div>
+
+  <div class="flex min-h-screen min-w-0 flex-1 flex-col">
+    <div id="header-container" class="w-full shrink-0 sticky z-50 top-0"></div>
+
+    <main id="conteudo-principal" class="relative flex min-w-0 flex-1 flex-col p-10">
+      <p class="m-auto text-sm text-[#64748B]" role="status">Carregando Login...</p>
+    </main>
+
+    <div id="footer-container" class="w-full shrink-0 mt-auto"></div>
+  </div>
+
+  <script src="../../src/componentes/footer.js" defer></script>
+  <script src="../../src/componentes/sidebar.js" defer></script>
+  <script src="../../src/componentes/header.js" defer></script>
+  <script src="js/estoqueInsumosTeste.js" defer></script>
+  <script src="js/alertaTeste.js" defer></script>
+  <script src="js/relatorioAnalisesTeste.js" defer></script>
+  <script src="js/historicoCompletoTeste.js" defer></script>
+  <script src="js/gestao-equipesTeste.js" defer></script>
+  <script src="js/cadastroFuncionarioTeste.js" defer></script>
+  <script src="js/painel-administrativoTeste.js" defer></script>
+  <script src="js/materia-primaTeste.js" defer></script>
+  <script src="js/indexTeste.js" defer></script>
+  <script src="js/splashTeste.js" defer></script>
+</body>
+
+</html>

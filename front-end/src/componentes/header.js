@@ -1,11 +1,11 @@
 const HEADER_HTML = `
   <header
-    class="bg-cocoa-800 border-b border-[#6B4E3B]/60 text-[#F7F1EA] px-4 sm:px-8 py-3 flex flex-wrap justify-between items-center gap-4 shadow-md">
+    class="bg-cocoa-800 border-l border-white text-[#F7F1EA] px-4 sm:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
     <div>
       <p class="text-xs text-[#D9C6B4] font-medium">
-        Gestão <span class="mx-1">/</span> Estoque
+      Gestão <span class="mx-1">/</span> <span data-header-page-name>Estoque</span>
       </p>
-      <h1 class="font-serif text-lg sm:text-xl font-bold tracking-tight text-[#F5EFE9]">
+    <h1 data-header-page-name class="font-serif text-lg sm:text-xl font-bold tracking-tight text-[#F5EFE9]">
         Estoque de Matérias-Primas
       </h1>
     </div>
@@ -43,6 +43,15 @@ function carregarHeader() {
   if (!container) return;
 
   container.innerHTML = HEADER_HTML;
+
+  const pageName = document.title
+    .replace(/^DoceGestão\s*[|—-]\s*/i, "")
+    .trim();
+  if (pageName) {
+    container.querySelectorAll("[data-header-page-name]").forEach((element) => {
+      element.textContent = pageName;
+    });
+  }
 
   if (window.lucide?.createIcons) {
     window.lucide.createIcons();

@@ -4,13 +4,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel de Alertas - Confeitaria</title>
-  <link rel="stylesheet" href="../src/css/output.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+  <meta name="theme-color" content="#3A2A1A" />
+  <meta name="description" content="DoceGestão: gestão prática para sua confeitaria." />
+  <title>DoceGestão | Painel de Alertas</title>
+
+  <!-- Fontes usadas pelas páginas do projeto -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
 
+  <!-- Estilos e ícones compartilhados -->
+  <link rel="stylesheet" href="../src/css/output.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 
+  <!-- Dependências específicas: copie e ative apenas as necessárias para a página. -->
   <style>
     body {
       font-family: "Plus Jakarta Sans", sans-serif;
@@ -19,18 +28,17 @@
 </head>
 
 <body class="min-h-screen bg-[#FAFAFA] text-[#4A3F39] flex">
-  <!-- Sidebar -->
+  <!-- SIDEBAR Componente -->
   <div id="sidebar-container" data-active="alertas" class="w-64 shrink-0"></div>
 
-  <!-- Conteúdo Principal -->
-  <div>
-    <!-- Header -->
-    <div id="header-container" class="w-full shrink-0 sticky top-0 z-50"></div>
+  <div id="conteudo-centralizado" class="flex min-h-screen min-w-0 flex-1 flex-col">
+    <!-- HEADER Componente -->
+    <div id="header-container" class="w-full shrink-0 sticky z-50 top-0" style="box-shadow: 10px rgba(0, 0, 0, 10)"></div>
 
-    <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
+    <!-- CONTEUDO PRINCIPAL -->
+    <main class="relative flex min-w-0 flex-1 flex-col p-10">
 
-      <!-- Main Content -->
-      <main class="flex-1 overflow-y-auto p-8 space-y-6">
+      <div class="space-y-6">
         <!-- Tabs & Sorting -->
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div class="flex items-center gap-2 bg-gray-200/50 p-1 rounded-xl text-xs font-bold text-gray-500"
@@ -62,7 +70,7 @@
         </div>
 
         <!-- Main Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <!-- Column 1 & 2: Alert Cards Container -->
           <div class="lg:col-span-2 space-y-4" id="alertCardsContainer">
             <!-- Card 1: VENCIDO -->
@@ -252,10 +260,6 @@
                 class="w-full bg-[#784E38] hover:bg-[#633e2c] text-white text-xs font-bold py-3 rounded-xl transition-colors shadow-sm">
                 Ver Relatório Completo
               </button>
-            </div>
-          </div>
-        </div>
-      </main>
 
       <!-- Toast Notification Overlay -->
       <div id="toastNotification"
@@ -277,93 +281,95 @@
           </svg>
         </button>
       </div>
-    </div>
-  </div>
+    </main>
 
-  <!-- Modal 1: Novo Item -->
-  <div id="modalNovoItem"
-    class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-5">
-      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
-        <h3 class="font-bold text-gray-800 text-base">Cadastrar Novo Item</h3>
-        <button onclick="closeModal('modalNovoItem')" class="text-gray-400 hover:text-gray-600">
-          ✕
-        </button>
-      </div>
-      <form onsubmit="handleNovoItem(event)" class="space-y-4 text-xs">
-        <div>
-          <label class="block font-semibold text-gray-700 mb-1">Nome do Item</label>
-          <input type="text" required placeholder="Ex: Leite Condensado 395g"
-            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#D8A87D]" />
+    <!-- Modal 1: Novo Item -->
+    <div id="modalNovoItem"
+      class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-5">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+          <h3 class="font-bold text-gray-800 text-base">Cadastrar Novo Item</h3>
+          <button onclick="closeModal('modalNovoItem')" class="text-gray-400 hover:text-gray-600">
+            ✕
+          </button>
         </div>
-        <div class="grid grid-cols-2 gap-3">
+        <form onsubmit="handleNovoItem(event)" class="space-y-4 text-xs">
           <div>
-            <label class="block font-semibold text-gray-700 mb-1">SKU</label>
-            <input type="text" required placeholder="MAT-LEIT-01"
+            <label class="block font-semibold text-gray-700 mb-1">Nome do Item</label>
+            <input type="text" required placeholder="Ex: Leite Condensado 395g"
               class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#D8A87D]" />
           </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-gray-700 mb-1">SKU</label>
+              <input type="text" required placeholder="MAT-LEIT-01"
+                class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#D8A87D]" />
+            </div>
+            <div>
+              <label class="block font-semibold text-gray-700 mb-1">Quantidade</label>
+              <input type="number" step="0.1" required placeholder="10"
+                class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#D8A87D]" />
+            </div>
+          </div>
           <div>
-            <label class="block font-semibold text-gray-700 mb-1">Quantidade</label>
-            <input type="number" step="0.1" required placeholder="10"
+            <label class="block font-semibold text-gray-700 mb-1">Data de Validade</label>
+            <input type="date" required
               class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#D8A87D]" />
           </div>
-        </div>
-        <div>
-          <label class="block font-semibold text-gray-700 mb-1">Data de Validade</label>
-          <input type="date" required
-            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#D8A87D]" />
-        </div>
-        <div class="flex gap-3 pt-2">
-          <button type="button" onclick="closeModal('modalNovoItem')"
-            class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition-colors">
-            Cancelar
-          </button>
-          <button type="submit"
-            class="w-1/2 bg-[#784E38] hover:bg-[#633e2c] text-white font-semibold py-2.5 rounded-lg transition-colors">
-            Salvar Item
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal 2: Repor Item -->
-  <div id="modalRepor" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-5">
-      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
-        <h3 class="font-bold text-gray-800 text-base">Solicitar Reposição</h3>
-        <button onclick="closeModal('modalRepor')" class="text-gray-400 hover:text-gray-600">
-          ✕
-        </button>
+          <div class="flex gap-3 pt-2">
+            <button type="button" onclick="closeModal('modalNovoItem')"
+              class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition-colors">
+              Cancelar
+            </button>
+            <button type="submit"
+              class="w-1/2 bg-[#784E38] hover:bg-[#633e2c] text-white font-semibold py-2.5 rounded-lg transition-colors">
+              Salvar Item
+            </button>
+          </div>
+        </form>
       </div>
-      <form onsubmit="handleReporSubmit(event)" class="space-y-4 text-xs">
-        <div>
-          <label class="block font-semibold text-gray-500 mb-1">Item Selecionado</label>
-          <input id="reporItemNome" type="text" readonly
-            class="w-full px-3 py-2 bg-gray-100 text-gray-700 font-bold rounded-lg focus:outline-none" />
-        </div>
-        <div>
-          <label class="block font-semibold text-gray-700 mb-1">Quantidade a Repor</label>
-          <input type="number" step="0.1" required placeholder="Ex: 5"
-            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#D8A87D]" />
-        </div>
-        <div class="flex gap-3 pt-2">
-          <button type="button" onclick="closeModal('modalRepor')"
-            class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition-colors">
-            Cancelar
-          </button>
-          <button type="submit"
-            class="w-1/2 bg-[#784E38] hover:bg-[#633e2c] text-white font-semibold py-2.5 rounded-lg transition-colors">
-            Confirmar
-          </button>
-        </div>
-      </form>
     </div>
+
+    <!-- Modal 2: Repor Item -->
+    <div id="modalRepor" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-5">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+          <h3 class="font-bold text-gray-800 text-base">Solicitar Reposição</h3>
+          <button onclick="closeModal('modalRepor')" class="text-gray-400 hover:text-gray-600">
+            ✕
+          </button>
+        </div>
+        <form onsubmit="handleReporSubmit(event)" class="space-y-4 text-xs">
+          <div>
+            <label class="block font-semibold text-gray-500 mb-1">Item Selecionado</label>
+            <input id="reporItemNome" type="text" readonly
+              class="w-full px-3 py-2 bg-gray-100 text-gray-700 font-bold rounded-lg focus:outline-none" />
+          </div>
+          <div>
+            <label class="block font-semibold text-gray-700 mb-1">Quantidade a Repor</label>
+            <input type="number" step="0.1" required placeholder="Ex: 5"
+              class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#D8A87D]" />
+          </div>
+          <div class="flex gap-3 pt-2">
+            <button type="button" onclick="closeModal('modalRepor')"
+              class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition-colors">
+              Cancelar
+            </button>
+            <button type="submit"
+              class="w-1/2 bg-[#784E38] hover:bg-[#633e2c] text-white font-semibold py-2.5 rounded-lg transition-colors">
+              Confirmar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- FOOTER Base -->
+    <div id="footer-container" class="w-full shrink-0 mt-auto"></div>
   </div>
 
-  <script>
-    lucide.createIcons();
-  </script>
+  <script> lucide.createIcons(); </script>
+  <script src="../src/componentes/footer.js" defer></script>
   <script src="../src/componentes/sidebar.js" defer></script>
   <script src="../src/componentes/header.js" defer></script>
   <script src="../src/script/alertas.js" defer></script>
