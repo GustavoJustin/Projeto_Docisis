@@ -11,7 +11,7 @@
       href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../../../src/css/output.css" />
+    <link rel="stylesheet" href="../src/css/output.css" />
     <style>
       body {
         font-family: "Plus Jakarta Sans", sans-serif;
@@ -21,7 +21,7 @@
   <body class="flex min-h-screen items-center justify-center bg-cream px-4 py-8 text-cocoa-800">
     <main class="mx-auto w-full max-w-xl">
       <a
-        href="../painel.html?pagina=login"
+        href="painel.html?pagina=login"
         class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-cocoa-700 hover:text-cocoa-900"
       >
         <span aria-hidden="true">&larr;</span>
@@ -37,7 +37,7 @@
           </p>
         </div>
 
-        <form id="form-cadastro" data-cadastro-publico="true" class="space-y-5">
+        <form id="form-cadastro" data-cadastro-publico="true" novalidate class="space-y-5">
           <div
             id="cadastro-alert"
             class="hidden rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
@@ -116,7 +116,7 @@
 
           <div class="flex flex-col-reverse justify-center gap-3 border-t border-cocoa-100 pt-5 sm:flex-row">
             <a
-              href="../painel.html?pagina=login"
+              href="painel.html?pagina=login"
               class="min-w-36 rounded-xl border border-cocoa-200 px-5 py-3 text-center text-sm font-semibold text-cocoa-700 transition hover:bg-cream"
             >
               Cancelar
@@ -131,6 +131,6 @@
         </form>
       </section>
     </main>
-    <script src="../js/cadastroFuncionarioTeste.js" defer></script>
+    <script src="../src/script/cadastroFuncionario.js" defer></script>
   </body>
 </html>

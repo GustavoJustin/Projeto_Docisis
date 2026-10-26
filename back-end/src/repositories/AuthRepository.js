@@ -4,7 +4,7 @@ class AuthRepository {
   // Usado no login pra pegar o funcionário (com a senha em hash) pelo email
   async buscarPorEmail(email) {
     const [rows] = await pool.query(
-      "SELECT * FROM tbl_funcionarios WHERE email = ?",
+      "SELECT * FROM tbl_funcionarios WHERE LOWER(email) = ?",
       [email],
     );
     return rows[0];

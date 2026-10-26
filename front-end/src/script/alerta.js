@@ -1,57 +1,62 @@
 const conteudoPrincipal = document.getElementById("conteudo-principal");
 const paginasDemo = {
   estoque: {
-    arquivo: "estoqueInsumosTeste.html",
+    arquivo: "estoqueInsumos.html",
     titulo: "Estoque de Matérias-Primas",
     ativo: "estoque",
     modais: ["modal-insumo", "modal-excluir"],
   },
   alertas: {
-    arquivo: "alertaTeste.html",
+    arquivo: "alerta.html",
     titulo: "Painel de Alertas",
     ativo: "alertas",
     modais: ["modalNovoItem", "modalRepor", "toastNotification"],
   },
   relatorios: {
-    arquivo: "relatorioAnalisesTeste.html",
+    arquivo: "relatorioAnalises.html",
     titulo: "Relatórios e Análises",
     ativo: "relatorios",
     modais: ["modal-perfil", "modal-configuracoes", "modal-logout"],
   },
   historico: {
-    arquivo: "historicoCompletoTeste.html",
+    arquivo: "historicoCompleto.html",
     titulo: "Histórico Completo",
     ativo: "historico",
   },
   funcionarios: {
-    arquivo: "gestao-equipesTeste.html",
+    arquivo: "gestao-equipes.html",
     titulo: "Gestão de Equipes",
     ativo: "funcionarios",
   },
   admin: {
-    arquivo: "painel-administrativoTeste.html",
+    arquivo: "painel-administrativo.html",
     titulo: "Painel Administrativo",
     ativo: "admin",
     modais: ["modal-chamado", "toast-container"],
   },
   materia: {
-    arquivo: "materia-primaTeste.html",
+    arquivo: "materia-prima.html",
     titulo: "Detalhes da Matéria-Prima",
     ativo: "estoque",
   },
   cadastro: {
-    arquivo: "cadastroFuncionarioTeste.html",
+    arquivo: "cadastroFuncionario.html",
     titulo: "Cadastro de Funcionário",
     ativo: "funcionarios",
   },
+  cadastroPublico: {
+    arquivo: "cadastroPublico.html",
+    titulo: "Criar conta",
+    especial: true,
+  },
   login: {
-    arquivo: "indexTeste.html",
+    arquivo: "pagina-login.html",
     titulo: "Login",
     especial: true,
     css: "login-css",
   },
   splash: {
-    arquivo: "splashTeste.html",
+    arquivo: "splash.html",
     titulo: "Carregando",
     especial: true,
     css: "splash-css",
@@ -61,15 +66,21 @@ const paginasDemo = {
 const paginasPorArquivo = {
   "estoqueinsumo.html": "estoque",
   "estoqueinsumos.html": "estoque",
+  "alerta.html": "alertas",
   "alertas.html": "alertas",
+  "relatorioanalises.html": "relatorios",
   "relatorios_analises.html": "relatorios",
+  "historicocompleto.html": "historico",
   "historico-completo.html": "historico",
   "historico.html": "historico",
   "gestao-equipes.html": "funcionarios",
   "painel-administrativo.html": "admin",
   "materia-prima.html": "materia",
   "historico-materias_prima.html": "materia",
+  "cadastrofuncionario.html": "cadastro",
   "cadastro-funcionario.html": "cadastro",
+  "cadastropublico.html": "cadastroPublico",
+  "pagina-login.html": "login",
   "index.html": "login",
   "splash.html": "splash",
 };
@@ -234,10 +245,13 @@ async function carregarPaginaAtual() {
   atualizarHeader(configuracao.titulo);
 
   try {
-    const resposta = await fetch(`html/${configuracao.arquivo}`);
+    const caminhoPagina = window.location.pathname.includes("/teste-navegacao/")
+      ? `../${configuracao.arquivo}`
+      : configuracao.arquivo;
+    const resposta = await fetch(caminhoPagina);
     if (!resposta.ok) {
       throw new Error(
-        `Não foi possível carregar html/${configuracao.arquivo} (HTTP ${resposta.status}).`,
+        `Não foi possível carregar ${caminhoPagina} (HTTP ${resposta.status}).`,
       );
     }
 
@@ -265,7 +279,7 @@ async function carregarPaginaAtual() {
       new CustomEvent("demo:page-loaded", { detail: { pagina } }),
     );
   } catch (erro) {
-    console.error(`Erro ao carregar html/${configuracao.arquivo}:`, erro);
+    console.error(`Erro ao carregar ${configuracao.arquivo}:`, erro);
     exibirErro(
       "Não foi possível carregar a página. Confira se o projeto está aberto por um servidor local.",
     );

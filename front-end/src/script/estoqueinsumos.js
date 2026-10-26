@@ -1,4 +1,6 @@
-document.addEventListener("DOMContentLoaded", () => {
+function inicializarEstoque() {
+    if (!document.getElementById("grid-produtos")) return;
+
     const botoes = document.querySelectorAll(".filtro-btn");
     const inputBusca = document.getElementById("input-busca");
     const cardAdicionar = document.getElementById("btn-card-adicionar");
@@ -182,8 +184,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (cardAdicionar) cardAdicionar.addEventListener("click", abrirModal);
-    if (btnNovoSidebar)
-        btnNovoSidebar.addEventListener("click", abrirModal);
+    if (btnNovoSidebar) {
+        btnNovoSidebar.onclick = (event) => {
+            event.preventDefault();
+            abrirModal();
+        };
+    }
     if (btnNovoFooter) btnNovoFooter.addEventListener("click", abrirModal);
     if (btnFecharModal)
         btnFecharModal.addEventListener("click", fecharModal);
@@ -273,4 +279,10 @@ document.addEventListener("DOMContentLoaded", () => {
         fecharModal();
         aplicarFiltros();
     });
-});
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", inicializarEstoque, { once: true });
+} else {
+    inicializarEstoque();
+}

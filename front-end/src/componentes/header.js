@@ -28,10 +28,10 @@ const HEADER_HTML = `
 
       <div class="flex items-center gap-3 border-l border-[#6B4E3B]/70 pl-3 sm:pl-5">
         <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80&w=120"
-          alt="Avatar de Maria Luiza" class="w-9 h-9 rounded-full object-cover border border-[#D4A373]">
+          alt="Avatar da conta" class="w-9 h-9 rounded-full object-cover border border-[#D4A373]">
         <div class="hidden sm:block text-left">
-          <p class="text-xs font-bold leading-tight text-[#FDF7F1]">Maria Luiza</p>
-          <p class="text-[11px] text-[#D9C6B4]">Administrador(a)</p>
+          <p data-header-user-name class="text-xs font-bold leading-tight text-[#FDF7F1]">Nenhuma conta conectada</p>
+          <p data-header-user-role class="text-[11px] text-[#D9C6B4]">Acesse sua conta</p>
         </div>
       </div>
     </div>
@@ -52,6 +52,21 @@ function carregarHeader() {
       element.textContent = pageName;
     });
   }
+
+  function atualizarConta() {
+    try {
+      const user = JSON.parse(localStorage.getItem("docegestao_funcionario") || "null");
+      const userName = container.querySelector("[data-header-user-name]");
+      const userRole = container.querySelector("[data-header-user-role]");
+      if (userName) userName.textContent = user?.nome || "Nenhuma conta conectada";
+      if (userRole) userRole.textContent = user?.nome_cargo || (user ? "Conta conectada" : "Acesse sua conta");
+    } catch (error) {
+      console.error("Não foi possível carregar os dados da conta:", error);
+    }
+  }
+  atualizarConta();
+  document.addEventListener("demo:page-loaded", atualizarConta);
+  window.addEventListener("storage", atualizarConta);
 
   if (window.lucide?.createIcons) {
     window.lucide.createIcons();

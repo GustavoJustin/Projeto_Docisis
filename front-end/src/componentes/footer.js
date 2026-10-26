@@ -3,7 +3,7 @@ const FOOTER_HTML = `
     <div class="mx-auto max-w-7xl px-6 py-10 sm:px-8 lg:px-10">
       <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
         <div>
-          <a href="./index.html" class="inline-flex items-center gap-2 text-xl font-bold text-cream">
+          <a href="./painel.html?pagina=login" class="inline-flex items-center gap-2 text-xl font-bold text-cream">
             <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-cocoa-700 text-brand-brown-light">
               <i data-lucide="cake-slice" class="h-5 w-5"></i>
             </span>

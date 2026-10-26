@@ -1,35 +1,5 @@
-<!doctype html>
-<html lang="pt-BR">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#3A2A1A" />
-  <meta name="description" content="DoceGestão: gestão prática para sua confeitaria." />
-  <title>DoceGestão | Painel Administrativo</title>
-
-  <!-- Fontes usadas pelas páginas do projeto -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-    rel="stylesheet" />
-
-  <!-- Estilos e ícones compartilhados -->
-  <link rel="stylesheet" href="../src/css/output.css" />
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- Dependências específicas: copie e ative apenas as necessárias para a página. -->
-</head>
-
 <body class="min-h-screen bg-[#FAFAFA] text-[#4A3F39] flex">
-  <!-- SIDEBAR Componente -->
-  <div id="sidebar-container" data-active="painel-administrativo" class="w-64 shrink-0"></div>
-
   <div id="conteudo-centralizado" class="flex min-h-screen min-w-0 flex-1 flex-col">
-    <!-- HEADER Componente -->
-    <div id="header-container" class="w-full shrink-0 sticky z-50 top-0"></div>
-
     <!-- Container de Notificações Toast (Estilo idêntico ao da imagem) -->
     <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
@@ -73,10 +43,10 @@
         <div id="view-visao-geral" class="hidden space-y-6">
           <div>
             <h2 class="text-2xl font-bold text-[#6D4936]">
-              Visão Geral da Confeitaria
+              Painel Administrativo
             </h2>
             <p class="text-xs text-gray-400 mt-1">
-              Acompanhamento de vendas, produção e entregas.
+              Gestão técnica, auditoria de logs e segurança do sistema.
             </p>
           </div>
 
@@ -219,12 +189,6 @@
       </div>
     </main>
 
-    <!-- FOOTER Componente -->
-    <div id="footer-container" class="w-full shrink-0 mt-auto"></div>
   </div>
 
-  <script> lucide.createIcons(); </script>
-  <script src="../src/componentes/footer.js" defer></script>
-  <script src="../src/componentes/sidebar.js" defer></script>
-  <script src="../src/componentes/header.js" defer></script>
 </body>

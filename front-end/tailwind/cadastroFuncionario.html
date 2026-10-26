@@ -3,7 +3,7 @@
     <!-- CONTEUDO PRINCIPAL -->
     <main class="flex-1 flex flex-col h-screen overflow-hidden p-10">
       <div class="flex-1 overflow-y-auto">
-        <form id="form-cadastro" class="max-w-4xl mx-auto space-y-6">
+        <form id="form-cadastro" novalidate class="max-w-4xl mx-auto space-y-6">
           <div
             id="cadastro-alert"
             class="hidden rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
@@ -13,7 +13,7 @@
             <span id="cadastro-alert-text"></span>
             <a
               id="cadastro-alert-link"
-              href="index.html"
+              href="pagina-login.html"
               class="ml-1 font-semibold underline"
             >
               Voltar ao login
@@ -139,7 +139,7 @@
                     completa de usuários.
                   </p>
                 </div>
-                <input type="radio" name="nivel_acesso" value="administrador" checked
+                <input type="radio" name="nivel_acesso" value="administrador"
                   class="mt-1 w-4 h-4 accent-[#875C46]" />
               </label>
 
@@ -159,7 +159,7 @@
                     diários.
                   </p>
                 </div>
-                <input type="radio" name="nivel_acesso" value="funcionario" class="mt-1 w-4 h-4 accent-[#875C46]" />
+                <input type="radio" name="nivel_acesso" value="funcionario" checked class="mt-1 w-4 h-4 accent-[#875C46]" />
               </label>
             </div>
           </div>
@@ -226,7 +226,7 @@
               class="px-6 py-2.5 rounded-xl text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-100 transition-all">
               Cancelar
             </button>
-            <button type="submit"
+            <button type="submit" form="form-cadastro"
               class="px-7 py-2.5 rounded-xl text-sm font-semibold bg-[#875C46] text-white hover:bg-[#6D4936] transition-all shadow-sm active:scale-[0.98]">
               Criar Conta
             </button>
@@ -237,4 +237,9 @@
 
   </div>
 
+  <script> lucide.createIcons(); </script>
+  <script src="../src/componentes/footer.js" defer></script>
+  <script src="../src/componentes/sidebar.js" defer></script>
+  <script src="../src/componentes/header.js" defer></script>
+  <script src="../src/script/cadastro-funcionario.js" defer></script>
 </body>

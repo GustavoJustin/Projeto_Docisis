@@ -21,7 +21,7 @@ class AuthService {
   async cadastrarFuncionarioPublico(dados) {
     const nome = String(dados.nome || "").trim();
     const cpf = String(dados.cpf || "").replace(/\D/g, "");
-    const email = String(dados.email || "").trim();
+    const email = String(dados.email || "").trim().toLowerCase();
     const senha = String(dados.senha || "");
 
     if (!nome || !cpf || !email || !senha) {
@@ -40,9 +40,9 @@ class AuthService {
       };
     }
 
-    let cargos;
+    let cargoFuncionario;
     try {
-      cargos = await CargosRepository.listarCargo();
+      cargoFuncionario = await CargosRepository.garantirCargoFuncionario();
     } catch {
       throw {
         status: 503,
@@ -50,13 +50,6 @@ class AuthService {
           "Banco de dados indisponível. Configure o arquivo back-end/.env antes de criar contas.",
       };
     }
-    const cargoFuncionario = cargos.find((cargo) =>
-      cargo.nome_cargo
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .includes("funcion"),
-    );
 
     if (!cargoFuncionario) {
       throw {
@@ -83,7 +76,7 @@ class AuthService {
       throw { status: 400, mensagem: "Email e senha são obrigatórios" };
     }
 
-    const funcionario = await AuthRepository.buscarPorEmail(email.trim());
+    const funcionario = await AuthRepository.buscarPorEmail(email.trim().toLowerCase());
 
     // Mesma mensagem tanto pra "email não existe" quanto pra "senha errada" -
     // de propósito, pra não dar dica pra quem tá tentando adivinhar um email válido
