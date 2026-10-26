@@ -50,20 +50,7 @@
             <i data-lucide="file-text" class="w-4 h-4"></i>
             <span>Exportar PDF</span>
           </button>
-        <div class="flex items-center gap-3">
-          <!-- Botão Exportar PDF -->
-          <button id="btn-export-pdf" type="button"
-            class="bg-[#F0B8CB] text-[#783A4C] hover:opacity-90 px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition active:scale-95 cursor-pointer">
-            <i data-lucide="file-text" class="w-4 h-4"></i>
-            <span>Exportar PDF</span>
-          </button>
 
-          <!-- Botão Exportar Excel -->
-          <button id="btn-export-excel" type="button"
-            class="bg-[#684627] hover:bg-[#54381F] text-white px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition active:scale-95 cursor-pointer">
-            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
-            <span>Exportar Excel</span>
-          </button>
           <!-- Botão Exportar Excel -->
           <button id="btn-export-excel" type="button"
             class="bg-[#684627] hover:bg-[#54381F] text-white px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition active:scale-95 cursor-pointer">
@@ -73,15 +60,6 @@
 
           <!-- CONTAINER DO PERFIL + DROPDOWN -->
           <div class="relative inline-block">
-            <button id="btn-perfil" data-profile-trigger type="button" title="Menu do Usuário" aria-expanded="false"
-              class="w-10 h-10 rounded-full bg-[#EBE7DF] border border-[#D5CFC5] hover:bg-[#E0DAD0] flex items-center justify-center text-[#684627] shadow-sm shrink-0 transition focus:outline-none focus:ring-2 focus:ring-[#684627] cursor-pointer overflow-hidden">
-              <img id="avatar-header"
-                src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=150&auto=format&fit=crop&q=80"
-                alt="Foto do Confeiteiro" class="w-full h-full object-cover" />
-            </button>
-          <!-- CONTAINER DO PERFIL + DROPDOWN -->
-          <div class="relative inline-block">
-
             <!-- DROPDOWN DO PERFIL (Descolado da borda com posição ajustada) -->
             <div id="dropdown-perfil"
               class="hidden absolute right-0 sm:right-2 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-[#EAE6DF] py-2 z-50 transition-all duration-200">
@@ -511,6 +489,8 @@
               </button>
             </div>
           </form>
+        </div>
+      </div>
 
           <!-- MODAL: CONFIGURAÇÕES -->
           <div id="modal-configuracoes"
