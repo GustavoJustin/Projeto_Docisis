@@ -1,5 +1,5 @@
 
-(() => {
+function inicializarLogin() {
     const modal = document.getElementById("modal-esqueci");
     const btnAbrir = document.getElementById("btn-abrir-esqueci");
     const btnFechar = document.getElementById("btn-fechar-esqueci");
@@ -16,6 +16,27 @@
     const contatoEmail = document.getElementById("contato-email");
     const contatoTelefone = document.getElementById("contato-telefone");
     const contatoInstagram = document.getElementById("contato-instagram");
+    const loginAlert = document.getElementById("login-alert");
+    const loginAlertText = document.getElementById("login-alert-text");
+    const loginAlertLink = document.getElementById("login-alert-link");
+
+    const avisoCadastro = sessionStorage.getItem("docegestao_aviso_login");
+    if (avisoCadastro && loginAlert && loginAlertText) {
+        loginAlertText.textContent = avisoCadastro;
+        loginAlertLink?.classList.add("hidden");
+        loginAlert.classList.remove(
+            "hidden",
+            "border-amber-200",
+            "bg-amber-50",
+            "text-amber-800",
+        );
+        loginAlert.classList.add(
+            "border-emerald-200",
+            "bg-emerald-50",
+            "text-emerald-800",
+        );
+        sessionStorage.removeItem("docegestao_aviso_login");
+    }
 
     async function abrirContato() {
         modalContato.style.display = "flex";
@@ -112,12 +133,36 @@
     modalContato.addEventListener("click", (event) => {
         if (event.target === modalContato) fecharContato();
     });
-    window.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") fecharContato();
-    });
+    if (!window.__loginEscapeHandler) {
+        window.addEventListener("keydown", (event) => {
+            if (event.key !== "Escape") return;
+            const contato = document.getElementById("modal-contato");
+            const recuperacao = document.getElementById("modal-esqueci");
+            if (contato) contato.style.display = "none";
+            if (recuperacao) recuperacao.style.display = "none";
+        });
+        window.__loginEscapeHandler = true;
+    }
 
     formLogin.addEventListener("submit", async (e) => {
         e.preventDefault();
+        if (loginAlert) {
+            loginAlert.classList.add("hidden");
+            loginAlertLink?.classList.remove("hidden");
+            loginAlert.classList.remove(
+                "border-red-200",
+                "bg-red-50",
+                "text-red-800",
+                "border-emerald-200",
+                "bg-emerald-50",
+                "text-emerald-800",
+            );
+            loginAlert.classList.add(
+                "border-amber-200",
+                "bg-amber-50",
+                "text-amber-800",
+            );
+        }
         const btnEntrar = formLogin.querySelector('button[type="submit"]');
         btnEntrar.disabled = true;
 
@@ -143,9 +188,32 @@
                 "docegestao_funcionario",
                 JSON.stringify(resultado.funcionario),
             );
-            window.location.href = "splash.html";
+            const destino = new URLSearchParams(window.location.search).get("retorno");
+            if (destino === "cadastro" && typeof window.navegarDemo === "function") {
+                window.navegarDemo("cadastro");
+            } else if (destino === "cadastro") {
+                window.location.href = "./painel.html?pagina=cadastro";
+            } else if (typeof window.navegarDemo === "function") {
+                window.navegarDemo("splash");
+            } else {
+                window.location.href = "./painel.html?pagina=splash";
+            }
         } catch (erro) {
-            alert(erro.message || "Não foi possível conectar à API.");
+            if (loginAlert && loginAlertText) {
+                loginAlertText.textContent =
+                    erro.message || "Não foi possível conectar à API.";
+                loginAlert.classList.remove(
+                    "hidden",
+                    "border-emerald-200",
+                    "bg-emerald-50",
+                    "text-emerald-800",
+                );
+                loginAlert.classList.add(
+                    "border-red-200",
+                    "bg-red-50",
+                    "text-red-800",
+                );
+            }
         } finally {
             btnEntrar.disabled = false;
         }
@@ -198,4 +266,8 @@
             "A recuperação de senha ainda não está conectada ao servidor. Entre em contato com o administrador.";
         msgErro.style.display = "block";
     });
-})();
+}
+
+document.addEventListener("demo:page-loaded", (event) => {
+    if (event.detail?.pagina === "login") inicializarLogin();
+});

@@ -51,6 +51,26 @@ Documentação automática gerada a partir das rotas e controladores do backend.
   }
   ```
 
+### POST /api/login/cadastro-funcionario
+
+- Descrição: cria uma conta de funcionário. Se o cargo "Funcionário" ainda não existir, ele é criado automaticamente.
+- Body:
+  ```json
+  {
+    "nome": "Maria Oliveira",
+    "cpf": "12345678901",
+    "email": "maria@email.com",
+    "senha": "123456"
+  }
+  ```
+
+### Primeiro acesso como administrador
+
+- Em uma instalação sem administrador, crie a primeira conta no terminal com `npm --prefix back-end run criar-admin-inicial`.
+- O comando prepara as colunas de autenticação ausentes, permite vários funcionários no mesmo cargo e converte CPF para texto de 11 dígitos nas colunas relacionadas, preservando as chaves estrangeiras existentes.
+- Informe o CPF com ou sem pontuação; o comando remove a formatação. A senha é solicitada sem exibição e o comando só funciona enquanto ainda não existir um administrador.
+- Depois, entre pela página de login e cadastre funcionários pela área de gestão da equipe.
+
 ### GET /api/sessao
 
 - Descrição: valida o token do usuário autenticado.
@@ -104,15 +124,15 @@ Documentação automática gerada a partir das rotas e controladores do backend.
 
 ### GET /api/funcionarios
 
-- Lista funcionários.
+- Lista funcionários sem retornar os hashes das senhas. Requer autenticação e perfil de administrador.
 
 ### GET /api/funcionarios/:id
 
-- Busca um funcionário por id.
+- Busca um funcionário por id sem retornar o hash da senha. Requer perfil de administrador.
 
 ### POST /api/funcionarios
 
-- Cria funcionário.
+- Cria um funcionário com senha definida pelo administrador. Requer perfil de administrador.
 - Body exemplo:
   ```json
   {
@@ -126,11 +146,11 @@ Documentação automática gerada a partir das rotas e controladores do backend.
 
 ### PUT /api/funcionarios/:id
 
-- Atualiza funcionário.
+- Atualiza funcionário. Requer perfil de administrador.
 
 ### DELETE /api/funcionarios/:id
 
-- Deleta funcionário.
+- Deleta funcionário. Requer perfil de administrador.
 
 ## Estoque
 

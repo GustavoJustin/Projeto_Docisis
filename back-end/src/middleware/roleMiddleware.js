@@ -11,8 +11,7 @@ function exigirAdministrador(req, res, next) {
       if (!nomeCargo.includes("admin")) {
         return res.status(403).json({
           sucesso: false,
-          mensagem:
-            "Apenas administradores podem acessar movimentações de entrada e saída",
+          mensagem: "Apenas administradores podem acessar este recurso.",
         });
       }
 

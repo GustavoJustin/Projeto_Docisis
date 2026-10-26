@@ -1,121 +1,227 @@
-
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("demo:page-loaded", async () => {
     const tableBody = document.getElementById("team-table-body");
     const searchInput = document.getElementById("search-member");
+    if (!tableBody || !searchInput) return;
+
     const roleButtons = document.querySelectorAll(".filter-role");
-    const removedMembers = new Set(
-        JSON.parse(
-            localStorage.getItem("equipe_docegestao_removida") || "[]",
-        ),
-    );
+    const createLink = document.querySelector("#conteudo-principal a[href='cadastroFuncionario.html']");
+    const table = tableBody.closest("table");
+    const tableContainer = table?.parentElement;
+    if (!table || !tableContainer) return;
+
     let selectedRole = "all";
+    let members = [];
 
-    document.querySelectorAll(".member-row").forEach((row) => {
-        const email = row.querySelector(".member-email").innerText.trim();
-        if (removedMembers.has(email)) row.remove();
-    });
+    const notice = document.createElement("div");
+    notice.className = "mb-4 rounded-xl border px-4 py-3 text-sm";
+    notice.setAttribute("role", "status");
+    notice.setAttribute("aria-live", "polite");
+    tableContainer.parentElement.insertBefore(notice, tableContainer);
 
-    const equipeSalva = JSON.parse(
-        localStorage.getItem("equipe_docegestao") || "[]",
-    );
-    equipeSalva.forEach((func) => {
-        if (removedMembers.has(func.email)) return;
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-gray-50/50 transition-colors member-row";
-        tr.dataset.role = func.cargo;
-        tr.dataset.status = func.status || "Ativo";
-        const avatar = func.foto
-            ? `<img src="${func.foto}" class="w-9 h-9 rounded-full object-cover" alt="${func.nome}" />`
-            : `<div class="w-9 h-9 rounded-full bg-[#875C46] text-white font-bold flex items-center justify-center">${func.nome.charAt(0).toUpperCase()}</div>`;
+    function showNotice(message, type = "success") {
+        notice.textContent = message;
+        notice.className =
+            type === "error"
+                ? "mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+                : type === "info"
+                    ? "mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+                : "mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800";
+        notice.hidden = !message;
+    }
 
-        tr.innerHTML = `
-            <td class="py-4 px-6 flex items-center gap-3">
-              ${avatar}
-              <div>
-                <p class="font-bold text-gray-800 member-name">${func.nome}</p>
-                <p class="text-[10px] text-gray-400">CPF: ${func.cpf || "Não informado"}</p>
-              </div>
-            </td>
-            <td class="py-4 px-6 text-gray-600 member-email">${func.email}</td>
-            <td class="py-4 px-6"><span class="px-2.5 py-1 rounded-full font-semibold">${func.cargo}</span></td>
-            <td class="py-4 px-6">${func.status || "Ativo"}</td>
-            <td class="py-4 px-6 text-right"><button onclick="deleteMember(this)" class="text-rose-500 hover:text-rose-700 font-semibold">Remover</button></td>
-          `;
-        tableBody.appendChild(tr);
-    });
+    function configureCreateLink(hasSession) {
+        if (!createLink) return;
+        createLink.href = hasSession
+            ? "?pagina=cadastro"
+            : "?pagina=cadastroPublico";
+        const label = createLink.querySelector("[data-create-label]");
+        if (label) {
+            label.textContent = hasSession
+                ? "Novo Funcionário"
+                : "Criar conta de funcionário";
+        }
+    }
+
+    const successMessage = localStorage.getItem("docegestao_aviso_funcionario");
+    if (successMessage) {
+        showNotice(successMessage);
+        localStorage.removeItem("docegestao_aviso_funcionario");
+    } else {
+        notice.hidden = true;
+    }
 
     function updateCounts() {
-        const rows = [...document.querySelectorAll(".member-row")];
-        const activeCount = rows.filter(
-            (row) => row.dataset.status.toLowerCase() === "ativo",
-        ).length;
-        const adminCount = rows.filter(
-            (row) => row.dataset.role === "Administrador",
-        ).length;
-
-        const totalCount = document.getElementById("total-count");
-        if (totalCount) totalCount.innerText = rows.length;
+        document.querySelectorAll("[data-total-count]").forEach((count) => {
+            count.textContent = String(members.length);
+        });
         document.querySelectorAll('[id="active-count"]').forEach((count) => {
-            count.innerText = activeCount;
+            count.textContent = String(members.length);
         });
         document.querySelectorAll('[id="admin-count"]').forEach((count) => {
-            count.innerText = adminCount;
+            count.textContent = String(
+                members.filter((member) =>
+                    member.nome_cargo?.normalize("NFD")
+                        .replace(/[\u0300-\u036f]/g, "")
+                        .toLowerCase()
+                        .includes("admin"),
+                ).length,
+            );
         });
     }
 
-    function applyTableFilters() {
+    function renderMembers() {
         const query = searchInput.value.trim().toLowerCase();
+        const filteredMembers = members.filter((member) => {
+            const role = member.nome_cargo || "Funcionário";
+            return (
+                (member.nome.toLowerCase().includes(query) ||
+                    member.email.toLowerCase().includes(query)) &&
+                (selectedRole === "all" || role === selectedRole)
+            );
+        });
 
-        document.querySelectorAll(".member-row").forEach((row) => {
-            const name = row
-                .querySelector(".member-name")
-                .innerText.toLowerCase();
-            const email = row
-                .querySelector(".member-email")
-                .innerText.toLowerCase();
-            row.style.display =
-                (name.includes(query) || email.includes(query)) &&
-                    (selectedRole === "all" || row.dataset.role === selectedRole)
-                    ? ""
-                    : "none";
+        tableBody.replaceChildren();
+        if (filteredMembers.length === 0) {
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+            cell.colSpan = 5;
+            cell.className = "py-6 px-6 text-center text-sm text-gray-500";
+            cell.textContent = members.length
+                ? "Nenhum funcionário corresponde à busca."
+                : "Nenhum funcionário cadastrado.";
+            row.appendChild(cell);
+            tableBody.appendChild(row);
+            return;
+        }
+
+        filteredMembers.forEach((member) => {
+            const row = document.createElement("tr");
+            row.className = "hover:bg-gray-50/50 transition-colors member-row";
+            row.dataset.role = member.nome_cargo || "Funcionário";
+            row.dataset.status = "Ativo";
+
+            const identity = document.createElement("td");
+            identity.className = "py-4 px-6 flex items-center gap-3";
+            const avatar = document.createElement("div");
+            avatar.className =
+                "w-9 h-9 rounded-full bg-[#875C46] text-white font-bold flex items-center justify-center";
+            avatar.textContent = member.nome.charAt(0).toUpperCase();
+            const details = document.createElement("div");
+            const name = document.createElement("p");
+            name.className = "font-bold text-gray-800 member-name";
+            name.textContent = member.nome;
+            const cpf = document.createElement("p");
+            cpf.className = "text-[10px] text-gray-400";
+            cpf.textContent = `CPF: ${member.cpf || "Não informado"}`;
+            details.append(name, cpf);
+            identity.append(avatar, details);
+
+            const email = document.createElement("td");
+            email.className = "py-4 px-6 text-gray-600 member-email";
+            email.textContent = member.email;
+
+            const roleCell = document.createElement("td");
+            roleCell.className = "py-4 px-6";
+            const role = document.createElement("span");
+            role.className = "px-2.5 py-1 rounded-full font-semibold";
+            role.textContent = member.nome_cargo || "Funcionário";
+            roleCell.appendChild(role);
+
+            const statusCell = document.createElement("td");
+            statusCell.className = "py-4 px-6";
+            statusCell.textContent = "Ativo";
+
+            const actions = document.createElement("td");
+            actions.className = "py-4 px-6 text-right";
+            const removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.className =
+                "text-rose-500 hover:text-rose-700 font-semibold";
+            removeButton.textContent = "Remover";
+            removeButton.addEventListener("click", () => removerFuncionario(member));
+            actions.appendChild(removeButton);
+
+            row.append(identity, email, roleCell, statusCell, actions);
+            tableBody.appendChild(row);
         });
     }
 
-    updateCounts();
-    searchInput.addEventListener("input", applyTableFilters);
+    async function loadMembers() {
+        tableBody.replaceChildren();
+        members = [];
+        updateCounts();
+        const token = localStorage.getItem("docegestao_token");
+        if (!token) {
+            configureCreateLink(false);
+            showNotice(
+                "Nenhuma sessão de administrador está ativa. Use “Criar conta de funcionário” para se cadastrar e depois entrar no sistema.",
+                "info",
+                "error",
+            );
+            updateCounts();
+            renderMembers();
+            return;
+        }
 
-    roleButtons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-            selectedRole = btn.dataset.filter;
-            roleButtons.forEach((button) => {
-                const selected = button === btn;
-                button.classList.toggle("bg-[#875C46]", selected);
-                button.classList.toggle("text-white", selected);
-                button.classList.toggle("bg-gray-100", !selected);
-                button.classList.toggle("text-gray-600", !selected);
+        configureCreateLink(true);
+        try {
+            const response = await fetch("/api/funcionarios", {
+                headers: { Authorization: `Bearer ${token}` },
             });
-            applyTableFilters();
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.mensagem || "Não foi possível carregar a equipe.");
+            }
+
+            members = result.dados || [];
+            updateCounts();
+            renderMembers();
+        } catch (error) {
+            renderMembers();
+            if (error.message === "Token inválido ou expirado") {
+                localStorage.removeItem("docegestao_token");
+                localStorage.removeItem("docegestao_funcionario");
+                configureCreateLink(false);
+            }
+            showNotice(error.message || "Não foi possível conectar ao servidor.", "error");
+        }
+    }
+
+    async function removerFuncionario(member) {
+        if (!confirm(`Deseja realmente remover ${member.nome} da equipe?`)) return;
+
+        const token = localStorage.getItem("docegestao_token");
+        try {
+            const response = await fetch(`/api/funcionarios/${member.id_funcionario}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.mensagem || "Não foi possível remover o funcionário.");
+            }
+
+            showNotice(`${member.nome} foi removido da equipe.`);
+            await loadMembers();
+        } catch (error) {
+            showNotice(error.message || "Não foi possível conectar ao servidor.", "error");
+        }
+    }
+
+    searchInput.addEventListener("input", renderMembers);
+    roleButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            selectedRole = button.dataset.filter;
+            roleButtons.forEach((item) => {
+                const selected = item === button;
+                item.classList.toggle("bg-[#875C46]", selected);
+                item.classList.toggle("text-white", selected);
+                item.classList.toggle("bg-gray-100", !selected);
+                item.classList.toggle("text-gray-600", !selected);
+            });
+            renderMembers();
         });
     });
 
-    window.deleteMember = (btn) => {
-        if (
-            !confirm("Tem certeza de que deseja remover este membro da equipe?")
-        )
-            return;
-        const row = btn.closest(".member-row");
-        const email = row.querySelector(".member-email").innerText.trim();
-        removedMembers.add(email);
-        localStorage.setItem(
-            "equipe_docegestao_removida",
-            JSON.stringify([...removedMembers]),
-        );
-        const savedTeam = JSON.parse(
-            localStorage.getItem("equipe_docegestao") || "[]",
-        ).filter((member) => member.email !== email);
-        localStorage.setItem("equipe_docegestao", JSON.stringify(savedTeam));
-        row.remove();
-        updateCounts();
-        applyTableFilters();
-    };
+    await loadMembers();
 });

@@ -9,12 +9,12 @@ const app = express();
 app.use(express.json());
 
 app.use(express.static(path.resolve(__dirname, "../../front-end")));
-app.get("/", (req, res) => res.redirect("/tailwind/index.html"));
+app.get("/", (req, res) => res.redirect("/tailwind/painel.html?pagina=login"));
 
 app.use("/api", routes);
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log(`Servidor rodando na porta ${PORT} | Link: http://localhost:3000/tailwind/painel.html?pagina=login | Login inicial: npm run criar-admin-inicial`);
 });

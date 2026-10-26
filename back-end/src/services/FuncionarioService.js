@@ -27,15 +27,15 @@ class FuncionarioService {
     }
 
     async cadastrarFuncionario(dados) {
-        // JWT: "senha" entra na desestruturação e na validação
-        const {cpf, id_cargos, nome, email, senha} = dados
+        const {cpf: cpfInformado, id_cargos, nome, email, senha} = dados
+        const cpf = String(cpfInformado || '').replace(/\D/g, '')
 
         if(!cpf || !id_cargos || !nome || !email || !senha) {
             throw { status: 400, mensagem: "CPF, id cargos, nome, email e senha são obrigatórios" } // JWT: senha adicionada na mensagem
         }
 
-        if(typeof cpf != "string" || cpf.trim() == "") {
-            throw { status: 400, mensagem: "CPF é obrigatório" }
+        if(cpf.length !== 11) {
+            throw { status: 400, mensagem: "Informe um CPF com 11 dígitos" }
         }
         if(typeof id_cargos != "number" || id_cargos <= 0) {
             throw { status: 400, mensagem: "id cargos deve ser um número positivo" }
@@ -54,7 +54,7 @@ class FuncionarioService {
             cpf,
             id_cargos,
             nome: nome.trim(),
-            email: email.trim(),
+            email: email.trim().toLowerCase(),
             senha: senhaHash // JWT: salva o hash, não a senha crua
         }
 
@@ -75,11 +75,14 @@ class FuncionarioService {
         }
 
         const funcionarioAtualizado = {}
-        const {cpf, id_cargos, nome, email, senha} = dados // JWT: senha adicionada aqui também
+        const {cpf: cpfInformado, id_cargos, nome, email, senha} = dados
+        const cpf = cpfInformado === undefined
+            ? undefined
+            : String(cpfInformado).replace(/\D/g, '')
 
         if(cpf != undefined) {
-            if(typeof cpf != "number" || cpf <= 0) {
-                throw { status: 400, mensagem: "O cpf deve ser um número positivo" }
+            if(cpf.length !== 11) {
+                throw { status: 400, mensagem: "Informe um CPF com 11 dígitos" }
             }
             funcionarioAtualizado.cpf = cpf
         }
@@ -93,7 +96,7 @@ class FuncionarioService {
 
         if(nome !== undefined && nome.trim() != "") funcionarioAtualizado.nome = nome.trim()
 
-        if(email !== undefined && email.trim() != "") funcionarioAtualizado.email = email.trim()
+        if(email !== undefined && email.trim() != "") funcionarioAtualizado.email = email.trim().toLowerCase()
 
         // JWT: troca de senha é opcional na atualização - só mexe se vier alguma coisa no campo
         if(senha !== undefined) {

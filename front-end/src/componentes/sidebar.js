@@ -20,27 +20,27 @@ const SIDEBAR_HTML = `
         <!-- Navegação Principal -->
         <nav class="space-y-1 text-sm font-semibold text-[#334155]">
           <!-- Estoque -->
-          <a href="./estoqueInsumo.html" data-page="estoque"
+          <a href="./estoqueInsumos.html" data-page="estoque"
             class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
             <i data-lucide="package" class="w-5 h-5"></i>
             <span>Estoque</span>
           </a>
 
           <!-- Alertas -->
-          <a href="./alertas.html" data-page="alertas"
+          <a href="./alerta.html" data-page="alertas"
             class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
             <i data-lucide="bell" class="w-5 h-5"></i>
             <span>Alertas</span>
           </a>
 
-          <a href="./relatorios_analises.html" data-page="relatorios"
+          <a href="./relatorioAnalises.html" data-page="relatorios"
             class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
             <i data-lucide="chart-no-axes-combined" class="w-5 h-5"></i>
             <span>Relatórios</span>
           </a>
 
           <!-- Historico -->
-          <a href="./historico-completo.html" data-page="historico"
+          <a href="./historicoCompleto.html" data-page="historico"
             class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
             <i data-lucide="clock" class="w-5 h-5"></i>
             <span>Historico</span>
@@ -65,7 +65,7 @@ const SIDEBAR_HTML = `
 
     <!-- Rodapé: Botão Novo Item -->
     <div class="p-5">
-      <a href="./historico-materias_prima.html" id="btn-novo-sidebar"
+      <a href="./materia-prima.html" id="btn-novo-sidebar"
         class="w-full bg-cocoa-700 hover:bg-cocoa-800 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer text-sm">
         <span class="text-base font-normal">+</span>
         <span>Nova Movimentação</span>
