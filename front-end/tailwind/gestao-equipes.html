@@ -13,7 +13,11 @@
               4
             </p>
           </div>
+<<<<<<< HEAD
           <a href="cadastroFuncionario.html"
+=======
+          <a id="btn-novo-funcionario" href="cadastro-funcionario.html"
+>>>>>>> 3398ba2c07c708ac337e5d626170afe0fe08276d
             class="bg-[#875C46] hover:bg-[#6D4936] text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -25,7 +29,7 @@
 
         <!-- Indicadores e Métricas Rápidas -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+          <div data-team-filter="all" role="button" tabindex="0" aria-label="Mostrar toda a equipe" class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#875C46]">
             <div>
               <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 Total da Equipe
@@ -43,7 +47,7 @@
             </div>
           </div>
 
-          <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+          <div data-team-filter="active" role="button" tabindex="0" aria-label="Mostrar acessos ativos" class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
             <div>
               <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 Acessos Ativos
@@ -60,7 +64,7 @@
             </div>
           </div>
 
-          <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+          <div data-team-filter="admins" role="button" tabindex="0" aria-label="Mostrar administradores" class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#875C46]">
             <div>
               <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 Administradores
@@ -148,7 +152,7 @@
                   </span>
                 </td>
                 <td class="py-4 px-6 text-right">
-                  <button onclick="deleteMember(this)" class="text-rose-500 hover:text-rose-700 font-semibold">
+                  <button type="button" class="btn-remover text-rose-500 hover:text-rose-700 font-semibold">
                     Remover
                   </button>
                 </td>
@@ -181,7 +185,7 @@
                   </span>
                 </td>
                 <td class="py-4 px-6 text-right">
-                  <button onclick="deleteMember(this)" class="text-rose-500 hover:text-rose-700 font-semibold">
+                  <button type="button" class="btn-remover text-rose-500 hover:text-rose-700 font-semibold">
                     Remover
                   </button>
                 </td>
@@ -192,6 +196,53 @@
       </div>
     </main>
 
+<<<<<<< HEAD
   </div>
 
 </body>
+=======
+    <!-- Modal de confirmação de exclusão, no mesmo padrão visual do estoque -->
+    <div id="confirm-removal-modal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4"
+      role="dialog" aria-modal="true" aria-labelledby="confirm-removal-title">
+      <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl border border-black/10 text-center space-y-4">
+        <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center mx-auto">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </div>
+        <div>
+          <h3 id="confirm-removal-title" class="font-display font-bold text-base text-brand-text-dark">
+            Excluir Funcionário
+          </h3>
+          <p class="text-xs text-brand-text-muted mt-1 leading-relaxed">
+            Deseja realmente excluir <strong id="confirm-removal-name" class="font-semibold">este funcionário</strong> da equipe? Esta ação não poderá ser desfeita.
+          </p>
+        </div>
+        <div class="flex items-center gap-3 pt-2">
+          <button type="button" id="confirm-removal-cancel"
+            class="w-full py-2.5 rounded-xl text-xs font-semibold text-brand-text-muted bg-brand-cream/60 hover:bg-black/5 transition-colors cursor-pointer">
+            Cancelar
+          </button>
+          <button type="button" id="confirm-removal-yes"
+            class="w-full py-2.5 rounded-xl text-xs font-semibold bg-rose-500 text-white hover:bg-rose-600 transition-colors shadow-sm cursor-pointer">
+            Sim, Excluir
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER Componente -->
+    <div id="footer-container" class="w-full shrink-0 mt-auto"></div>
+  </div>
+
+  <script> lucide.createIcons(); </script>
+  <script src="../src/componentes/footer.js" defer></script>
+  <script src="../src/componentes/sidebar.js" defer></script>
+  <script src="../src/componentes/header.js" defer></script>
+  <script src="../src/script/gestao-equipes.js" defer></script>
+</body>
+
+</html>
+>>>>>>> 3398ba2c07c708ac337e5d626170afe0fe08276d

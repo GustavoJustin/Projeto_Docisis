@@ -1,344 +1,219 @@
-<!doctype html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DoceGestão | Movimentação de Matérias-Primas</title>
+// Integra o formulário de movimentação com a API do DoceGestão.
 
-    <!-- CSS Tailwind via CDN -->
-    <link rel="stylesheet" href="../../src/css/output.css" />
+document.addEventListener("DOMContentLoaded", function () {
+  const formulario = document.getElementById("form-movimentacao");
+  const campoInsumo = document.getElementById("insumo");
+  const campoQuantidade = document.getElementById("quantidade");
+  const campoTipo = document.getElementById("tipo_movimentacao");
+  const corpoTabela = document.querySelector("main table tbody");
+  const campoBusca = document.querySelector('main input[placeholder="Buscar insumo..."]');
+  const token = localStorage.getItem("docegestao_token");
 
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-  </head>
+  let insumos = [];
+  let movimentacoes = [];
 
-  <body class="min-h-screen bg-stone-50 text-stone-800">
-    <div class="flex min-h-screen">
-      <!-- ===================== SIDEBAR ===================== -->
-      <div
-        id="sidebar-container"
-        data-active="historico-materia_prima"
-        class="w-64 shrink-0"
-      ></div>
+  if (!formulario || !campoInsumo || !campoQuantidade || !campoTipo || !corpoTabela) {
+    return;
+  }
 
-      <!-- CONTEÚDO PRINCIPAL (PÁGINA DE MOVIMENTAÇÃO) -->
-      <main class="flex-1 px-8 py-6 space-y-6">
-        <!-- Header / Busca Superior -->
-        <div class="flex items-center justify-between">
-          <div class="relative w-80">
-            <i
-              data-lucide="search"
-              class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-300"
-            ></i>
-            <input
-              type="text"
-              placeholder="Buscar insumo..."
-              class="w-full rounded-lg border border-stone-200 bg-white py-2 pl-9 pr-3 text-sm text-stone-600 placeholder:text-stone-300 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800"
-            />
-          </div>
-          <div class="flex items-center gap-4">
-            <i
-              data-lucide="bell"
-              class="h-5 w-5 text-stone-400 cursor-pointer"
-            ></i>
-            <div
-              data-profile-trigger
-              data-profile-initials
-              class="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center text-xs font-semibold text-amber-800"
-            >
-              DG
-            </div>
-          </div>
-        </div>
+  if (!token) {
+    alert("Sua sessão expirou. Faça login novamente.");
+    return;
+  }
 
-        <!-- Título da Página -->
-        <div>
-          <h1 class="text-2xl font-semibold text-stone-800">
-            Movimentação de Matérias-Primas
-          </h1>
-          <p class="mt-1 text-sm text-stone-400">
-            Registre as entradas e saídas de estoque para manter níveis
-            precisos.
-          </p>
-        </div>
+  // Todas as chamadas protegidas usam o token salvo no login.
+  async function chamarApi(url, configuracao = {}) {
+    const resposta = await fetch(url, {
+      ...configuracao,
+      headers: {
+        Authorization: "Bearer " + token,
+        ...(configuracao.body ? { "Content-Type": "application/json" } : {}),
+      },
+    });
 
-        <!-- Formulário: Registrar Movimentação -->
-        <div class="rounded-2xl border border-stone-200 bg-white p-6 space-y-5">
-          <div class="flex items-center gap-2">
-            <i
-              data-lucide="arrow-left-right"
-              class="h-5 w-5 text-amber-800"
-            ></i>
-            <h2 class="text-base font-semibold text-stone-800">
-              Registrar Movimentação
-            </h2>
-          </div>
+    const resultado = await resposta.json();
 
-          <form
-            class="space-y-4"
-            id="form-movimentacao"
-            onsubmit="event.preventDefault()"
-          >
-            <!-- Insumo (Obrigatório) -->
-            <div>
-              <label
-                for="insumo"
-                class="mb-1 block text-xs font-medium text-stone-500"
-              >
-                Insumo / Matéria-Prima <span class="text-rose-500">*</span>
-              </label>
-              <div class="relative">
-                <input
-                  type="text"
-                  id="insumo"
-                  name="insumo"
-                  required
-                  placeholder="Selecione um produto..."
-                  class="w-full rounded-lg border border-stone-200 px-3 py-2 pr-9 text-sm text-stone-600 placeholder:text-stone-300 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800"
-                />
-                <i
-                  data-lucide="search"
-                  class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400"
-                ></i>
-              </div>
-            </div>
+    if (!resposta.ok) {
+      throw new Error(resultado.mensagem || "Não foi possível falar com a API.");
+    }
 
-            <!-- Tipo e Quantidade -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Tipo de Movimentação (Clicável) -->
-              <div>
-                <label class="mb-1 block text-xs font-medium text-stone-500"
-                  >Tipo de Movimentação</label
-                >
-                <!-- Campo oculto para registrar a escolha de Entrada/Saída no formulário -->
-                <input
-                  type="hidden"
-                  id="tipo_movimentacao"
-                  name="tipo_movimentacao"
-                  value="ENTRADA"
-                />
+    return resultado;
+  }
 
-                <div
-                  class="grid grid-cols-2 gap-1 rounded-lg border border-stone-200 bg-stone-50 p-1"
-                >
-                  <button
-                    type="button"
-                    id="btn-entrada"
-                    onclick="selecionarTipo('ENTRADA')"
-                    class="rounded-md bg-white py-1.5 text-xs font-semibold text-emerald-700 shadow-xs text-center border border-stone-200 transition"
-                  >
-                    Entrada
-                  </button>
-                  <button
-                    type="button"
-                    id="btn-saida"
-                    onclick="selecionarTipo('SAIDA')"
-                    class="rounded-md py-1.5 text-xs font-medium text-stone-500 hover:text-stone-700 text-center transition"
-                  >
-                    Saída
-                  </button>
-                </div>
-              </div>
+  // O texto da opção identifica produto, marca e lote.
+  function nomeCompletoDoInsumo(insumo) {
+    let nome = insumo.tipo;
+    if (insumo.marca) nome += " — " + insumo.marca;
+    if (insumo.lote) nome += " — lote " + insumo.lote;
+    return nome;
+  }
 
-              <!-- Quantidade (Obrigatório) -->
-              <div>
-                <label
-                  for="quantidade"
-                  class="mb-1 block text-xs font-medium text-stone-500"
-                >
-                  Quantidade <span class="text-rose-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  id="quantidade"
-                  name="quantidade"
-                  step="0.01"
-                  min="0.01"
-                  required
-                  placeholder="0.00"
-                  class="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-600 placeholder:text-stone-300 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800"
-                />
-              </div>
-            </div>
+  // Carrega os insumos cadastrados e mostra sugestões no campo existente.
+  async function carregarInsumos() {
+    const resultado = await chamarApi("/api/estoque/materias-primas");
+    insumos = resultado.dados || [];
 
-            <!-- Motivo / Referência -->
-            <div>
-              <label class="mb-1 block text-xs font-medium text-stone-500"
-                >Motivo / Referência</label
-              >
-              <select
-                name="motivo"
-                class="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-600 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800"
-              >
-                <option value="Compra / Reposição">Compra / Reposição</option>
-                <option value="Uso na Produção">Uso na Produção</option>
-                <option value="Ajuste de Estoque">Ajuste de Estoque</option>
-                <option value="Perda / Avaria">Perda / Avaria</option>
-              </select>
-            </div>
+    let lista = document.getElementById("lista-insumos-api");
+    if (!lista) {
+      lista = document.createElement("datalist");
+      lista.id = "lista-insumos-api";
+      document.body.appendChild(lista);
+    }
 
-            <!-- Notas Adicionais -->
-            <div>
-              <label class="mb-1 block text-xs font-medium text-stone-500"
-                >Notas Adicionais</label
-              >
-              <textarea
-                name="notas"
-                rows="3"
-                placeholder="Observações opcionais..."
-                class="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-600 placeholder:text-stone-300 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800 resize-none"
-              ></textarea>
-            </div>
+    campoInsumo.setAttribute("list", lista.id);
+    lista.innerHTML = "";
 
-            <!-- Botão Submeter -->
-            <div class="flex justify-end pt-2">
-              <button
-                type="submit"
-                class="flex items-center gap-2 rounded-lg bg-amber-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-amber-950 transition"
-              >
-                <i data-lucide="check-circle-2" class="h-4 w-4"></i>
-                Confirmar Movimentação
-              </button>
-            </div>
-          </form>
-        </div>
+    insumos.forEach(function (insumo) {
+      const opcao = document.createElement("option");
+      opcao.value = nomeCompletoDoInsumo(insumo);
+      lista.appendChild(opcao);
+    });
+  }
 
-        <!-- Tabela: Histórico Recente -->
-        <div class="rounded-2xl border border-stone-200 bg-white p-6 space-y-4">
-          <div class="flex items-center justify-between">
-            <h2 class="text-base font-semibold text-stone-800">
-              Histórico Recente
-            </h2>
-            <a
-              href="historico-completo.html"
-              class="flex items-center gap-1 text-xs font-medium text-amber-800 hover:underline"
-            >
-              Ver Histórico Completo
-              <i data-lucide="arrow-right" class="h-3.5 w-3.5"></i>
-            </a>
-          </div>
+  // Adiciona uma célula ao histórico sem interpretar dados como HTML.
+  function adicionarCelula(linha, texto, classes) {
+    const celula = document.createElement("td");
+    celula.className = classes;
+    celula.textContent = texto || "—";
+    linha.appendChild(celula);
+    return celula;
+  }
 
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-              <thead>
-                <tr
-                  class="border-b border-stone-100 text-xs uppercase tracking-wide text-stone-400"
-                >
-                  <th class="pb-3 font-medium">Data/Hora</th>
-                  <th class="pb-3 font-medium">Insumo</th>
-                  <th class="pb-3 font-medium text-center">Tipo</th>
-                  <th class="pb-3 font-medium text-right">Qtd</th>
-                  <th class="pb-3 font-medium text-right">Responsável</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-stone-50">
-                <tr>
-                  <td class="py-3 text-stone-600">Hoje, 10:45</td>
-                  <td class="py-3 font-medium text-stone-800">
-                    Farinha de Trigo Especial
-                  </td>
-                  <td class="py-3 text-center">
-                    <span
-                      class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700"
-                      >ENTRADA</span
-                    >
-                  </td>
-                  <td class="py-3 text-right font-medium text-emerald-600">
-                    + 50.0 kg
-                  </td>
-                  <td class="py-3 text-right text-stone-600">João Silva</td>
-                </tr>
-                <tr>
-                  <td class="py-3 text-stone-600">Hoje, 09:30</td>
-                  <td class="py-3 font-medium text-stone-800">
-                    Manteiga Extra sem Sal
-                  </td>
-                  <td class="py-3 text-center">
-                    <span
-                      class="inline-flex rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600"
-                      >SAÍDA</span
-                    >
-                  </td>
-                  <td class="py-3 text-right font-medium text-rose-600">
-                    - 12.5 kg
-                  </td>
-                  <td class="py-3 text-right text-stone-600">Maria Clara</td>
-                </tr>
-                <tr>
-                  <td class="py-3 text-stone-600">Ontem, 16:20</td>
-                  <td class="py-3 font-medium text-stone-800">
-                    Açúcar de Confeiteiro
-                  </td>
-                  <td class="py-3 text-center">
-                    <span
-                      class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700"
-                      >ENTRADA</span
-                    >
-                  </td>
-                  <td class="py-3 text-right font-medium text-emerald-600">
-                    + 25.0 kg
-                  </td>
-                  <td class="py-3 text-right text-stone-600">João Silva</td>
-                </tr>
-                <tr>
-                  <td class="py-3 text-stone-600">Ontem, 14:15</td>
-                  <td class="py-3 font-medium text-stone-800">
-                    Cacau em Pó 100%
-                  </td>
-                  <td class="py-3 text-center">
-                    <span
-                      class="inline-flex rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600"
-                      >SAÍDA</span
-                    >
-                  </td>
-                  <td class="py-3 text-right font-medium text-rose-600">
-                    - 5.0 kg
-                  </td>
-                  <td class="py-3 text-right text-stone-600">Ricardo Mendes</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </main>
-    </div>
+  // Mostra o histórico recebido da API na tabela que já existe na página.
+  function mostrarHistorico(lista) {
+    corpoTabela.innerHTML = "";
 
-    <!-- Script para Controle de Seleção do Tipo e Ícones -->
-    <script>
-      lucide.createIcons();
+    if (lista.length === 0) {
+      const linha = document.createElement("tr");
+      const celula = document.createElement("td");
+      celula.colSpan = 5;
+      celula.className = "py-4 text-center text-stone-400";
+      celula.textContent = "Nenhuma movimentação registrada ainda.";
+      linha.appendChild(celula);
+      corpoTabela.appendChild(linha);
+      return;
+    }
 
-      const tipoInicial = new URLSearchParams(window.location.search)
-        .get("tipo")
-        ?.toUpperCase();
-      if (tipoInicial === "ENTRADA" || tipoInicial === "SAIDA") {
-        selecionarTipo(tipoInicial);
+    lista.forEach(function (movimentacao, indice) {
+      const linha = document.createElement("tr");
+      if (indice < lista.length - 1) linha.className = "border-b border-stone-50";
+
+      const data = new Date(movimentacao.data_hora);
+      const dataFormatada = Number.isNaN(data.getTime())
+        ? movimentacao.data_hora
+        : new Intl.DateTimeFormat("pt-BR", {
+            dateStyle: "short",
+            timeStyle: "short",
+          }).format(data);
+
+      adicionarCelula(linha, dataFormatada, "py-3 text-stone-600");
+      adicionarCelula(linha, movimentacao.insumo, "py-3 font-medium text-stone-800");
+
+      const celulaTipo = document.createElement("td");
+      celulaTipo.className = "py-3 text-center";
+      const etiqueta = document.createElement("span");
+      const entrada = movimentacao.tipo === "ENTRADA";
+      etiqueta.className = entrada
+        ? "inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700"
+        : "inline-flex rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600";
+      etiqueta.textContent = entrada ? "ENTRADA" : "SAÍDA";
+      celulaTipo.appendChild(etiqueta);
+      linha.appendChild(celulaTipo);
+
+      const quantidade = Number(movimentacao.quantidade).toLocaleString("pt-BR");
+      const sinal = entrada ? "+ " : "− ";
+      const corQuantidade = entrada ? "text-emerald-600" : "text-rose-600";
+      adicionarCelula(
+        linha,
+        sinal + quantidade,
+        "py-3 text-right font-medium " + corQuantidade,
+      );
+      adicionarCelula(
+        linha,
+        movimentacao.responsavel,
+        "py-3 text-right text-stone-600",
+      );
+      corpoTabela.appendChild(linha);
+    });
+  }
+
+  // Busca as movimentações e atualiza a tabela.
+  async function carregarHistorico() {
+    const resultado = await chamarApi("/api/estoque/movimentacoes");
+    movimentacoes = resultado.dados || [];
+    mostrarHistorico(movimentacoes);
+  }
+
+  // Envia a movimentação quando o botão do formulário é clicado.
+  formulario.addEventListener("submit", async function (evento) {
+    evento.preventDefault();
+
+    const insumoEscolhido = insumos.find(function (insumo) {
+      return nomeCompletoDoInsumo(insumo) === campoInsumo.value;
+    });
+
+    if (!insumoEscolhido) {
+      campoInsumo.setCustomValidity("Escolha um insumo da lista.");
+      campoInsumo.reportValidity();
+      campoInsumo.addEventListener("input", function () {
+        campoInsumo.setCustomValidity("");
+      }, { once: true });
+      return;
+    }
+
+    campoInsumo.setCustomValidity("");
+    const quantidade = Number(campoQuantidade.value);
+    const botao = formulario.querySelector('button[type="submit"]');
+
+    if (botao) botao.disabled = true;
+
+    try {
+      const dadosFormulario = new FormData(formulario);
+      const dadosMovimentacao = {
+        id_produtos: Number(insumoEscolhido.id_produtos),
+        tipo: campoTipo.value,
+        quantidade: quantidade,
+        motivo: dadosFormulario.get("motivo"),
+        notas: dadosFormulario.get("notas"),
+      };
+
+      await chamarApi("/api/estoque/movimentacoes", {
+        method: "POST",
+        body: JSON.stringify(dadosMovimentacao),
+      });
+
+      formulario.reset();
+      if (typeof window.selecionarTipo === "function") {
+        window.selecionarTipo("ENTRADA");
       }
 
-      function selecionarTipo(tipo) {
-        const btnEntrada = document.getElementById("btn-entrada");
-        const btnSaida = document.getElementById("btn-saida");
-        const inputTipo = document.getElementById("tipo_movimentacao");
+      await carregarInsumos();
+      await carregarHistorico();
+      alert("Movimentação registrada e estoque atualizado.");
+    } catch (erro) {
+      alert(erro.message);
+    } finally {
+      if (botao) botao.disabled = false;
+    }
+  });
 
-        inputTipo.value = tipo;
+  // Filtra o histórico usando o campo de busca já existente na tela.
+  if (campoBusca) {
+    campoBusca.addEventListener("input", function () {
+      const busca = campoBusca.value.toLocaleLowerCase("pt-BR");
+      const resultado = movimentacoes.filter(function (movimentacao) {
+        const texto = [movimentacao.insumo, movimentacao.tipo, movimentacao.responsavel]
+          .join(" ")
+          .toLocaleLowerCase("pt-BR");
+        return texto.includes(busca);
+      });
+      mostrarHistorico(resultado);
+    });
+  }
 
-        if (tipo === "ENTRADA") {
-          // Estilos para botão Entrada ativo
-          btnEntrada.className =
-            "rounded-md bg-white py-1.5 text-xs font-semibold text-emerald-700 shadow-xs text-center border border-stone-200 transition";
-          // Estilos para botão Saída inativo
-          btnSaida.className =
-            "rounded-md py-1.5 text-xs font-medium text-stone-500 hover:text-stone-700 text-center transition";
-        } else {
-          // Estilos para botão Saída ativo
-          btnSaida.className =
-            "rounded-md bg-white py-1.5 text-xs font-semibold text-rose-600 shadow-xs text-center border border-stone-200 transition";
-          // Estilos para botão Entrada inativo
-          btnEntrada.className =
-            "rounded-md py-1.5 text-xs font-medium text-stone-500 hover:text-stone-700 text-center transition";
-        }
-      }
-    </script>
-
-    <!-- <script src="../../src/componentes/sidebar.js" defer></script> -->
-  </body>
-</html>
+  // Carrega as opções e o histórico assim que a página abre.
+  Promise.all([carregarInsumos(), carregarHistorico()]).catch(function (erro) {
+    console.error(erro);
+    alert(erro.message);
+  });
+});
