@@ -119,10 +119,12 @@ document.addEventListener("demo:page-loaded", () => {
             localStorage.getItem("docegestao_chamados") || "[]",
         );
         chamados.push({
+            id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
             descricao: chamadoTexto.value.trim(),
             criadoEm: new Date().toISOString(),
         });
         localStorage.setItem("docegestao_chamados", JSON.stringify(chamados));
+        document.dispatchEvent(new Event("docegestao:atualizar-notificacoes"));
         fecharModal();
         showToast(
             "Chamado salvo",

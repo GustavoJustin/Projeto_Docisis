@@ -1,3 +1,74 @@
+const ESTOQUE_NOTIFICACOES_KEY = "docegestao_estoque_v1";
+
+function slugProdutoEstoque(nome) {
+    return String(nome || "insumo")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "insumo";
+}
+
+function lerEstoqueParaNotificacoes() {
+    try {
+        return JSON.parse(localStorage.getItem(ESTOQUE_NOTIFICACOES_KEY) || "{}");
+    } catch (error) {
+        console.error("Não foi possível carregar o estoque salvo:", error);
+        return {};
+    }
+}
+
+function atualizarNotificacoesDoEstoque() {
+    try {
+        const estoque = lerEstoqueParaNotificacoes();
+        document.querySelectorAll(".cartao-produto").forEach((card) => {
+            const nome = card.querySelector("h3")?.textContent.trim() || "Insumo";
+            const id = card.dataset.id || slugProdutoEstoque(nome);
+            const quantidadeTexto = card.querySelector(".qtd-valor")?.firstChild?.textContent || "";
+            const quantidade = Number.parseFloat(quantidadeTexto.replace(",", "."));
+            if (!Number.isFinite(quantidade)) return;
+            const levelText = [...card.querySelectorAll("span")]
+                .map((element) => element.textContent.trim())
+                .find((text) => /\d+(?:[.,]\d+)?\s*\/\s*\d+/.test(text));
+            const levelMatch = levelText?.match(/(\d+(?:[.,]\d+)?)\s*\/\s*(\d+(?:[.,]\d+)?)/);
+
+            card.dataset.id = id;
+            estoque[id] = {
+                ...(estoque[id] || {}),
+                id,
+                nome,
+                categoria: card.dataset.categoria || "",
+                unidade:
+                    card.dataset.unidade ||
+                    card.querySelector(".qtd-valor span")?.textContent.trim() ||
+                    estoque[id]?.unidade ||
+                    "un",
+                quantidade,
+                maximo: levelMatch
+                    ? Number.parseFloat(levelMatch[2].replace(",", "."))
+                    : Number(estoque[id]?.maximo) || Math.max(quantidade, 1),
+            };
+        });
+        localStorage.setItem(ESTOQUE_NOTIFICACOES_KEY, JSON.stringify(estoque));
+        document.dispatchEvent(new Event("docegestao:atualizar-notificacoes"));
+    } catch (error) {
+        console.error("Não foi possível atualizar as notificações do estoque:", error);
+    }
+}
+
+function restaurarQuantidadeEstoque(card, produto) {
+    const displayQtd = card.querySelector(".qtd-valor");
+    if (!displayQtd) return;
+    const unidade = card.dataset.unidade || produto.unidade || "un";
+    const unidadeElement = displayQtd.querySelector("span");
+    if (unidadeElement) {
+        displayQtd.firstChild.textContent = `${produto.quantidade} `;
+        unidadeElement.textContent = unidade;
+    } else {
+        displayQtd.textContent = `${produto.quantidade} ${unidade}`;
+    }
+}
+
 function inicializarEstoque() {
     if (!document.getElementById("grid-produtos")) return;
 
@@ -5,6 +76,15 @@ function inicializarEstoque() {
     const inputBusca = document.getElementById("input-busca");
     const cardAdicionar = document.getElementById("btn-card-adicionar");
     const gridProdutos = document.getElementById("grid-produtos");
+    const estoqueSalvo = lerEstoqueParaNotificacoes();
+
+    document.querySelectorAll(".cartao-produto").forEach((card) => {
+        const nome = card.querySelector("h3")?.textContent.trim() || "Insumo";
+        const id = card.dataset.id || slugProdutoEstoque(nome);
+        card.dataset.id = id;
+        const produtoSalvo = estoqueSalvo[id];
+        if (produtoSalvo) restaurarQuantidadeEstoque(card, produtoSalvo);
+    });
 
     // Elementos do Modal de Insumo
     const modal = document.getElementById("modal-insumo");
@@ -113,8 +193,21 @@ function inicializarEstoque() {
     btnCancelarExclusao.addEventListener("click", fecharModalExclusao);
     btnConfirmarExclusao.addEventListener("click", () => {
         if (cardParaExcluir) {
+            const estoqueAtual = lerEstoqueParaNotificacoes();
+            const id = cardParaExcluir.dataset.id;
+            const nome = cardParaExcluir.querySelector("h3")?.textContent.trim() || "";
+            delete estoqueAtual[id];
             cardParaExcluir.remove();
+            try {
+                localStorage.setItem(ESTOQUE_NOTIFICACOES_KEY, JSON.stringify(estoqueAtual));
+                document.dispatchEvent(
+                    new CustomEvent("docegestao:produto-removido", { detail: { id, nome } }),
+                );
+            } catch (error) {
+                console.error("Não foi possível salvar a exclusão do insumo:", error);
+            }
             aplicarFiltros();
+            document.dispatchEvent(new Event("docegestao:atualizar-notificacoes"));
         }
         fecharModalExclusao();
     });
@@ -138,7 +231,10 @@ function inicializarEstoque() {
         const btnMenos = card.querySelector(".btn-menos");
         const btnMais = card.querySelector(".btn-mais");
         const displayQtd = card.querySelector(".qtd-valor");
-        const unidade = card.getAttribute("data-unidade") || "un";
+        const unidade =
+            card.getAttribute("data-unidade") ||
+            displayQtd.querySelector("span")?.textContent.trim() ||
+            "un";
 
         if (btnMenos && btnMais && displayQtd) {
             btnMenos.addEventListener("click", (e) => {
@@ -153,6 +249,7 @@ function inicializarEstoque() {
                         : "text-brand-text-muted";
                     displayQtd.innerHTML = `${valor} <span class="text-xs font-normal ${corUnidade}">${unidade}</span>`;
                 }
+                atualizarNotificacoesDoEstoque();
             });
 
             btnMais.addEventListener("click", (e) => {
@@ -164,6 +261,7 @@ function inicializarEstoque() {
                     ? "text-rose-400"
                     : "text-brand-text-muted";
                 displayQtd.innerHTML = `${valor} <span class="text-xs font-normal ${corUnidade}">${unidade}</span>`;
+                atualizarNotificacoesDoEstoque();
             });
         }
     }
@@ -172,6 +270,7 @@ function inicializarEstoque() {
     document
         .querySelectorAll(".cartao-produto")
         .forEach(vincularEventosCard);
+    atualizarNotificacoesDoEstoque();
 
     // ==================== LÓGICA DO MODAL DE CADASTRO ====================
     function abrirModal() {
@@ -276,6 +375,7 @@ function inicializarEstoque() {
 
         gridProdutos.insertBefore(novoCard, cardAdicionar);
         vincularEventosCard(novoCard);
+        atualizarNotificacoesDoEstoque();
         fecharModal();
         aplicarFiltros();
     });

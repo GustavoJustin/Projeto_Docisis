@@ -566,7 +566,10 @@
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
     catch { return {}; }
   }
-  function save(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+  function save(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    document.dispatchEvent(new Event('docegestao:atualizar-notificacoes'));
+  }
   function parseQuantity(card) {
     const span = $('.qtd-valor', card);
     return span ? (parseFloat((span.firstChild?.textContent || span.textContent).replace(',', '.')) || 0) : 0;
@@ -693,7 +696,9 @@
     $('#btn-cancelar-exclusao')?.addEventListener('click', () => $('#modal-excluir')?.classList.add('hidden'));
     $('#btn-confirmar-exclusao')?.addEventListener('click', () => {
       const card = window.cardParaExcluir; if (!card) return;
-      const data = load(); delete data[getCardId(card)]; save(data); card.remove(); window.cardParaExcluir = null;
+      const data = load(), id = getCardId(card), nome = data[id]?.nome || card.querySelector('h3')?.textContent.trim() || '';
+      delete data[id]; save(data); card.remove(); window.cardParaExcluir = null;
+      document.dispatchEvent(new CustomEvent('docegestao:produto-removido', { detail: { id, nome } }));
       $('#modal-excluir')?.classList.add('hidden');
     });
   }
