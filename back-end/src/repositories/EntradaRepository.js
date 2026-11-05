@@ -1,8 +1,20 @@
 const pool = require('../config/database')
 
 class EntradaRepository {
+    async buscarFuncionarioPorCpf(cpf) {
+        const [rows] = await pool.query('SELECT id_funcionario FROM tbl_funcionarios WHERE cpf = ?', [String(cpf).replace(/\D/g, '')])
+        return rows[0]
+    }
+
     async listarEntrada() {
-        const [rows] = await pool.query('SELECT * FROM tbl_mov_entrada')
+        const [rows] = await pool.query(`
+            SELECT m.*, p.nome_item, p.marca, COALESCE(p.nome_item, p.marca) AS produto,
+                   f.nome AS usuario_nome, f.cpf
+            FROM tbl_mov_entrada m
+            LEFT JOIN tbl_produtos p ON p.id_produtos = m.id_produtos
+            LEFT JOIN tbl_funcionarios f ON f.id_funcionario = m.id_funcionario
+            ORDER BY m.data_hora DESC
+        `)
         return rows
     }
 

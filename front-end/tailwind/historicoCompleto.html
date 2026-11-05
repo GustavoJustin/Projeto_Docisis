@@ -320,7 +320,7 @@ if (!window.inicializarHistorico) {
 
     if (!tableBody) return;
 
-    const rows = [...tableBody.querySelectorAll("tr")];
+    let rows = [...tableBody.querySelectorAll("tr")];
     let filteredRows = [...rows];
     let activeTypeFilter = "todos";
     let activeDateFilter = "";
@@ -536,6 +536,7 @@ if (!window.inicializarHistorico) {
     });
 
     renderRows();
+    carregarMovimentacoesBanco();
   }
 
   if (document.readyState === "loading")
