@@ -89,7 +89,8 @@ const HEADER_HTML = `
     <div id="header-notifications-dialog" class="fixed inset-0 z-[60] hidden bg-black/20"
       role="presentation">
       <section role="dialog" aria-modal="true" aria-labelledby="header-notifications-title"
-        class="absolute inset-y-0 right-0 flex w-full max-w-sm flex-col overflow-hidden border-l border-[#E7DED5] bg-[#FAFAFA] text-[#4A3F39] shadow-2xl">
+        class="absolute inset-y-0 right-0 flex w-full max-w-sm flex-col overflow-hidden border-l border-[#E7DED5] text-[#4A3F39] shadow-2xl"
+        style="background-color:#FAFAFA">
         <div class="flex items-center justify-between border-b border-gray-100 bg-[#F8F6F2] px-5 py-4">
           <div class="flex items-center gap-3">
             <div>
@@ -109,7 +110,7 @@ const HEADER_HTML = `
           </div>
         </div>
         <p id="header-notifications-error" class="hidden mx-5 mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800" role="alert"></p>
-        <div id="header-notifications-list" class="flex-1 space-y-3 overflow-y-auto p-5">
+        <div id="header-notifications-list" class="flex-1 space-y-3 overflow-y-auto p-5" style="background-color:#FAFAFA">
           <div data-notifications-empty class="flex h-full min-h-64 flex-col items-center justify-center text-center">
             <span class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F5ECE5] text-[#875C46]">
               <i data-lucide="bell-ring" class="h-7 w-7"></i>
@@ -286,7 +287,7 @@ const HEADER_DARK_STYLES = `
   html[data-theme="dark"] [class~="cartao-produto"],
   html[data-theme="dark"] #header-profile-menu,
   html[data-theme="dark"] #header-settings-dialog [role="dialog"],
-  html[data-theme="dark"] #header-notifications-dialog [role="dialog"] {
+  html[data-theme="dark"] #header-logout-dialog [role="dialog"] {
     background-color: #2c221c !important;
     color: #f7f0e8 !important;
     border-color: #49382d !important;
@@ -471,9 +472,11 @@ function carregarHeader() {
   const PREFERENCES_KEY = "docegestao_preferencias_v1";
   const PROFILE_KEY = "docegestao_perfil_v1";
   const THEME_KEY = "docegestao_tema_v1";
+  const MIGRATED_CALLS_KEY = "docegestao_chamados_migrados_v1";
   let activeDialogTrigger = null;
   let usuarioAtual = null;
   let selectedProfilePhoto = null;
+  let sincronizacaoChamadosAtual = null;
 
   function lerJsonLocalStorage(key, fallback) {
     try {
@@ -515,6 +518,26 @@ function carregarHeader() {
   function limparErroNotificacoes() {
     notificationsError.textContent = "";
     notificationsError.classList.add("hidden");
+  }
+
+  async function lerRespostaChamados(response, mensagemPadrao) {
+    const body = await response.text();
+    let result;
+    try {
+      result = JSON.parse(body);
+    } catch {
+      if (body.trimStart().startsWith("<")) {
+        throw new Error(
+          "O servidor ainda não carregou a API de chamados. Reinicie o backend e tente novamente.",
+        );
+      }
+      throw new Error(mensagemPadrao);
+    }
+
+    if (!response.ok) {
+      throw new Error(result.mensagem || mensagemPadrao);
+    }
+    return result;
   }
 
   function obterPreferencias() {
@@ -979,27 +1002,6 @@ function carregarHeader() {
         throw new Error(result.mensagem || "Não foi possível atualizar as notificações do estoque.");
       }
 
-      async function sincronizarChamadosNotificacoes() {
-        const token = localStorage.getItem("docegestao_token");
-        if (!token) return;
-
-        try {
-          const response = await fetch("/api/chamados", {
-            headers: { Authorization: "Bearer " + token },
-          });
-          const result = await response.json();
-          if (!response.ok) {
-            throw new Error(result.mensagem || "Não foi possível carregar os chamados.");
-          }
-          localStorage.setItem("docegestao_chamados", JSON.stringify(result.dados || []));
-          atualizarNotificacoes();
-          limparErroNotificacoes();
-        } catch (error) {
-          console.error("Não foi possível sincronizar os chamados:", error);
-          exibirErroNotificacoes(error.message || "Não foi possível carregar os chamados.");
-        }
-      }
-
       const inventory = Object.fromEntries((result.dados || []).map((product) => {
         const id = String(product.id ?? product.id_produtos);
         return [id, {
@@ -1020,6 +1022,83 @@ function carregarHeader() {
     } catch (error) {
       console.error("Não foi possível sincronizar os produtos para as notificações:", error);
     }
+  }
+
+  async function sincronizarChamadosNotificacoes() {
+    if (sincronizacaoChamadosAtual) return sincronizacaoChamadosAtual;
+
+    const token = localStorage.getItem("docegestao_token");
+    if (!token) return;
+
+    sincronizacaoChamadosAtual = (async () => {
+      try {
+        const headers = { Authorization: "Bearer " + token };
+        const response = await fetch("/api/chamados", { headers });
+        const result = await lerRespostaChamados(
+          response,
+          "Não foi possível carregar os chamados.",
+        );
+        const chamados = Array.isArray(result.dados) ? result.dados : [];
+        const chamadosMigrados = lerJsonLocalStorage(MIGRATED_CALLS_KEY, {});
+        const chamadosAntigos = lerJsonLocalStorage("docegestao_chamados", []);
+        const chamadosParaMigrar = new Map();
+        const novosChamados = [];
+
+        (Array.isArray(chamadosAntigos) ? chamadosAntigos : []).forEach((chamado) => {
+          if (chamado?.id) chamadosParaMigrar.set(String(chamado.id), chamado);
+        });
+        carregarNotificacoes().items
+          .filter((item) => item.tipo === "chamado")
+          .forEach((item) => {
+            const id = String(item.callId || item.id || "").replace(/^chamado:/, "");
+            if (id && !/^\d+$/.test(id) && !chamadosParaMigrar.has(id)) {
+              chamadosParaMigrar.set(id, {
+                id,
+                descricao: item.mensagem,
+                criadoEm: item.criadaEm,
+              });
+            }
+          });
+
+        for (const chamado of chamadosParaMigrar.values()) {
+          const idAntigo = String(chamado?.id || "");
+          if (!idAntigo || /^\d+$/.test(idAntigo) || chamadosMigrados[idAntigo]) continue;
+
+          const migracaoResponse = await fetch("/api/chamados", {
+            method: "POST",
+            headers: { ...headers, "Content-Type": "application/json" },
+            body: JSON.stringify({ descricao: chamado.descricao }),
+          });
+          const migracao = await lerRespostaChamados(
+            migracaoResponse,
+            "Não foi possível migrar os chamados antigos.",
+          );
+          const idNovo = String(migracao.dados?.id || "");
+          if (!/^\d+$/.test(idNovo)) {
+            throw new Error("O servidor retornou um identificador inválido para o chamado.");
+          }
+
+          chamadosMigrados[idAntigo] = idNovo;
+          localStorage.setItem(MIGRATED_CALLS_KEY, JSON.stringify(chamadosMigrados));
+          novosChamados.push(migracao.dados);
+        }
+
+        const chamadosPorId = new Map(
+          [...chamados, ...novosChamados].map((chamado) => [String(chamado.id), chamado]),
+        );
+        const chamadosAtualizados = [...chamadosPorId.values()];
+        localStorage.setItem("docegestao_chamados", JSON.stringify(chamadosAtualizados));
+        atualizarNotificacoes();
+        limparErroNotificacoes();
+      } catch (error) {
+        console.error("Não foi possível sincronizar os chamados:", error);
+        exibirErroNotificacoes(error.message || "Não foi possível carregar os chamados.");
+      } finally {
+        sincronizacaoChamadosAtual = null;
+      }
+    })();
+
+    return sincronizacaoChamadosAtual;
   }
 
   function atualizarConta() {
@@ -1252,8 +1331,8 @@ function carregarHeader() {
   });
 
   closeSelectedNotification.addEventListener("click", async () => {
-    const state = carregarNotificacoes();
-    const selectedItem = state.items.find((item) =>
+    let state = carregarNotificacoes();
+    let selectedItem = state.items.find((item) =>
       item.id === state.selectedId && item.tipo === "chamado",
     );
     if (!selectedItem || closeSelectedNotification.disabled) return;
@@ -1267,15 +1346,28 @@ function carregarHeader() {
     closeSelectedNotification.disabled = true;
     limparErroNotificacoes();
     try {
-      const callId = String(selectedItem.callId || selectedItem.id.replace(/^chamado:/, ""));
+      let callId = String(selectedItem.callId || selectedItem.id.replace(/^chamado:/, ""));
+      if (!/^\d+$/.test(callId)) {
+        await sincronizarChamadosNotificacoes();
+        const idMigrado = lerJsonLocalStorage(MIGRATED_CALLS_KEY, {})[callId];
+        if (!/^\d+$/.test(String(idMigrado || ""))) {
+          throw new Error("Não foi possível migrar este chamado antigo para o banco de dados.");
+        }
+        state = carregarNotificacoes();
+        selectedItem = state.items.find(
+          (item) => item.tipo === "chamado" && item.callId === String(idMigrado),
+        );
+        if (!selectedItem) {
+          throw new Error("O chamado foi atualizado. Selecione-o novamente para fechar.");
+        }
+        callId = String(idMigrado);
+      }
+
       const response = await fetch(`/api/chamados/${encodeURIComponent(callId)}`, {
         method: "DELETE",
         headers: { Authorization: "Bearer " + token },
       });
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.mensagem || "Não foi possível remover o chamado.");
-      }
+      await lerRespostaChamados(response, "Não foi possível remover o chamado.");
 
       const calls = lerJsonLocalStorage("docegestao_chamados", []);
       localStorage.setItem(
