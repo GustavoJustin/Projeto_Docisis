@@ -86,7 +86,33 @@ CREATE TABLE tbl_produtos (
     lote VARCHAR(30) NOT NULL,
     tipo VARCHAR(100) NOT NULL,
     validade DATE NULL,
+    nome_insumo VARCHAR(200) NULL,
+    descricao TEXT NULL,
+    categoria VARCHAR(100) NULL,
+    preco VARCHAR(50) NULL,
+    quantidade DECIMAL(12,2) NOT NULL DEFAULT 0,
+    estoque_maximo DECIMAL(12,2) NOT NULL DEFAULT 1,
+    unidade VARCHAR(10) NOT NULL DEFAULT 'un',
+    imagem MEDIUMTEXT NULL,
+    data_chegada DATE NULL,
+    ativo TINYINT(1) NOT NULL DEFAULT 1,
     CONSTRAINT fk_produtos_fornecedor FOREIGN KEY (id_fornecedor) REFERENCES tbl_fornecedor(id_fornecedor)
+);
+
+CREATE TABLE tbl_mov_ajuste_estoque (
+    id_movimentacao INT AUTO_INCREMENT PRIMARY KEY,
+    id_produtos INT NOT NULL,
+    nome_produto VARCHAR(200) NOT NULL,
+    usuario VARCHAR(200) NOT NULL DEFAULT 'Sistema',
+    tipo VARCHAR(10) NOT NULL,
+    quantidade_anterior DECIMAL(12,2) NOT NULL,
+    quantidade_nova DECIMAL(12,2) NOT NULL,
+    quantidade DECIMAL(12,2) NOT NULL,
+    unidade VARCHAR(10) NOT NULL DEFAULT 'un',
+    descricao TEXT NULL,
+    data_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_mov_ajuste_produto (id_produtos),
+    INDEX idx_mov_ajuste_data (data_hora)
 );
 
 -- -----------------------------------------------------

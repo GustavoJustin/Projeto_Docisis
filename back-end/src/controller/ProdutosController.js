@@ -32,6 +32,34 @@ class ProdutosController {
         }
     }
 
+    async listarMovimentacoesEstoque(req, res) {
+        try {
+            const resultado = await ProdutoService.listarMovimentacoesEstoque()
+            res.json(resultado)
+        } catch (erro) {
+            res.status(erro.status || 500).json({
+                sucesso: false,
+                mensagem: erro.mensagem || "Erro interno no servidor",
+            })
+        }
+    }
+
+    async registrarAjusteEstoque(req, res) {
+        try {
+            const resultado = await ProdutoService.registrarAjusteEstoque(
+                req.params.id,
+                req.body,
+                req.funcionario,
+            )
+            res.status(201).json(resultado)
+        } catch (erro) {
+            res.status(erro.status || 500).json({
+                sucesso: false,
+                mensagem: erro.mensagem || erro.message || "Erro interno no servidor",
+            })
+        }
+    }
+
     async buscarProdutosId(req, res) {
         try {
             const resultado = await ProdutoService.buscarProdutosId(req.params.id)

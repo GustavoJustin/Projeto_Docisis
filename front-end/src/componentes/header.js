@@ -64,6 +64,28 @@ const HEADER_HTML = `
       </div>
     </header>
 
+    <div id="header-logout-dialog" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+      role="presentation">
+      <section role="dialog" aria-modal="true" aria-labelledby="header-logout-title"
+        class="w-full max-w-sm rounded-2xl border border-[#E7DED5] bg-white p-6 text-[#4A3F39] shadow-2xl">
+        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#F5ECE5] text-[#875C46]">
+          <i data-lucide="log-out" class="h-5 w-5"></i>
+        </div>
+        <h2 id="header-logout-title" class="mt-4 text-center text-lg font-bold text-[#3A2A1A]">Sair da conta?</h2>
+        <p class="mt-2 text-center text-sm text-gray-500">Você precisará entrar novamente para acessar sua conta.</p>
+        <div class="mt-6 flex justify-center gap-3">
+          <button id="header-cancel-logout" type="button"
+            class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-50">
+            Cancelar
+          </button>
+          <button id="header-confirm-logout" type="button"
+            class="rounded-lg bg-[#875C46] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#6D4936]">
+            Sair
+          </button>
+        </div>
+      </section>
+    </div>
+
     <div id="header-notifications-dialog" class="fixed inset-0 z-[60] hidden bg-black/20"
       role="presentation">
       <section role="dialog" aria-modal="true" aria-labelledby="header-notifications-title"
@@ -458,6 +480,9 @@ function carregarHeader() {
   const notificationDetailsDate = container.querySelector("#header-notification-details-date");
   const accountAction = container.querySelector("#header-account-action");
   const accountSettingsAction = container.querySelector("#header-account-settings");
+  const logoutDialog = container.querySelector("#header-logout-dialog");
+  const cancelLogoutButton = container.querySelector("#header-cancel-logout");
+  const confirmLogoutButton = container.querySelector("#header-confirm-logout");
   const accountActionLabel = container.querySelector("[data-header-account-action-label]");
   const closeSelectedNotification = container.querySelector("#header-close-selected-notification");
   const closeNotificationDetails = container.querySelector("#header-close-notification-details");
@@ -651,98 +676,6 @@ function carregarHeader() {
       .replace(/^-|-$/g, "") || "produto";
   }
 
-  function dataLocalISO(data) {
-    return [
-      data.getFullYear(),
-      String(data.getMonth() + 1).padStart(2, "0"),
-      String(data.getDate()).padStart(2, "0"),
-    ].join("-");
-  }
-
-  function importarAlertasDaPagina(inventory, state) {
-    const alertContainer = document.querySelector("#alertCardsContainer");
-    if (!alertContainer) return inventory;
-
-    const removedProductIds = new Set(state.removedProductIds);
-    Object.values(inventory).forEach((product) => {
-      if (product?.nome) removedProductIds.delete(slugProduto(product.nome));
-    });
-    state.removedProductIds = [...removedProductIds];
-
-    const pageProductIds = [];
-    alertContainer.querySelectorAll(".alert-card").forEach((card) => {
-      const category = card.dataset.category;
-      if (!["vencido", "critico", "prox-vencimento"].includes(category)) return;
-      const name = card.querySelector(".item-title")?.textContent.trim();
-      if (!name) return;
-
-      const id = String(card.dataset.id || slugProduto(name));
-      if (removedProductIds.has(id) || removedProductIds.has(slugProduto(name))) return;
-      const existing = inventory[id];
-      pageProductIds.push(id);
-
-      const quantity = Number(card.dataset.quantidade);
-      if (!Number.isFinite(quantity)) return;
-      const product = {
-        ...existing,
-        id,
-        nome: name,
-        categoria: category === "prox-vencimento" && existing?.categoria === "Estoque crítico"
-          ? "Próximo ao vencimento"
-          : existing?.categoria || (
-          category === "vencido"
-            ? "Vencido"
-            : category === "prox-vencimento"
-              ? "Próximo ao vencimento"
-              : "Estoque crítico"
-          ),
-        unidade: (existing?.unidade && !(category === "prox-vencimento" && existing.unidade === "un"))
-          || card.textContent.match(/\bkg\b|\blitros?\b|\bunidades?|\bbandejas?\b/i)?.[0]
-          || "un",
-        quantidade: existing?.quantidade ?? quantity,
-        maximo: existing?.maximo ?? quantity,
-        validade: existing?.validade || "",
-        imagem: existing?.imagem || card.querySelector("img")?.src || "",
-      };
-
-      if (["vencido", "prox-vencimento"].includes(category) && !product.validade) {
-        const dateFromData = card.dataset.vencimento;
-        const dateFromText = card.textContent.match(/(?:Venceu em|Vencimento(?: em)?|Validade(?: expira em)?)\s*:?\s*(\d{2})\/(\d{2})\/(\d{4})/i);
-        const validDataDate = /^\d{4}-\d{2}-\d{2}$/.test(dateFromData || "") ? dateFromData : "";
-        const parsedTextDate = dateFromText
-          ? `${dateFromText[3]}-${dateFromText[2]}-${dateFromText[1]}`
-          : "";
-        if (category === "vencido") {
-          product.validade = validDataDate || parsedTextDate;
-        } else {
-          const todayDate = new Date();
-          todayDate.setHours(0, 0, 0, 0);
-          const dateFromTextDays = card.textContent.match(/(?:em\s*)?(\d+)\s*dias?/i);
-          if (validDataDate && validDataDate >= dataLocalISO(todayDate)) {
-            product.validade = validDataDate;
-          } else if (dateFromTextDays) {
-            todayDate.setDate(todayDate.getDate() + Number(dateFromTextDays[1]));
-            product.validade = dataLocalISO(todayDate);
-          } else if (/\bhoje\b/i.test(card.textContent)) {
-            product.validade = dataLocalISO(todayDate);
-          } else if (parsedTextDate && parsedTextDate >= dataLocalISO(todayDate)) {
-            product.validade = parsedTextDate;
-          }
-        }
-      }
-
-      if (category === "critico" && !Number(existing?.maximo)) {
-        const percentages = [...card.textContent.matchAll(/(\d+(?:[.,]\d+)?)\s*%/g)];
-        const percentage = percentages[percentages.length - 1];
-        const fraction = percentage ? Number(percentage[1].replace(",", ".")) / 100 : 0.25;
-        product.maximo = fraction > 0 ? Math.round((quantity / fraction) * 100) / 100 : quantity;
-      }
-      inventory[id] = product;
-    });
-    state.alertProductIds = pageProductIds;
-    return inventory;
-  }
-
   function registrarProdutoRemovido(event) {
     const id = String(event.detail?.id || "");
     const name = String(event.detail?.nome || "");
@@ -765,7 +698,7 @@ function carregarHeader() {
     const visibleItems = state.items.filter((item) => {
       if (preferences.all) return false;
       if (item.tipo === "chamado" && preferences.calls) return false;
-      if (["esgotado", "critico", "vencido", "prox-vencimento"].includes(item.tipo) && preferences.products) return false;
+      if (["esgotado", "critico", "vencido", "prox-vencimento", "medio"].includes(item.tipo) && preferences.products) return false;
       return true;
     });
     notificationCount.textContent = String(visibleItems.length);
@@ -800,6 +733,9 @@ function carregarHeader() {
     [...visibleItems].sort((first, second) => {
       if (first.tipo === "chamado" && second.tipo !== "chamado") return -1;
       if (first.tipo !== "chamado" && second.tipo === "chamado") return 1;
+      const urgencia = { esgotado: 5, critico: 5, vencido: 4, "prox-vencimento": 3, medio: 2 };
+      const diferencaUrgencia = (urgencia[second.tipo] || 0) - (urgencia[first.tipo] || 0);
+      if (diferencaUrgencia !== 0) return diferencaUrgencia;
       return new Date(second.criadaEm) - new Date(first.criadaEm);
     }).forEach((item) => {
       const card = document.createElement("article");
@@ -814,36 +750,31 @@ function carregarHeader() {
       const severityClass = item.tipo === "vencido"
         ? "border-red-300 bg-red-50"
         : item.tipo === "prox-vencimento"
-          ? "border-rose-300 bg-rose-50"
+          ? "border-orange-300 bg-orange-50"
+        : item.tipo === "medio"
+          ? "border-yellow-300 bg-yellow-50"
         : item.tipo === "critico" || item.tipo === "esgotado"
           ? "border-amber-300 bg-amber-50"
           : item.tipo === "chamado"
             ? "border-sky-200 bg-sky-50"
             : "border-[#E9D9CC] bg-[#F8F6F2]";
-      const accentClass = item.tipo === "vencido"
-        ? "border-l-4"
-        : item.tipo === "prox-vencimento"
-          ? "border-l-4"
-        : item.tipo === "critico" || item.tipo === "esgotado"
-          ? "border-l-4"
-          : item.tipo === "chamado"
-            ? "border-l-4"
-            : "";
       const accentColor = item.tipo === "vencido"
         ? "#ef4444"
         : item.tipo === "prox-vencimento"
-          ? "#f43f5e"
+          ? "#ea580c"
+          : item.tipo === "medio"
+            ? "#facc15"
           : item.tipo === "critico" || item.tipo === "esgotado"
             ? "#f59e0b"
             : item.tipo === "chamado"
               ? "#0ea5e9"
               : "";
-      card.className = `rounded-xl border p-4 transition-all duration-200 ease-out ${selectable ? "cursor-pointer focus-visible:outline-none" : ""} ${selected ? "-translate-y-1 shadow-md" : ""} ${accentClass} ${severityClass} ${item.lida ? "opacity-80" : ""}`;
+      card.className = `rounded-xl border-0 p-4 transition-all duration-200 ease-out ${selectable ? "cursor-pointer focus-visible:outline-none" : ""} ${selected ? "-translate-y-1 shadow-md" : ""} ${severityClass} ${item.lida ? "opacity-80" : ""}`;
       if (selected) {
         card.style.transform = "translateY(-5px)";
         card.style.boxShadow = "0 8px 18px rgba(58, 42, 26, 0.22)";
       }
-      if (accentColor) card.style.borderLeftColor = accentColor;
+      if (accentColor) card.style.borderLeft = `4px solid ${accentColor}`;
       if (selectable) {
         const selecionarNotificacao = () => {
           const currentState = carregarNotificacoes();
@@ -908,7 +839,6 @@ function carregarHeader() {
   function atualizarNotificacoes() {
     const state = carregarNotificacoes();
     let inventory = lerJsonLocalStorage("docegestao_estoque_v1", {});
-    inventory = importarAlertasDaPagina(inventory, state);
     const activeProducts = {};
     const today = new Date();
     const todayString = [
@@ -945,6 +875,14 @@ function carregarHeader() {
         quantity / maximo <= 0.25
       ) {
         statuses.push("critico");
+      } else if (
+        Number.isFinite(quantity) &&
+        Number.isFinite(maximo) &&
+        maximo > 0 &&
+        quantity / maximo > 0.5 &&
+        quantity / maximo <= 0.75
+      ) {
+        statuses.push("medio");
       }
       if (validExpiry && daysUntilExpiry < 0) {
         statuses.push("vencido");
@@ -967,11 +905,15 @@ function carregarHeader() {
               ? "Produto próximo ao vencimento"
             : status === "critico"
               ? "Estoque crítico"
+              : status === "medio"
+                ? "Estoque em nível médio"
               : "Produto esgotado",
           status === "esgotado"
             ? `${name} está sem estoque.`
             : status === "critico"
               ? `${name} está com ${quantity} de ${maximo} ${product.unidade || "un"} em estoque.`
+              : status === "medio"
+                ? `${name} está com ${quantity} de ${maximo} ${product.unidade || "un"} em estoque.`
               : status === "prox-vencimento"
                   ? `${name} vence em ${product.validade.split("-").reverse().join("/")} (${daysUntilExpiry === 0 ? "hoje" : `em ${daysUntilExpiry} ${daysUntilExpiry === 1 ? "dia" : "dias"}`}).`
                 : `${name} venceu em ${product.validade.split("-").reverse().join("/")}.`,
@@ -1017,6 +959,41 @@ function carregarHeader() {
     renderizarNotificacoes(state);
   }
 
+  async function sincronizarEstoqueNotificacoes() {
+    const token = localStorage.getItem("docegestao_token");
+    if (!token) return;
+
+    try {
+      const response = await fetch("/api/produtos", {
+        headers: { Authorization: "Bearer " + token },
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.mensagem || "Não foi possível atualizar as notificações do estoque.");
+      }
+
+      const inventory = Object.fromEntries((result.dados || []).map((product) => {
+        const id = String(product.id ?? product.id_produtos);
+        return [id, {
+          id,
+          nome: String(product.nome || product.marca || "Insumo"),
+          categoria: String(product.categoria || product.tipo || "Outros"),
+          descricao: String(product.descricao || product.categoria || product.tipo || ""),
+          unidade: String(product.unidade || "un"),
+          quantidade: Number(product.quantidade) || 0,
+          maximo: Number(product.maximo) || 1,
+          chegada: product.chegada ? String(product.chegada).slice(0, 10) : "",
+          validade: product.validade ? String(product.validade).slice(0, 10) : "",
+          dismissed: false,
+        }];
+      }));
+      localStorage.setItem("docegestao_estoque_v1", JSON.stringify(inventory));
+      atualizarNotificacoes();
+    } catch (error) {
+      console.error("Não foi possível sincronizar os produtos para as notificações:", error);
+    }
+  }
+
   function atualizarConta() {
     try {
       const user = JSON.parse(localStorage.getItem("docegestao_funcionario") || "null");
@@ -1055,6 +1032,25 @@ function carregarHeader() {
   function fecharPerfil() {
     profileMenu.classList.add("hidden");
     profileTrigger.setAttribute("aria-expanded", "false");
+  }
+
+  function fecharConfirmacaoSaida() {
+    logoutDialog.classList.add("hidden");
+    logoutDialog.classList.remove("flex");
+    profileTrigger.focus();
+  }
+
+  function sairDaConta() {
+    fecharPerfil();
+    logoutDialog.classList.add("hidden");
+    logoutDialog.classList.remove("flex");
+    localStorage.removeItem("docegestao_token");
+    localStorage.removeItem("docegestao_funcionario");
+    if (typeof window.navegarDemo === "function") {
+      window.navegarDemo("login");
+    } else {
+      window.location.assign("./painel.html?pagina=login");
+    }
   }
 
   function fecharDialogo(dialog, trigger) {
@@ -1241,21 +1237,23 @@ function carregarHeader() {
   });
 
   accountAction.addEventListener("click", () => {
-    if (
-      usuarioAtual &&
-      !window.confirm("Deseja sair desta conta?")
-    ) {
+    fecharPerfil();
+    if (!usuarioAtual) {
+      sairDaConta();
       return;
     }
-    fecharPerfil();
-    if (usuarioAtual) {
-      localStorage.removeItem("docegestao_token");
-      localStorage.removeItem("docegestao_funcionario");
-    }
-    if (typeof window.navegarDemo === "function") {
-      window.navegarDemo("login");
-    } else {
-      window.location.href = "./painel.html?pagina=login";
+    logoutDialog.classList.remove("hidden");
+    logoutDialog.classList.add("flex");
+    confirmLogoutButton.focus();
+  });
+  cancelLogoutButton.addEventListener("click", fecharConfirmacaoSaida);
+  confirmLogoutButton.addEventListener("click", sairDaConta);
+  logoutDialog.addEventListener("click", (event) => {
+    if (event.target === logoutDialog) fecharConfirmacaoSaida();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !logoutDialog.classList.contains("hidden")) {
+      fecharConfirmacaoSaida();
     }
   });
 
@@ -1297,6 +1295,7 @@ function carregarHeader() {
   });
   document.addEventListener("docegestao:atualizar-notificacoes", atualizarNotificacoes);
   document.addEventListener("docegestao:produto-removido", registrarProdutoRemovido);
+  void sincronizarEstoqueNotificacoes();
 
   if (window.lucide?.createIcons) {
     window.lucide.createIcons();

@@ -4,7 +4,7 @@ const paginasDemo = {
     arquivo: "estoqueInsumos.html",
     titulo: "Estoque de Matérias-Primas",
     ativo: "estoque",
-    modais: ["modal-insumo", "modal-excluir"],
+    modais: ["modal-insumo", "modal-excluir", "modal-atualizar-estoque"],
   },
   alertas: {
     arquivo: "alertas.html",
@@ -22,6 +22,7 @@ const paginasDemo = {
     arquivo: "historicoCompleto.html",
     titulo: "Histórico Completo",
     ativo: "historico",
+    modais: ["modal-filtros-historico", "modal-exportar-pdf"],
   },
   funcionarios: {
     arquivo: "gestao-equipes.html",
@@ -89,6 +90,15 @@ const paginasPorArquivo = {
 let categoriaAlertaAtiva = "all";
 let buscaAlertaAtiva = "";
 let navegacaoAtual = 0;
+
+async function usuarioEhAdministrador() {
+  const usuario = await window.obterFuncionarioAutenticado?.();
+  const cargo = String(usuario?.nome_cargo || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+  return cargo.includes("admin");
+}
 
 function atualizarSidebar(pagina) {
   const sidebar = document.getElementById("sidebar-container");
@@ -245,6 +255,13 @@ async function carregarPaginaAtual() {
     return;
   }
 
+  if (pagina === "funcionarios" && !(await usuarioEhAdministrador())) {
+    urlAtual.searchParams.set("pagina", "estoque");
+    window.history.replaceState({}, "", urlAtual);
+    await carregarPaginaAtual();
+    return;
+  }
+
   if (!urlAtual.searchParams.has("pagina")) {
     urlAtual.searchParams.set("pagina", pagina);
     window.history.replaceState({}, "", urlAtual);
@@ -281,6 +298,8 @@ async function carregarPaginaAtual() {
       aplicarFiltrosAlertas();
     }
     if (pagina === "estoque") window.inicializarEstoque();
+    if (pagina === "alertas") window.inicializarAlertasEstoque?.();
+    if (pagina === "historico") window.inicializarHistorico?.();
     if (pagina === "relatorios") window.inicializarRelatorios();
     if (pagina === "materia") window.inicializarMateriaPrima();
 

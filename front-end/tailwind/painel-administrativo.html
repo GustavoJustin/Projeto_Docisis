@@ -97,12 +97,16 @@
           <section class="rounded-2xl border border-gray-200/80 bg-white p-5 shadow-sm">
             <h3 class="mb-3 text-sm font-bold text-gray-700">Parâmetros de Estoque</h3>
             <div class="mb-2 flex items-center justify-between text-xs">
-              <span class="text-gray-500">Limite Crítico</span>
-              <span class="font-bold text-red-500">15%</span>
+              <span class="text-gray-500">Capacidade média utilizada</span>
+              <span id="estoque-capacidade-percentual" class="font-bold text-emerald-600">Carregando...</span>
             </div>
-            <div class="mb-4 h-2 w-full rounded-full bg-gray-100">
-              <div class="h-2 w-[15%] rounded-full bg-red-500"></div>
+            <div class="mb-1 h-2 w-full rounded-full bg-gray-100" role="progressbar"
+              aria-label="Capacidade média de estoque utilizada" aria-valuemin="0" aria-valuemax="100">
+              <div id="estoque-capacidade-barra" class="h-2 w-0 rounded-full bg-emerald-500 transition-all"></div>
             </div>
+            <p id="estoque-capacidade-detalhe" class="mb-4 text-[10px] text-gray-400" aria-live="polite">
+              Consultando produtos cadastrados...
+            </p>
             <span class="rounded-md bg-[#FDF3E7] px-2.5 py-1 text-[10px] font-bold text-[#C67D35]">
               REABASTECIMENTO ATIVO
             </span>

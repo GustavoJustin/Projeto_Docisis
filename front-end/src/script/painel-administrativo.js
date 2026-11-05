@@ -1,4 +1,66 @@
 document.addEventListener("demo:page-loaded", () => {
+    const capacidadeValor = document.getElementById("estoque-capacidade-percentual");
+    const capacidadeBarra = document.getElementById("estoque-capacidade-barra");
+    const capacidadeDetalhe = document.getElementById("estoque-capacidade-detalhe");
+
+    if (capacidadeValor && capacidadeBarra && capacidadeDetalhe) {
+        const token = localStorage.getItem("docegestao_token");
+        if (!token) {
+            capacidadeValor.textContent = "Indisponível";
+            capacidadeDetalhe.textContent = "Entre na sua conta para consultar o estoque.";
+        } else {
+            void fetch("/api/produtos", {
+                headers: { Authorization: "Bearer " + token },
+            })
+                .then(async (response) => {
+                    if (!response.headers.get("content-type")?.includes("application/json")) {
+                        throw new Error("A API não retornou os dados de estoque.");
+                    }
+                    const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error(result.mensagem || "Não foi possível carregar os produtos.");
+                    }
+                    const produtos = result.dados || [];
+                    const niveis = produtos
+                        .map((produto) => {
+                            const quantidade = Number(produto.quantidade);
+                            const maximo = Number(produto.maximo);
+                            return Number.isFinite(quantidade) && Number.isFinite(maximo) && maximo > 0
+                                ? quantidade / maximo
+                                : null;
+                        })
+                        .filter((nivel) => nivel !== null);
+                    const percentual = niveis.length
+                        ? (niveis.reduce((total, nivel) => total + nivel, 0) / niveis.length) * 100
+                        : 0;
+                    const percentualArredondado = Math.round(percentual * 10) / 10;
+                    const percentualTexto = `${percentualArredondado.toLocaleString("pt-BR", {
+                        maximumFractionDigits: 1,
+                    })}%`;
+                    capacidadeValor.textContent = percentualTexto;
+                    capacidadeDetalhe.textContent = niveis.length
+                        ? `Média do estoque atual em relação ao limite máximo de ${niveis.length} produto(s).`
+                        : "Nenhum produto com limite máximo configurado.";
+                    capacidadeBarra.style.width = `${Math.min(100, Math.max(0, percentual))}%`;
+                    capacidadeBarra.classList.toggle("bg-rose-500", percentual >= 90);
+                    capacidadeBarra.classList.toggle("bg-amber-500", percentual >= 70 && percentual < 90);
+                    capacidadeBarra.classList.toggle("bg-emerald-500", percentual < 70);
+                    capacidadeValor.classList.toggle("text-rose-600", percentual >= 90);
+                    capacidadeValor.classList.toggle("text-amber-600", percentual >= 70 && percentual < 90);
+                    capacidadeValor.classList.toggle("text-emerald-600", percentual < 70);
+                    capacidadeBarra.parentElement.setAttribute(
+                        "aria-valuenow",
+                        String(Math.min(100, Math.max(0, percentualArredondado))),
+                    );
+                })
+                .catch((error) => {
+                    capacidadeValor.textContent = "Indisponível";
+                    capacidadeDetalhe.textContent = error.message;
+                    console.error("Não foi possível carregar os parâmetros de estoque:", error);
+                });
+        }
+    }
+
     // --- Funcao Toast Personalizada (Visual Escuro com Ícone Verde idêntico à foto) ---
     function showToast(title, message) {
         const container = document.getElementById("toast-container");

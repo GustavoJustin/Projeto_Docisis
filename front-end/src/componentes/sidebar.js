@@ -44,7 +44,7 @@ const SIDEBAR_HTML = `
           <a href="./gestao-equipes.html" data-page="funcionarios"
             class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
             <i data-lucide="users" class="w-5 h-5"></i>
-            <span>Funcionários</span>
+            <span>Gestão</span>
           </a>
 
           <!-- Admin -->
@@ -67,11 +67,46 @@ const SIDEBAR_HTML = `
     </div>
   </aside>
 `
+let sessaoUsuarioAtual = null;
+let tokenSessaoUsuarioAtual = null;
+
+async function obterFuncionarioAutenticado() {
+  const token = localStorage.getItem("docegestao_token");
+  if (!token) {
+    sessaoUsuarioAtual = null;
+    tokenSessaoUsuarioAtual = null;
+    return null;
+  }
+  if (token === tokenSessaoUsuarioAtual) return sessaoUsuarioAtual;
+
+  try {
+    const response = await fetch("/api/sessao", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const result = await response.json();
+    if (!response.ok || !result.funcionario?.nome_cargo) {
+      throw new Error(result.mensagem || "Não foi possível validar o cargo da conta.");
+    }
+
+    sessaoUsuarioAtual = result.funcionario;
+    tokenSessaoUsuarioAtual = token;
+    localStorage.setItem("docegestao_funcionario", JSON.stringify(result.funcionario));
+    return sessaoUsuarioAtual;
+  } catch (error) {
+    sessaoUsuarioAtual = null;
+    tokenSessaoUsuarioAtual = null;
+    console.error("Não foi possível validar a sessão do usuário:", error);
+    return null;
+  }
+}
+
 function carregarSidebar() {
   const container = document.getElementById("sidebar-container");
   if (!container) return;
 
   container.innerHTML = SIDEBAR_HTML;
+  const linkFuncionarios = container.querySelector('[data-page="funcionarios"]');
+  if (linkFuncionarios) linkFuncionarios.hidden = true;
 
   if (window.lucide?.createIcons) {
     window.lucide.createIcons();
@@ -99,10 +134,23 @@ function carregarSidebar() {
     );
     linkAtivo.setAttribute("aria-current", "page");
   }
+
+  void (async () => {
+    const funcionario = await obterFuncionarioAutenticado();
+    const cargo = String(funcionario?.nome_cargo || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+    if (linkFuncionarios?.isConnected) {
+      linkFuncionarios.hidden = !cargo.includes("admin");
+    }
+  })();
 }
 
+window.obterFuncionarioAutenticado = obterFuncionarioAutenticado;
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", carregarSidebar, { once: true });
 } else {
   carregarSidebar();
 }
+document.addEventListener("demo:page-loaded", carregarSidebar);

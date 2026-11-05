@@ -3,6 +3,23 @@ async function inicializarGestaoEquipes() {
   const searchInput = document.getElementById("search-member");
   if (!tableBody || !searchInput) return;
 
+  const usuario = await window.obterFuncionarioAutenticado?.();
+  const cargo = String(usuario?.nome_cargo || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+  if (!cargo.includes("admin")) {
+    const main = document.querySelector("main");
+    if (main) {
+      const notice = document.createElement("p");
+      notice.className = "m-auto max-w-xl rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-800";
+      notice.setAttribute("role", "alert");
+      notice.textContent = "A gestão de funcionários está disponível apenas para administradores.";
+      main.replaceChildren(notice);
+    }
+    return;
+  }
+
   const roleButtons = document.querySelectorAll(".filter-role");
   const createLink = document.querySelector("#conteudo-principal a[href='cadastroFuncionario.html']");
   const table = tableBody.closest("table");

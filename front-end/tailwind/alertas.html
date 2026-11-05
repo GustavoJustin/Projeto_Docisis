@@ -24,6 +24,40 @@
     body {
       font-family: "Plus Jakarta Sans", sans-serif;
     }
+
+    .alert-card,
+    #alertCardsContainer {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .alert-card > div:first-child {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .alert-card > div:first-child > div:last-child {
+      min-width: 0;
+      flex: 1 1 0%;
+      overflow-wrap: anywhere;
+    }
+
+    .alert-card > div:last-child {
+      min-width: 0;
+      width: 100%;
+    }
+
+    @media (min-width: 640px) {
+      .alert-card > div:first-child {
+        flex: 1 1 0%;
+        width: auto;
+      }
+
+      .alert-card > div:last-child {
+        flex: 0 0 9rem;
+        width: 9rem;
+      }
+    }
   </style>
 </head>
 
@@ -55,6 +89,9 @@
             </button>
             <button data-filter="critico" class="tab-btn px-4 py-2 hover:text-gray-800 transition-all">
               ESTOQUE CRÍTICO
+            </button>
+            <button data-filter="esgotado" class="tab-btn px-4 py-2 hover:text-gray-800 transition-all">
+              FORA DE ESTOQUE
             </button>
           </div>
 
@@ -352,6 +389,7 @@
   <script src="../src/componentes/footer.js" defer></script>
   <script src="../src/componentes/sidebar.js" defer></script>
   <script src="../src/componentes/header.js" defer></script>
+  <script src="../src/script/estoque-alertas.js" defer></script>
   <script src="../src/script/alertas.js" defer></script>
 <script>
 /* DoceGestão: comportamentos da página de estoque e sincronização dos alertas.
