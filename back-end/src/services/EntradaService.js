@@ -26,43 +26,33 @@ class EntradaService {
     }
 
     async cadastrarEntrada(dados) {
-        const {id_nota_fiscal, cpf, horario, quantidade, preco} = dados
-
-        if(!id_nota_fiscal || !cpf || !horario || !quantidade || !preco) {
-            throw { status: 400, mensagem: "O campo id nota fiscal, cpf, horario, quantidade e preço são obrigatórios" }
+        const id_nota_fiscal = Number(dados.id_nota_fiscal || dados.nota_fiscal || dados.id_nota)
+        const id_produtos = Number(dados.id_produtos || dados.id_produto)
+        let id_funcionario = Number(dados.id_funcionario)
+        if(!id_funcionario) {
+            const cpf = dados.cpf || dados.cpf_funcionario || dados.cpfFuncionario
+            const funcionario = cpf ? await EntradaRepository.buscarFuncionarioPorCpf(cpf) : null
+            id_funcionario = Number(funcionario?.id_funcionario || 0)
         }
-
-        if(typeof id_nota_fiscal != "number" || id_nota_fiscal <= 0) {
-            throw { status: 400, mensagem: "Id nota fiscal deve ser um número positivo" }
+        const quantidade = Number(dados.quantidade)
+        const preco = Number(dados.preco || 0)
+        if(!id_nota_fiscal || !id_produtos || !id_funcionario || !quantidade) {
+            throw { status: 400, mensagem: "Nota fiscal, produto, usuário e quantidade são obrigatórios" }
         }
-
-        if(typeof cpf != "string" || cpf.trim() == "") {
-            throw { status: 400, mensagem: "CPF é obrigatório" }
-        }
-
-        if(typeof horario != "string" || horario.trim() == "") {
-            throw { status: 400, mensagem: "Horario é obrigatório" }
-        }
-
-        if(typeof quantidade != "number" || quantidade <= 0) {
-            throw { status: 400, mensagem: "Quantidade deve ser um número positivo" }
-        }
-
-        if(typeof preco != "number" || preco <= 0) {
-            throw { status: 400, mensagem: "Preço deve ser um número positivo" }
-        }
-
+        const horario = dados.data_hora || dados.horario
+        const dataHora = horario && /^\d{2}:\d{2}/.test(String(horario))
+            ? `${new Date().toISOString().slice(0, 10)} ${horario}:00`
+            : horario || new Date()
         const novaEntrada = {
             id_nota_fiscal,
-            cpf,
-            horario,
+            id_produtos,
+            id_funcionario,
+            data_hora: dataHora,
             quantidade,
             preco
         }
-
         const resultado = await EntradaRepository.cadastrarEntrada(novaEntrada)
-
-        return { sucesso: true, mensagem: "Sucesso ao cadastrar", resultado }
+        return { sucesso: true, mensagem: "Entrada registrada", resultado }
     }
 
     async atualizarEntrada(id, dados) {

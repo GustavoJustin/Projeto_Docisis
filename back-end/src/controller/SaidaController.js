@@ -31,7 +31,10 @@ class SaidaController {
 
     async cadastrarSaida(req, res) {
         try {
-            const resultado = await SaidaService.cadastrarSaida(req.body)
+            const resultado = await SaidaService.cadastrarSaida({
+                ...req.body,
+                id_funcionario: req.body.id_funcionario || req.funcionario?.id_funcionario
+            })
             res.status(201).json(resultado)
 
         } catch (erro) {

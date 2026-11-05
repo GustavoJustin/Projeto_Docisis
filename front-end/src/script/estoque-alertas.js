@@ -18,6 +18,24 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     document.dispatchEvent(new Event('docegestao:atualizar-notificacoes'));
   }
+  function registrarMovimentoEstoque({ nome, produtoId, tipo, quantidade, unidade, motivo }) {
+    const chave = 'docegestao_movimentacoes_estoque_v1';
+    let movimentos = [];
+    try { movimentos = JSON.parse(localStorage.getItem(chave) || '[]'); } catch { movimentos = []; }
+    const usuario = JSON.parse(localStorage.getItem('docegestao_funcionario') || '{}');
+    movimentos.unshift({
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      produtoId: String(produtoId || ''),
+      nome,
+      tipo,
+      quantidade: Number(quantidade || 0),
+      unidade: unidade || '',
+      motivo,
+      usuario: usuario.nome || usuario.email || 'Usuário atual',
+      data_hora: new Date().toISOString()
+    });
+    localStorage.setItem(chave, JSON.stringify(movimentos.slice(0, 500)));
+  }
   function parseQuantity(card) {
     const span = $('.qtd-valor', card);
     return span ? (parseFloat((span.firstChild?.textContent || span.textContent).replace(',', '.')) || 0) : 0;
@@ -92,8 +110,19 @@
   function updateQuantity(card, delta) {
     const data = load(), id = getCardId(card), p = data[id];
     if (!p) return;
-    p.quantidade = Math.max(0, Math.round((Number(p.quantidade) + delta) * 100) / 100);
+    const quantidadeAnterior = Number(p.quantidade || 0);
+    p.quantidade = Math.max(0, Math.round((quantidadeAnterior + delta) * 100) / 100);
     p.dismissed = false; data[id] = p; save(data); syncCard(card, p);
+    if (p.quantidade !== quantidadeAnterior) {
+      registrarMovimentoEstoque({
+        nome: p.nome,
+        produtoId: id,
+        tipo: delta > 0 ? 'ENTRADA' : 'SAÍDA',
+        quantidade: Math.abs(p.quantidade - quantidadeAnterior),
+        unidade: p.unidade,
+        motivo: delta > 0 ? 'Adição manual no estoque' : 'Remoção manual do estoque'
+      });
+    }
   }
 
   // Inventory page
@@ -139,13 +168,15 @@
       card.dataset.id=id; card.dataset.nome=name.toLowerCase(); card.dataset.categoria=category; card.dataset.unidade=unit;
       card.innerHTML = `<div><div class="relative h-36 rounded-xl overflow-hidden mb-3 bg-gray-50 flex items-center justify-center"><button type="button" class="btn-excluir absolute top-2 right-2 w-7 h-7 rounded-full bg-white text-rose-500" title="Excluir insumo">×</button>${image ? `<img src="${esc(image)}" alt="${esc(name)}" class="w-full h-full object-contain p-2">` : `<span class="text-3xl text-brand-brown">${esc(name.slice(0,1).toUpperCase())}</span>`}</div><div class="px-1 space-y-2"><div class="flex items-baseline justify-between"><h3 class="font-bold text-xs text-brand-text-dark">${esc(name)}</h3><span class="text-xs font-bold text-brand-brown">${esc(price)}</span></div><p class="text-[10px] text-brand-text-muted">Categoria: ${esc(category)}</p><div class="pt-2"><div class="flex justify-between text-[9px] text-brand-text-muted mb-1"><span>Nível de Estoque</span><span>${qty}/${max} ${esc(unit)}</span></div><div class="w-full bg-black/5 rounded-full h-1"><div class="bg-brand-brown h-full rounded-full" style="width:${max ? Math.min(100,qty/max*100):0}%"></div></div></div></div></div><div class="flex items-center justify-between pt-4 px-1"><span class="qtd-valor text-base font-bold text-brand-text-dark">${qty} <span class="text-xs font-normal text-brand-text-muted">${esc(unit)}</span></span><div class="flex items-center gap-2 border border-black/10 rounded-lg px-2 py-0.5"><button type="button" class="btn-menos">-</button><button type="button" class="btn-mais">+</button></div></div>`;
       data = load(); data[id] = product; save(data); grid.insertBefore(card, $('#btn-card-adicionar')); syncCard(card, product);
+      registrarMovimentoEstoque({ nome: name, produtoId: id, tipo: 'ENTRADA', quantidade: qty, unidade: unit, motivo: 'Cadastro de novo insumo no estoque' });
       event.target.reset(); modal?.classList.add('hidden');
     });
     $('#btn-cancelar-exclusao')?.addEventListener('click', () => $('#modal-excluir')?.classList.add('hidden'));
     $('#btn-confirmar-exclusao')?.addEventListener('click', () => {
       const card = window.cardParaExcluir; if (!card) return;
-      const data = load(), id = getCardId(card), nome = data[id]?.nome || card.querySelector('h3')?.textContent.trim() || '';
+      const data = load(), id = getCardId(card), nome = data[id]?.nome || card.querySelector('h3')?.textContent.trim() || '', produto = data[id];
       delete data[id]; save(data); card.remove(); window.cardParaExcluir = null;
+      registrarMovimentoEstoque({ nome, produtoId: id, tipo: 'SAÍDA', quantidade: produto?.quantidade || 0, unidade: produto?.unidade || '', motivo: 'Exclusão do insumo do estoque' });
       document.dispatchEvent(new CustomEvent('docegestao:produto-removido', { detail: { id, nome } }));
       $('#modal-excluir')?.classList.add('hidden');
     });
