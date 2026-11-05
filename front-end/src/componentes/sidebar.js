@@ -33,12 +33,6 @@ const SIDEBAR_HTML = `
             <span>Alertas</span>
           </a>
 
-          <a href="./relatorioAnalises.html" data-page="relatorios"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
-            <i data-lucide="chart-no-axes-combined" class="w-5 h-5"></i>
-            <span>Relatórios</span>
-          </a>
-
           <!-- Historico -->
           <a href="./historicoCompleto.html" data-page="historico"
             class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
