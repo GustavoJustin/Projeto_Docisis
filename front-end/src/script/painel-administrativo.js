@@ -159,39 +159,74 @@ document.addEventListener("demo:page-loaded", () => {
     );
     const btnEnviarChamado = document.getElementById("btn-enviar-chamado");
     const chamadoTexto = document.getElementById("chamado-texto");
+    const chamadoErro = document.getElementById("chamado-erro");
 
     btnChamado?.addEventListener("click", () => {
+        if (chamadoErro) {
+            chamadoErro.textContent = "";
+            chamadoErro.classList.add("hidden");
+        }
         modalChamado.classList.remove("hidden");
     });
 
     const fecharModal = () => {
         modalChamado.classList.add("hidden");
         if (chamadoTexto) chamadoTexto.value = "";
+        if (chamadoErro) {
+            chamadoErro.textContent = "";
+            chamadoErro.classList.add("hidden");
+        }
     };
 
     closeModalChamado?.addEventListener("click", fecharModal);
     btnCancelarChamado?.addEventListener("click", fecharModal);
 
-    btnEnviarChamado?.addEventListener("click", () => {
-        if (chamadoTexto.value.trim() === "") {
-            alert("Por favor, descreva o seu chamado.");
+    btnEnviarChamado?.addEventListener("click", async () => {
+        const descricao = chamadoTexto.value.trim();
+        if (!descricao) {
+            chamadoErro.textContent = "Descreva o chamado antes de enviar.";
+            chamadoErro.classList.remove("hidden");
             return;
         }
-        const chamados = JSON.parse(
-            localStorage.getItem("docegestao_chamados") || "[]",
-        );
-        chamados.push({
-            id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-            descricao: chamadoTexto.value.trim(),
-            criadoEm: new Date().toISOString(),
-        });
-        localStorage.setItem("docegestao_chamados", JSON.stringify(chamados));
-        document.dispatchEvent(new Event("docegestao:atualizar-notificacoes"));
-        fecharModal();
-        showToast(
-            "Chamado salvo",
-            "A solicitação foi salva neste navegador; o servidor não possui integração de chamados.",
-        );
+        if (chamadoErro) {
+            chamadoErro.textContent = "";
+            chamadoErro.classList.add("hidden");
+        }
+
+        const token = localStorage.getItem("docegestao_token");
+        if (!token) {
+            chamadoErro.textContent = "Sua sessão expirou. Entre novamente para abrir um chamado.";
+            chamadoErro.classList.remove("hidden");
+            return;
+        }
+
+        btnEnviarChamado.disabled = true;
+        btnEnviarChamado.textContent = "Enviando...";
+        try {
+            const response = await fetch("/api/chamados", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token,
+                },
+                body: JSON.stringify({ descricao }),
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.mensagem || "Não foi possível registrar o chamado.");
+            }
+
+            document.dispatchEvent(new Event("docegestao:chamados-atualizados"));
+            fecharModal();
+            showToast("Chamado salvo", "A solicitação foi registrada com sucesso.");
+        } catch (error) {
+            chamadoErro.textContent = error.message || "Não foi possível conectar ao servidor.";
+            chamadoErro.classList.remove("hidden");
+            console.error("Não foi possível registrar o chamado:", error);
+        } finally {
+            btnEnviarChamado.disabled = false;
+            btnEnviarChamado.textContent = "Enviar Chamado";
+        }
     });
 
     // --- 5. Botão Novo Item ---

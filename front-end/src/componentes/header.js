@@ -75,11 +75,11 @@ const HEADER_HTML = `
         <p class="mt-2 text-center text-sm text-gray-500">Você precisará entrar novamente para acessar sua conta.</p>
         <div class="mt-6 flex justify-center gap-3">
           <button id="header-cancel-logout" type="button"
-            class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-50">
+            class="w-28 rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-50">
             Cancelar
           </button>
           <button id="header-confirm-logout" type="button"
-            class="rounded-lg bg-[#875C46] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#6D4936]">
+            class="w-28 rounded-lg bg-[#875C46] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#6D4936]">
             Sair
           </button>
         </div>
@@ -89,7 +89,7 @@ const HEADER_HTML = `
     <div id="header-notifications-dialog" class="fixed inset-0 z-[60] hidden bg-black/20"
       role="presentation">
       <section role="dialog" aria-modal="true" aria-labelledby="header-notifications-title"
-        class="absolute inset-y-0 right-0 flex w-full max-w-sm flex-col overflow-hidden border-l border-[#E7DED5] bg-white text-[#4A3F39] shadow-2xl">
+        class="absolute inset-y-0 right-0 flex w-full max-w-sm flex-col overflow-hidden border-l border-[#E7DED5] bg-[#FAFAFA] text-[#4A3F39] shadow-2xl">
         <div class="flex items-center justify-between border-b border-gray-100 bg-[#F8F6F2] px-5 py-4">
           <div class="flex items-center gap-3">
             <div>
@@ -108,6 +108,7 @@ const HEADER_HTML = `
             </button>
           </div>
         </div>
+        <p id="header-notifications-error" class="hidden mx-5 mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800" role="alert"></p>
         <div id="header-notifications-list" class="flex-1 space-y-3 overflow-y-auto p-5">
           <div data-notifications-empty class="flex h-full min-h-64 flex-col items-center justify-center text-center">
             <span class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F5ECE5] text-[#875C46]">
@@ -125,24 +126,6 @@ const HEADER_HTML = `
           </button>
         </div>
       </section>
-      <div id="header-notification-details" class="absolute inset-0 z-10 hidden items-center justify-center bg-black/40 p-4"
-        role="presentation">
-        <section role="dialog" aria-modal="true" aria-labelledby="header-notification-details-title"
-          class="w-full max-w-md rounded-2xl border border-white/50 bg-white p-5 text-[#4A3F39] shadow-2xl">
-          <div class="flex items-start justify-between gap-4">
-            <div class="min-w-0">
-              <h2 id="header-notification-details-title" class="text-base font-bold text-[#3A2A1A]">Detalhes da notificação</h2>
-              <p id="header-notification-details-date" class="mt-1 text-[11px] text-gray-400"></p>
-            </div>
-            <button id="header-close-notification-details" type="button"
-              class="shrink-0 rounded-full p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
-              aria-label="Fechar detalhes">
-              <i data-lucide="x" class="h-4 w-4"></i>
-            </button>
-          </div>
-          <p id="header-notification-details-message" class="mt-4 whitespace-pre-wrap break-words text-sm leading-6 text-gray-700"></p>
-        </section>
-      </div>
     </div>
 
     <div id="header-settings-dialog" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
@@ -192,7 +175,7 @@ const HEADER_HTML = `
                   </span>
                   <input type="checkbox" data-notification-preference="all" class="h-4 w-4 accent-[#784E38]">
                 </label>
-                <label class="flex cursor-pointer items-center justify-between gap-4 py-4">
+                <label data-calls-notification-preference class="hidden flex cursor-pointer items-center justify-between gap-4 py-4">
                   <span>
                     <span class="block text-sm font-semibold text-gray-800">Desativar notificações de chamados</span>
                     <span class="mt-1 block text-xs text-gray-500">Oculta avisos de novos chamados.</span>
@@ -303,8 +286,7 @@ const HEADER_DARK_STYLES = `
   html[data-theme="dark"] [class~="cartao-produto"],
   html[data-theme="dark"] #header-profile-menu,
   html[data-theme="dark"] #header-settings-dialog [role="dialog"],
-  html[data-theme="dark"] #header-notifications-dialog [role="dialog"],
-  html[data-theme="dark"] #header-notification-details [role="dialog"] {
+  html[data-theme="dark"] #header-notifications-dialog [role="dialog"] {
     background-color: #2c221c !important;
     color: #f7f0e8 !important;
     border-color: #49382d !important;
@@ -475,9 +457,7 @@ function carregarHeader() {
   const settingsThemeToggle = container.querySelector("#settings-theme-toggle");
   const notificationCount = container.querySelector("#header-notification-count");
   const notificationsList = container.querySelector("#header-notifications-list");
-  const notificationDetails = container.querySelector("#header-notification-details");
-  const notificationDetailsMessage = container.querySelector("#header-notification-details-message");
-  const notificationDetailsDate = container.querySelector("#header-notification-details-date");
+  const notificationsError = container.querySelector("#header-notifications-error");
   const accountAction = container.querySelector("#header-account-action");
   const accountSettingsAction = container.querySelector("#header-account-settings");
   const logoutDialog = container.querySelector("#header-logout-dialog");
@@ -485,7 +465,6 @@ function carregarHeader() {
   const confirmLogoutButton = container.querySelector("#header-confirm-logout");
   const accountActionLabel = container.querySelector("[data-header-account-action-label]");
   const closeSelectedNotification = container.querySelector("#header-close-selected-notification");
-  const closeNotificationDetails = container.querySelector("#header-close-notification-details");
   const fotoPerfil = container.querySelector("[data-header-avatar]");
   const fotoMenu = container.querySelector("[data-header-menu-avatar]");
   const NOTIFICATIONS_KEY = "docegestao_notificacoes_v1";
@@ -526,6 +505,16 @@ function carregarHeader() {
     } catch (error) {
       console.error("Não foi possível salvar as notificações:", error);
     }
+  }
+
+  function exibirErroNotificacoes(mensagem) {
+    notificationsError.textContent = mensagem;
+    notificationsError.classList.remove("hidden");
+  }
+
+  function limparErroNotificacoes() {
+    notificationsError.textContent = "";
+    notificationsError.classList.add("hidden");
   }
 
   function obterPreferencias() {
@@ -741,12 +730,13 @@ function carregarHeader() {
       const card = document.createElement("article");
       const selectable = item.tipo === "chamado";
       const selected = selectable && item.id === state.selectedId;
-      card.tabIndex = selectable ? 0 : -1;
-      if (selectable) {
-        card.setAttribute("role", "button");
-        card.setAttribute("aria-label", `Selecionar notificação: ${item.titulo}`);
-        card.setAttribute("aria-pressed", String(selected));
-      }
+      card.tabIndex = 0;
+      card.setAttribute("role", "button");
+      card.setAttribute(
+        "aria-label",
+        `${selectable ? (selected ? "Recolher chamado" : "Expandir chamado") : "Localizar alerta"}: ${item.titulo}`,
+      );
+      if (selectable) card.setAttribute("aria-pressed", String(selected));
       const severityClass = item.tipo === "vencido"
         ? "border-red-300 bg-red-50"
         : item.tipo === "prox-vencimento"
@@ -769,28 +759,46 @@ function carregarHeader() {
             : item.tipo === "chamado"
               ? "#0ea5e9"
               : "";
-      card.className = `rounded-xl border-0 p-4 transition-all duration-200 ease-out ${selectable ? "cursor-pointer focus-visible:outline-none" : ""} ${selected ? "-translate-y-1 shadow-md" : ""} ${severityClass} ${item.lida ? "opacity-80" : ""}`;
+      card.className = `cursor-pointer rounded-xl border-0 p-4 transition-all duration-200 ease-out hover:shadow-md focus:outline-none ${selected ? "shadow-md" : ""} ${severityClass} ${item.lida ? "opacity-80" : ""}`;
       if (selected) {
         card.style.transform = "translateY(-5px)";
         card.style.boxShadow = "0 8px 18px rgba(58, 42, 26, 0.22)";
       }
       if (accentColor) card.style.borderLeft = `4px solid ${accentColor}`;
-      if (selectable) {
-        const selecionarNotificacao = () => {
+      const ativarNotificacao = () => {
+        if (selectable) {
           const currentState = carregarNotificacoes();
-          currentState.selectedId = item.id;
+          const notification = currentState.items.find((entry) => entry.id === item.id);
+          if (!notification) return;
+          const isSelected = currentState.selectedId === item.id;
+          currentState.selectedId = isSelected ? null : item.id;
+          notification.lida = true;
           salvarNotificacoes(currentState);
           renderizarNotificacoes(currentState);
-        };
-        card.addEventListener("click", (event) => {
-          if (!event.target.closest("button")) selecionarNotificacao();
-        });
-        card.addEventListener("keydown", (event) => {
-          if (event.target !== card || !["Enter", " "].includes(event.key)) return;
-          event.preventDefault();
-          selecionarNotificacao();
-        });
-      }
+          return;
+        }
+
+        const productStateId = String(item.produtoStateId || "");
+        const separatorIndex = productStateId.lastIndexOf(":");
+        if (separatorIndex < 1) return;
+        const produtoId = productStateId.slice(0, separatorIndex);
+        const status = productStateId.slice(separatorIndex + 1);
+        if (typeof window.navegarDemo === "function") {
+          window.navegarDemo("alertas", { localizar: produtoId, status });
+        } else {
+          const destination = new URL("./painel.html", window.location.href);
+          destination.searchParams.set("pagina", "alertas");
+          destination.searchParams.set("localizar", produtoId);
+          destination.searchParams.set("status", status);
+          window.location.assign(destination);
+        }
+      };
+      card.addEventListener("click", ativarNotificacao);
+      card.addEventListener("keydown", (event) => {
+        if (!["Enter", " "].includes(event.key)) return;
+        event.preventDefault();
+        ativarNotificacao();
+      });
 
       const title = document.createElement("h3");
       title.className = "text-sm font-semibold text-gray-800";
@@ -798,38 +806,22 @@ function carregarHeader() {
       const message = document.createElement("p");
       message.className = "mt-1 text-xs leading-5 text-gray-600";
       const previewLimit = 70;
-      message.textContent = item.mensagem.length > previewLimit
-        ? `${item.mensagem.slice(0, previewLimit).trimEnd()}...`
-        : item.mensagem;
-      message.style.display = "-webkit-box";
-      message.style.webkitBoxOrient = "vertical";
-      message.style.webkitLineClamp = "2";
-      message.style.overflow = "hidden";
+      message.textContent = selected || item.mensagem.length <= previewLimit
+        ? item.mensagem
+        : `${item.mensagem.slice(0, previewLimit).trimEnd()}...`;
+      if (!selected) {
+        message.style.display = "-webkit-box";
+        message.style.webkitBoxOrient = "vertical";
+        message.style.webkitLineClamp = "2";
+        message.style.overflow = "hidden";
+      } else {
+        message.classList.add("whitespace-pre-wrap");
+      }
       message.style.overflowWrap = "anywhere";
       const date = document.createElement("p");
       date.className = "mt-2 text-[11px] text-gray-400";
       date.textContent = new Date(item.criadaEm).toLocaleString("pt-BR");
       card.append(title, message, date);
-
-      if (item.tipo === "chamado") {
-        const viewDetails = document.createElement("button");
-        viewDetails.type = "button";
-        viewDetails.className = "mt-3 text-xs font-semibold text-[#784E38] hover:underline";
-        viewDetails.textContent = "Ver notificação";
-        viewDetails.addEventListener("click", () => {
-          const currentState = carregarNotificacoes();
-          const notification = currentState.items.find((entry) => entry.id === item.id);
-          if (!notification) return;
-          notification.lida = true;
-          salvarNotificacoes(currentState);
-          renderizarNotificacoes(currentState);
-          notificationDetailsMessage.textContent = notification.mensagem;
-          notificationDetailsDate.textContent = new Date(notification.criadaEm).toLocaleString("pt-BR");
-          notificationDetails.classList.remove("hidden");
-          notificationDetails.classList.add("flex");
-        });
-        card.appendChild(viewDetails);
-      }
 
       notificationsList.appendChild(card);
     });
@@ -935,24 +927,39 @@ function carregarHeader() {
     }
 
     const calls = lerJsonLocalStorage("docegestao_chamados", []);
+    const activeCalls = new Map();
     if (Array.isArray(calls)) {
       calls.forEach((call, index) => {
         if (!call || typeof call !== "object") return;
         const callId = String(
           call.id || `${call.criadoEm || "chamado"}:${index}:${call.descricao || ""}`,
         );
-        if (state.seenCalls.includes(callId)) return;
-        state.seenCalls.push(callId);
+        activeCalls.set(callId, call);
+      });
+    }
+    state.items = state.items.filter((item) => {
+      if (item.tipo !== "chamado") return true;
+      const callId = String(item.callId || item.id || "").replace(/^chamado:/, "");
+      return activeCalls.has(callId);
+    });
+    activeCalls.forEach((call, callId) => {
+      const notificationId = `chamado:${callId}`;
+      let notification = state.items.find((item) => item.id === notificationId);
+      if (!notification) {
         criarNotificacao(
           state,
-          `chamado:${callId}`,
+          notificationId,
           "chamado",
           "Novo chamado aberto",
           String(call.descricao || "Um novo chamado foi registrado na administração."),
           "admin",
         );
-      });
-    }
+        notification = state.items[state.items.length - 1];
+      }
+      notification.callId = callId;
+      notification.mensagem = String(call.descricao || "Um novo chamado foi registrado na administração.");
+      notification.criadaEm = call.criadoEm || notification.criadaEm;
+    });
 
     state.items = state.items.slice(-100);
     salvarNotificacoes(state);
@@ -970,6 +977,27 @@ function carregarHeader() {
       const result = await response.json();
       if (!response.ok) {
         throw new Error(result.mensagem || "Não foi possível atualizar as notificações do estoque.");
+      }
+
+      async function sincronizarChamadosNotificacoes() {
+        const token = localStorage.getItem("docegestao_token");
+        if (!token) return;
+
+        try {
+          const response = await fetch("/api/chamados", {
+            headers: { Authorization: "Bearer " + token },
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.mensagem || "Não foi possível carregar os chamados.");
+          }
+          localStorage.setItem("docegestao_chamados", JSON.stringify(result.dados || []));
+          atualizarNotificacoes();
+          limparErroNotificacoes();
+        } catch (error) {
+          console.error("Não foi possível sincronizar os chamados:", error);
+          exibirErroNotificacoes(error.message || "Não foi possível carregar os chamados.");
+        }
       }
 
       const inventory = Object.fromEntries((result.dados || []).map((product) => {
@@ -1027,6 +1055,18 @@ function carregarHeader() {
     } catch (error) {
       console.error("Não foi possível carregar os dados da conta:", error);
     }
+  }
+
+  async function atualizarVisibilidadePreferenciaChamados() {
+    const preference = container.querySelector("[data-calls-notification-preference]");
+    if (!preference) return;
+
+    const user = await window.obterFuncionarioAutenticado?.();
+    const role = String(user?.nome_cargo || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+    preference.hidden = !role.includes("admin");
   }
 
   function fecharPerfil() {
@@ -1202,9 +1242,7 @@ function carregarHeader() {
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
-    if (!notificationDetails.classList.contains("hidden")) {
-      fecharDetalhesNotificacao();
-    } else if (!notificationsDialog.classList.contains("hidden")) {
+    if (!notificationsDialog.classList.contains("hidden")) {
       fecharDialogo(notificationsDialog, notificationsTrigger);
     } else if (!settingsDialog.classList.contains("hidden")) {
       fecharDialogo(settingsDialog, settingsTrigger);
@@ -1213,27 +1251,47 @@ function carregarHeader() {
     }
   });
 
-  function fecharDetalhesNotificacao() {
-    notificationDetails.classList.add("hidden");
-    notificationDetails.classList.remove("flex");
-  }
-
-  closeNotificationDetails.addEventListener("click", fecharDetalhesNotificacao);
-  notificationDetails.addEventListener("click", (event) => {
-    if (event.target === notificationDetails) fecharDetalhesNotificacao();
-  });
-
-  closeSelectedNotification.addEventListener("click", () => {
+  closeSelectedNotification.addEventListener("click", async () => {
     const state = carregarNotificacoes();
     const selectedItem = state.items.find((item) =>
       item.id === state.selectedId && item.tipo === "chamado",
     );
-    if (!selectedItem) return;
-    state.items = state.items.filter((item) => item.id !== selectedItem.id);
-    state.selectedId = null;
-    salvarNotificacoes(state);
-    renderizarNotificacoes(state);
-    fecharDetalhesNotificacao();
+    if (!selectedItem || closeSelectedNotification.disabled) return;
+
+    const token = localStorage.getItem("docegestao_token");
+    if (!token) {
+      exibirErroNotificacoes("Sua sessão expirou. Entre novamente para remover o chamado.");
+      return;
+    }
+
+    closeSelectedNotification.disabled = true;
+    limparErroNotificacoes();
+    try {
+      const callId = String(selectedItem.callId || selectedItem.id.replace(/^chamado:/, ""));
+      const response = await fetch(`/api/chamados/${encodeURIComponent(callId)}`, {
+        method: "DELETE",
+        headers: { Authorization: "Bearer " + token },
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.mensagem || "Não foi possível remover o chamado.");
+      }
+
+      const calls = lerJsonLocalStorage("docegestao_chamados", []);
+      localStorage.setItem(
+        "docegestao_chamados",
+        JSON.stringify(calls.filter((call) => String(call.id) !== callId)),
+      );
+      state.items = state.items.filter((item) => item.id !== selectedItem.id);
+      state.selectedId = null;
+      salvarNotificacoes(state);
+      renderizarNotificacoes(state);
+      limparErroNotificacoes();
+    } catch (error) {
+      console.error("Não foi possível remover o chamado:", error);
+      exibirErroNotificacoes(error.message || "Não foi possível remover o chamado.");
+      closeSelectedNotification.disabled = false;
+    }
   });
 
   accountAction.addEventListener("click", () => {
@@ -1274,9 +1332,11 @@ function carregarHeader() {
 
   aplicarTema(localStorage.getItem(THEME_KEY) === "dark");
   atualizarConta();
+  void atualizarVisibilidadePreferenciaChamados();
   atualizarFoto();
   preencherPerfil();
   atualizarNotificacoes();
+  void sincronizarChamadosNotificacoes();
   document.addEventListener("demo:page-loaded", () => {
     const titulo = document.title.replace(/^DoceGestão\s*[|—-]\s*/i, "").trim();
     if (titulo) {
@@ -1285,7 +1345,9 @@ function carregarHeader() {
       });
     }
     atualizarConta();
+    void atualizarVisibilidadePreferenciaChamados();
     atualizarNotificacoes();
+    void sincronizarChamadosNotificacoes();
     preencherPerfil();
   });
   window.addEventListener("storage", () => {
@@ -1294,6 +1356,9 @@ function carregarHeader() {
     atualizarNotificacoes();
   });
   document.addEventListener("docegestao:atualizar-notificacoes", atualizarNotificacoes);
+  document.addEventListener("docegestao:chamados-atualizados", () => {
+    void sincronizarChamadosNotificacoes();
+  });
   document.addEventListener("docegestao:produto-removido", registrarProdutoRemovido);
   void sincronizarEstoqueNotificacoes();
 

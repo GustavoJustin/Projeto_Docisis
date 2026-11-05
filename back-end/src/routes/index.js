@@ -60,4 +60,7 @@ router.use("/saidas", autenticar, exigirAdministrador, SaidaRoutes);
 const RelatorioRoutes = require("./RelatorioRoutes");
 router.use("/relatorios", autenticar, RelatorioRoutes); // JWT: protegido
 
+const ChamadoRoutes = require("./ChamadoRoutes");
+router.use("/chamados", autenticar, ChamadoRoutes);
+
 module.exports = router;

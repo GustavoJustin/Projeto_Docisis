@@ -143,6 +143,28 @@
     });
   }
 
+  function destacarAlertaDaNotificacao(container) {
+    const parametros = new URLSearchParams(window.location.search);
+    const produtoId = parametros.get("localizar");
+    if (!produtoId) return;
+
+    const status = parametros.get("status");
+    const cards = [...container.querySelectorAll(".alert-card")];
+    const card = cards.find((item) =>
+      item.dataset.id === produtoId && item.dataset.category === status,
+    ) || cards.find((item) => item.dataset.id === produtoId);
+    if (!card) return;
+
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+    card.style.outline = "3px solid #875C46";
+    card.style.outlineOffset = "3px";
+    window.setTimeout(() => {
+      if (!card.isConnected) return;
+      card.style.outline = "";
+      card.style.outlineOffset = "";
+    }, 2500);
+  }
+
   function mostrarErro(container, mensagem) {
     container.replaceChildren();
     const erro = document.createElement("p");
@@ -210,6 +232,7 @@
       const contador = document.getElementById("totalAlertsCount");
       if (contador) contador.textContent = String(registros.length);
       aplicarFiltros();
+      destacarAlertaDaNotificacao(container);
       container.onclick = (event) => {
         const botao = event.target.closest("[data-action='atualizar'], [data-action='localizar']");
         if (!botao) return;
