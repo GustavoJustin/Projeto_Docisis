@@ -27,7 +27,7 @@ class FuncionarioService {
     }
 
     async cadastrarFuncionario(dados) {
-        const {cpf: cpfInformado, id_cargos, nome, email, senha} = dados
+        const {cpf: cpfInformado, id_cargos, nome, email, senha, foto} = dados
         const cpf = String(cpfInformado || '').replace(/\D/g, '')
 
         if(!cpf || !id_cargos || !nome || !email || !senha) {
@@ -45,6 +45,12 @@ class FuncionarioService {
         if(typeof senha != "string" || senha.trim().length < 6) {
             throw { status: 400, mensagem: "Senha deve ter no mínimo 6 caracteres" }
         }
+        if(foto !== undefined && foto !== null && foto !== "" &&
+            (typeof foto !== "string" ||
+                foto.length > 1500000 ||
+                !/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(foto))) {
+            throw { status: 400, mensagem: "A foto de perfil é inválida ou muito grande." }
+        }
 
         // JWT: nunca guarda a senha como o funcionário digitou - só o hash dela.
         // O "10" é o "custo" do hash (quanto maior, mais lento e mais seguro; 10 é o padrão de mercado)
@@ -55,7 +61,8 @@ class FuncionarioService {
             id_cargos,
             nome: nome.trim(),
             email: email.trim().toLowerCase(),
-            senha: senhaHash // JWT: salva o hash, não a senha crua
+            senha: senhaHash, // JWT: salva o hash, não a senha crua
+            ...(foto ? { foto } : {})
         }
 
         const resultado = await FuncionarioRepository.cadastrarFuncionario(novoFuncionario)
@@ -115,6 +122,25 @@ class FuncionarioService {
         return { sucesso: true, mensagem: "Funcionario atualizado" }
     }
 
+    async atualizarFotoPerfil(id, foto) {
+        if(!id || !Number.isInteger(Number(id)) || Number(id) <= 0) {
+            throw { status: 400, mensagem: "Id inválido" }
+        }
+        if(typeof foto !== "string" ||
+            foto.length > 1500000 ||
+            !/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(foto)) {
+            throw { status: 400, mensagem: "A foto de perfil é inválida ou muito grande." }
+        }
+
+        const funcionario = await FuncionarioRepository.buscarFuncionarioId(id)
+        if(!funcionario) {
+            throw { status: 404, mensagem: "Funcionario não encontrado" }
+        }
+
+        await FuncionarioRepository.atualizarFotoPerfil(id, foto)
+        return { sucesso: true, mensagem: "Foto de perfil atualizada." }
+    }
+
     async deletarFuncionario(id) {
         if(!id || isNaN(id)) {
             throw { status: 400, mensagem: "Id inválido" }
@@ -124,6 +150,25 @@ class FuncionarioService {
 
         if(!funcionario) {
             throw { status: 404, mensagem: "Funcionario não encontrado" }
+        }
+
+        const ehAdministrador = (nomeCargo) => String(nomeCargo || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .includes('admin')
+        if(ehAdministrador(funcionario.nome_cargo)) {
+            const funcionarios = await FuncionarioRepository.listarFuncionario()
+            const outrosAdministradores = funcionarios.filter((item) => {
+                return ehAdministrador(item.nome_cargo) &&
+                    String(item.id_funcionario) !== String(id)
+            })
+            if(outrosAdministradores.length === 0) {
+                throw {
+                    status: 409,
+                    mensagem: "Não é possível excluir o último administrador cadastrado.",
+                }
+            }
         }
 
         await FuncionarioRepository.deletarFuncionario(id)

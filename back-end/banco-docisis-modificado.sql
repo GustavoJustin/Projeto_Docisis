@@ -41,6 +41,7 @@ CREATE TABLE tbl_funcionarios (
     nome VARCHAR(200) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
+    foto LONGTEXT NULL,
     CONSTRAINT fk_funcionarios_cargos FOREIGN KEY (id_cargos) REFERENCES tbl_cargos(id_cargos)
 );
 

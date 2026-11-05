@@ -2,6 +2,7 @@ const CargosRepository = require('../repositories/CargosRepository')
 
 class CargoService {
     async listarCargo() {
+        await CargosRepository.garantirCargoFuncionario()
         const cargos = await CargosRepository.listarCargo()
 
         return {

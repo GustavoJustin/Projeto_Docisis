@@ -147,6 +147,28 @@ function inicializarCadastroFuncionario() {
         document.getElementById("cadastro-alert-link")?.classList.add("hidden");
     }
 
+    async function prepararFoto(file) {
+        if (!file) return null;
+        if (!file.type.startsWith("image/")) {
+            throw new Error("Escolha um arquivo de imagem.");
+        }
+        if (file.size > 2 * 1024 * 1024) {
+            throw new Error("A imagem deve ter no máximo 2 MB.");
+        }
+
+        const imagem = await createImageBitmap(file);
+        try {
+            const escala = Math.min(1, 512 / Math.max(imagem.width, imagem.height));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.max(1, Math.round(imagem.width * escala));
+            canvas.height = Math.max(1, Math.round(imagem.height * escala));
+            canvas.getContext("2d").drawImage(imagem, 0, 0, canvas.width, canvas.height);
+            return canvas.toDataURL("image/jpeg", 0.82);
+        } finally {
+            imagem.close();
+        }
+    }
+
     const cadastroPublicoLink = document.getElementById("cadastro-alert-link");
     cadastroPublicoLink?.classList.add("hidden");
     void validarAcessoAdministrador();
@@ -191,22 +213,28 @@ function inicializarCadastroFuncionario() {
     });
 
     // Cartões de nível de acesso
+    function atualizarCartoesNivel(nivelSelecionado) {
+        if (!cardAdmin || !cardFunc) return;
+
+        const cardSelecionado =
+            "relative flex items-start p-4 rounded-xl border-2 border-[#875C46] bg-[#FDFBF7] cursor-pointer transition-all";
+        const cardDesmarcado =
+            "relative flex items-start p-4 rounded-xl border border-gray-200 bg-white hover:border-[#875C46]/50 cursor-pointer transition-all";
+
+        cardAdmin.className =
+            nivelSelecionado === "administrador" ? cardSelecionado : cardDesmarcado;
+        cardFunc.className =
+            nivelSelecionado === "funcionario" ? cardSelecionado : cardDesmarcado;
+    }
+
     radioNivel.forEach((radio) => {
         radio.addEventListener("change", (e) => {
-            if (!cardAdmin || !cardFunc) return;
-            if (e.target.value === "administrador") {
-                cardAdmin.className =
-                    "relative flex items-start p-4 rounded-xl border-2 border-[#875C46] bg-[#FDFBF7] cursor-pointer transition-all";
-                cardFunc.className =
-                    "relative flex items-start p-4 rounded-xl border border-gray-200 bg-white hover:border-[#875C46]/50 cursor-pointer transition-all";
-            } else {
-                cardFunc.className =
-                    "relative flex items-start p-4 rounded-xl border-2 border-[#875C46] bg-[#FDFBF7] cursor-pointer transition-all";
-                cardAdmin.className =
-                    "relative flex items-start p-4 rounded-xl border border-gray-200 bg-white hover:border-[#875C46]/50 cursor-pointer transition-all";
-            }
+            atualizarCartoesNivel(e.target.value);
         });
     });
+    atualizarCartoesNivel(
+        form.querySelector('input[name="nivel_acesso"]:checked')?.value,
+    );
 
     // Validação e Gravação
     form.addEventListener("submit", async (e) => {
@@ -320,6 +348,7 @@ function inicializarCadastroFuncionario() {
                     email: document.getElementById("input-email").value.trim(),
                     senha,
                     id_cargos: Number(cargo.id_cargos),
+                    foto: await prepararFoto(inputFoto?.files?.[0]),
                 }),
             });
             const resultado = await response.json();

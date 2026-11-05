@@ -11,6 +11,39 @@ describe("FuncionariosRepository.prepararSchemaAutenticacao", () => {
     jest.spyOn(FuncionariosRepository, "prepararSchemaCpf").mockResolvedValue();
   });
 
+  describe("FuncionariosRepository photo support", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+      FuncionariosRepository.preparacaoColunaFoto = null;
+    });
+
+    test("adds the photo column when listing employees on an old schema", async () => {
+      const employees = [{ id_funcionario: 1, foto: "data:image/jpeg;base64,aGVsbG8=" }];
+      pool.query
+        .mockResolvedValueOnce([[], []])
+        .mockResolvedValueOnce([{}, []])
+        .mockResolvedValueOnce([employees, []]);
+
+      await expect(FuncionariosRepository.listarFuncionario()).resolves.toEqual(employees);
+
+      expect(pool.query.mock.calls[1][0]).toContain(
+        "ADD COLUMN foto LONGTEXT NULL",
+      );
+      expect(pool.query.mock.calls[2][0]).toContain("f.foto");
+    });
+
+    test("updates an employee profile photo", async () => {
+      const foto = "data:image/jpeg;base64,aGVsbG8=";
+      pool.query
+        .mockResolvedValueOnce([[{ Field: "foto" }], []])
+        .mockResolvedValueOnce([{ affectedRows: 1 }, []]);
+
+      await expect(FuncionariosRepository.atualizarFotoPerfil(5, foto)).resolves.toBe(1);
+      expect(pool.query.mock.calls[1][0]).toContain("SET foto = ?");
+      expect(pool.query.mock.calls[1][1]).toEqual([foto, 5]);
+    });
+  });
+
   test("adds login columns and replaces the unique role index without dropping the CPF primary key", async () => {
     pool.query
       .mockResolvedValueOnce([

@@ -57,6 +57,21 @@ class FuncionariosController {
         }
     }
 
+    async atualizarFotoPerfil(req, res) {
+        try {
+            const resultado = await FuncionarioService.atualizarFotoPerfil(
+                req.funcionario.id_funcionario,
+                req.body.foto,
+            )
+            res.json(resultado)
+        } catch (erro) {
+            res.status(erro.status || 500).json({
+                sucesso: false,
+                mensagem: erro.mensagem || "Erro interno do servidor",
+            })
+        }
+    }
+
     async deletarFuncionario(req, res) {
         try {
             const resultado = await FuncionarioService.deletarFuncionario(req.params.id)

@@ -7,7 +7,7 @@ const paginasDemo = {
     modais: ["modal-insumo", "modal-excluir"],
   },
   alertas: {
-    arquivo: "alerta.html",
+    arquivo: "alertas.html",
     titulo: "Painel de Alertas",
     ativo: "alertas",
     modais: ["modalNovoItem", "modalRepor", "toastNotification"],
@@ -27,6 +27,7 @@ const paginasDemo = {
     arquivo: "gestao-equipes.html",
     titulo: "Gestão de Equipes",
     ativo: "funcionarios",
+    modais: ["confirm-removal-modal"],
   },
   admin: {
     arquivo: "painel-administrativo.html",

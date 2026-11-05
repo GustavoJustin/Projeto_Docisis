@@ -1,6 +1,25 @@
 const pool = require('../config/database')
 
 class FuncionarioRepository {
+    async garantirColunaFoto() {
+        if (!this.preparacaoColunaFoto) {
+            this.preparacaoColunaFoto = (async () => {
+                const [colunas] = await pool.query(
+                    "SHOW COLUMNS FROM tbl_funcionarios LIKE 'foto'",
+                )
+                if (colunas.length === 0) {
+                    await pool.query(
+                        'ALTER TABLE tbl_funcionarios ADD COLUMN foto LONGTEXT NULL',
+                    )
+                }
+            })().catch((erro) => {
+                this.preparacaoColunaFoto = null
+                throw erro
+            })
+        }
+        await this.preparacaoColunaFoto
+    }
+
     async prepararSchemaAutenticacao() {
         const [colunas] = await pool.query('SHOW COLUMNS FROM tbl_funcionarios')
         const nomesColunas = new Set(colunas.map((coluna) => coluna.Field))
@@ -237,9 +256,10 @@ class FuncionarioRepository {
     }
 
     async listarFuncionario() {
+        await this.garantirColunaFoto()
         const [rows] = await pool.query(`
             SELECT f.id_funcionario, f.id_cargos, f.cpf, f.nome, f.email,
-                   c.nome_cargo
+                   f.foto, c.nome_cargo
             FROM tbl_funcionarios f
             JOIN tbl_cargos c ON c.id_cargos = f.id_cargos
             ORDER BY f.id_funcionario
@@ -248,9 +268,10 @@ class FuncionarioRepository {
     }
 
     async buscarFuncionarioId(id) {
+        await this.garantirColunaFoto()
         const [rows] = await pool.query(`
             SELECT f.id_funcionario, f.id_cargos, f.cpf, f.nome, f.email,
-                   c.nome_cargo
+                   f.foto, c.nome_cargo
             FROM tbl_funcionarios f
             JOIN tbl_cargos c ON c.id_cargos = f.id_cargos
             WHERE f.id_funcionario = ?
@@ -259,11 +280,13 @@ class FuncionarioRepository {
     }
 
     async cadastrarFuncionario(dadosDoFuncionario) {
+        await this.garantirColunaFoto()
         const [resultado] = await pool.query('INSERT INTO tbl_funcionarios SET ?', [dadosDoFuncionario])
         return resultado.insertId
     }
 
     async atualizarFuncionario(id, dadosDoFuncionario) {
+        await this.garantirColunaFoto()
         const camposFuncionario = []
         const dadoFuncionario = []
 
@@ -280,6 +303,15 @@ class FuncionarioRepository {
 
         const [resultado] = await pool.query(query, dadoFuncionario)
 
+        return resultado.affectedRows
+    }
+
+    async atualizarFotoPerfil(id, foto) {
+        await this.garantirColunaFoto()
+        const [resultado] = await pool.query(
+            'UPDATE tbl_funcionarios SET foto = ? WHERE id_funcionario = ?',
+            [foto, id],
+        )
         return resultado.affectedRows
     }
 

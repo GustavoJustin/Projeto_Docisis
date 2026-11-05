@@ -1137,7 +1137,25 @@ function carregarHeader() {
         settingsProfileAvatar.src = selectedProfilePhoto;
         fotoPerfil.src = selectedProfilePhoto;
         fotoMenu.src = selectedProfilePhoto;
-        settingsProfileFeedback.textContent = "Foto atualizada.";
+        const token = localStorage.getItem("docegestao_token");
+        if (token && usuarioAtual?.id_funcionario) {
+          const response = await fetch("/api/funcionarios/perfil/foto", {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ foto: selectedProfilePhoto }),
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.mensagem || "Não foi possível salvar a foto no sistema.");
+          }
+          settingsProfileFeedback.textContent = "Foto atualizada para sua conta.";
+        } else {
+          settingsProfileFeedback.textContent =
+            "Foto salva neste navegador. Entre na conta para sincronizá-la.";
+        }
         settingsProfileFeedback.className = "min-h-5 text-xs text-emerald-700";
       }
     } catch (error) {

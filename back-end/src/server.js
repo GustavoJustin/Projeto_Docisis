@@ -6,7 +6,7 @@ const routes = require("./routes/index");
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: "2mb" }));
 
 app.use(express.static(path.resolve(__dirname, "../../front-end")));
 app.get("/", (req, res) => res.redirect("/tailwind/painel.html?pagina=login"));

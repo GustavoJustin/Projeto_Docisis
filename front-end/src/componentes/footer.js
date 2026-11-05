@@ -35,11 +35,9 @@ const FOOTER_HTML = `
           </div>
           <p class="mt-4 max-w-xs text-sm leading-6 text-cocoa-300">
             Para dúvidas sobre cadastro, acesso ou permissões, procure o administrador do sistema. 
-           
-          </p>
-         
-          <p> Contato: 11 99988-8110<p>
-         
+            <br>
+            Contato: 11 99988-8110
+          </p>         
         </div>
       </div>
 
