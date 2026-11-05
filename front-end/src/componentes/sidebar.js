@@ -77,7 +77,23 @@ async function obterFuncionarioAutenticado() {
     tokenSessaoUsuarioAtual = null;
     return null;
   }
-  if (token === tokenSessaoUsuarioAtual) return sessaoUsuarioAtual;
+  if (token === tokenSessaoUsuarioAtual) {
+    try {
+      const usuarioLocal = JSON.parse(
+        localStorage.getItem("docegestao_funcionario") || "null",
+      );
+      if (
+        usuarioLocal &&
+        String(usuarioLocal.id_funcionario) ===
+          String(sessaoUsuarioAtual?.id_funcionario)
+      ) {
+        sessaoUsuarioAtual = { ...sessaoUsuarioAtual, foto: usuarioLocal.foto || null };
+      }
+    } catch (error) {
+      console.error("Não foi possível sincronizar a foto local da conta:", error);
+    }
+    return sessaoUsuarioAtual;
+  }
 
   try {
     const response = await fetch("/api/sessao", {

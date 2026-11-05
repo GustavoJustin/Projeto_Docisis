@@ -2,36 +2,6 @@
   "use strict";
 
   const STORAGE_KEY = "docegestao_estoque_v1";
-  const DIAS_PARA_ALERTA = 7;
-
-  function diasAte(data) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(data || "")) return null;
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-    const validade = new Date(`${data}T00:00:00`);
-    return Math.floor((validade - hoje) / 86400000);
-  }
-
-  function classificar(produto) {
-    const quantidade = Number(produto.quantidade);
-    const maximo = Number(produto.maximo);
-    const alertas = [];
-    if (Number.isFinite(quantidade) && quantidade <= 0) {
-      alertas.push("esgotado");
-    } else if (Number.isFinite(quantidade) && Number.isFinite(maximo) &&
-      maximo > 0 && quantidade / maximo <= 0.25) {
-      alertas.push("critico");
-    } else if (Number.isFinite(quantidade) && Number.isFinite(maximo) &&
-      maximo > 0 && quantidade / maximo > 0.5 && quantidade / maximo <= 0.75) {
-      alertas.push("medio");
-    }
-
-    const dias = diasAte(produto.validade);
-    if (dias !== null && dias < 0) alertas.push("vencido");
-    else if (dias !== null && dias <= DIAS_PARA_ALERTA) alertas.push("prox-vencimento");
-    return alertas;
-  }
-
   function dataPtBr(valor) {
     if (!valor) return "Sem validade cadastrada";
     return valor.split("-").reverse().join("/");
@@ -39,25 +9,21 @@
 
   function criarCard(produto, status) {
     const card = document.createElement("article");
-    const vencido = status === "vencido";
-    const critico = status === "critico" || status === "esgotado";
-    const estoqueNormal = status === "medio";
-    const dias = diasAte(produto.validade);
-    const cores = vencido
-      ? ["border-red-500", "bg-red-100 text-red-700", "VENCIDO", 4, "#ef4444", "#fee2e2", "#b91c1c"]
-      : status === "prox-vencimento"
-        ? ["border-orange-500", "bg-orange-100 text-orange-800", "PRÓXIMO DO VENCIMENTO", 3, "#f97316", "#ffedd5", "#9a3412"]
-        : status === "medio"
-          ? ["border-yellow-400", "bg-yellow-100 text-yellow-800", "ESTOQUE MÉDIO", 2, "#facc15", "#fef9c3", "#854d0e"]
-        : status === "esgotado"
-          ? ["border-red-600", "bg-red-100 text-red-700", "FORA DE ESTOQUE", 5, "#dc2626", "#fee2e2", "#b91c1c"]
-          : ["border-red-600", "bg-red-100 text-red-700", "ESTOQUE CRÍTICO", 4, "#dc2626", "#fee2e2", "#b91c1c"];
+    const classificacao = window.estoqueClassificacao.classificar(produto);
+    const vencido = classificacao.estados.includes("vencido");
+    const alertaValidade =
+      vencido || classificacao.estados.includes("prox-vencimento");
+    const alerta = window.estoqueClassificacao.obterAlerta(status);
+    const dias = classificacao.diasValidade;
+    const alertaEstoque = classificacao.estados.some((estado) =>
+      ["critico", "prox-estoque", "esgotado", "medio"].includes(estado),
+    );
     card.className =
-      `alert-card flex w-full min-w-0 flex-col items-start justify-between gap-5 rounded-2xl border border-gray-100 border-l-4 ${cores[0]} bg-white p-5 shadow-sm transition-all sm:flex-row sm:items-center`;
-    card.style.borderLeftColor = cores[4];
+      "alert-card flex w-full min-w-0 flex-col items-start justify-between gap-5 rounded-2xl border border-gray-100 border-l-4 bg-white p-5 shadow-sm transition-all sm:flex-row sm:items-center";
+    card.style.borderLeftColor = alerta.cor;
     card.dataset.id = String(produto.id);
     card.dataset.category = status;
-    card.dataset.urgency = String(cores[3]);
+    card.dataset.urgency = String(alerta.prioridade);
     card.dataset.quantidade = String(produto.quantidade);
     card.dataset.vencimento = produto.validade || "";
 
@@ -73,10 +39,10 @@
     const texto = document.createElement("div");
     texto.className = "alert-card__content min-w-0 space-y-1";
     const selo = document.createElement("span");
-    selo.className = `inline-flex rounded px-2 py-0.5 text-[9px] font-bold ${cores[1]}`;
-    selo.style.backgroundColor = cores[5];
-    selo.style.color = cores[6];
-    selo.textContent = cores[2];
+    selo.className = "inline-flex rounded px-2 py-0.5 text-[9px] font-bold";
+    selo.style.backgroundColor = alerta.fundo;
+    selo.style.color = alerta.texto;
+    selo.textContent = alerta.etiqueta;
     const nome = document.createElement("h3");
     nome.className = "item-title break-words text-base font-bold text-gray-800";
     nome.textContent = produto.nome;
@@ -88,14 +54,15 @@
     quantidade.textContent = `Disponível: ${produto.quantidade} ${produto.unidade}`;
     texto.append(selo, nome, descricao, quantidade);
 
-    if (vencido || status === "prox-vencimento") {
+    if (alertaValidade) {
       const validade = document.createElement("p");
       validade.className = "text-xs text-gray-500";
       validade.textContent = vencido
         ? `Venceu em ${dataPtBr(produto.validade)}`
         : `Validade: ${dataPtBr(produto.validade)} (${dias === 0 ? "hoje" : `em ${dias} ${dias === 1 ? "dia" : "dias"}`})`;
       texto.appendChild(validade);
-    } else {
+    }
+    if (alertaEstoque || !alertaValidade) {
       const limite = document.createElement("p");
       limite.className = "text-xs text-gray-500";
       limite.textContent = `Limite configurado: ${produto.maximo} ${produto.unidade}`;
@@ -106,11 +73,14 @@
 
     const acoes = document.createElement("div");
     acoes.className = "alert-card__actions flex min-w-0 flex-col gap-2";
-    if (critico || estoqueNormal) {
+    acoes.style.width = "180px";
+    acoes.style.maxWidth = "100%";
+    acoes.style.flexShrink = "0";
+    if (alertaEstoque) {
       const atualizar = document.createElement("button");
       atualizar.type = "button";
       atualizar.dataset.action = "atualizar";
-      atualizar.className = "rounded-lg bg-[#784E38] px-3 py-2 text-xs font-semibold text-white hover:bg-[#633e2c]";
+      atualizar.className = "w-full rounded-lg bg-[#784E38] px-3 py-2 text-xs font-semibold text-white hover:bg-[#633e2c]";
       atualizar.textContent = "Atualizar estoque";
       acoes.appendChild(atualizar);
     }
@@ -123,7 +93,8 @@
     acoes.appendChild(localizar);
     if (vencido) {
       const aviso = document.createElement("p");
-      aviso.className = "text-center text-xs font-semibold text-red-700";
+      aviso.className = "w-full text-center text-xs font-semibold";
+      aviso.style.color = alerta.cor;
       aviso.textContent = "Produto vencido — não utilizar";
       acoes.appendChild(aviso);
     }
@@ -177,6 +148,7 @@
   async function inicializarAlertasEstoque() {
     const container = document.getElementById("alertCardsContainer");
     if (!container) return;
+    container.dataset.alertasOrigem = "api";
     if (container.dataset.alertasCarregando === "true") return;
     container.dataset.alertasCarregando = "true";
     container.replaceChildren();
@@ -215,18 +187,20 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(inventory));
       document.dispatchEvent(new Event("docegestao:atualizar-notificacoes"));
 
-      const registros = produtos.flatMap((produto) =>
-        classificar(produto).map((status) => ({ produto, status })),
-      );
+      const registros = produtos.flatMap((produto) => {
+        const status = window.estoqueClassificacao.classificar(produto).status;
+        return status ? [{ produto, status }] : [];
+      });
       registros.sort((a, b) => {
-        const urgencia = { esgotado: 5, critico: 4, vencido: 4, "prox-vencimento": 3, medio: 2 };
-        return urgencia[b.status] - urgencia[a.status];
+        const urgenciaA = window.estoqueClassificacao.obterAlerta(a.status).prioridade;
+        const urgenciaB = window.estoqueClassificacao.obterAlerta(b.status).prioridade;
+        return urgenciaB - urgenciaA;
       });
       registros.forEach(({ produto, status }) => container.appendChild(criarCard(produto, status)));
       if (!registros.length) {
         const vazio = document.createElement("p");
         vazio.className = "rounded-xl border border-gray-100 bg-white p-6 text-sm text-gray-500";
-        vazio.textContent = "Nenhum produto está fora do estoque, com nível crítico ou médio, ou próximo do vencimento.";
+        vazio.textContent = "Nenhum produto está com estoque baixo, esgotado ou próximo do vencimento.";
         container.appendChild(vazio);
       }
       const contador = document.getElementById("totalAlertsCount");

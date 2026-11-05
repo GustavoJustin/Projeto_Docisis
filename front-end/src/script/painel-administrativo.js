@@ -111,43 +111,6 @@ document.addEventListener("demo:page-loaded", () => {
         });
     }
 
-    // --- 2. Correção do Botão BACKUP ---
-    const btnBackup = document.getElementById("btn-backup");
-    btnBackup?.addEventListener("click", () => {
-        showToast(
-            "Backup indisponível",
-            "O servidor ainda não oferece uma operação de backup do banco de dados.",
-        );
-    });
-
-    // --- 3. Correção do Botão EXPORTAR ---
-    const btnExportar = document.getElementById("btn-exportar");
-    btnExportar?.addEventListener("click", () => {
-        const rows = [...document.querySelectorAll("#logs-tbody tr")];
-        const csv = [
-            ["Data/Hora", "Usuário", "Ação", "Status"],
-            ...rows.map((row) =>
-                [...row.cells].map((cell) => cell.innerText.trim()),
-            ),
-        ]
-            .map((row) =>
-                row.map((value) => `"${value.replace(/"/g, '""')}"`).join(","),
-            )
-            .join("\r\n");
-        const url = URL.createObjectURL(
-            new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" }),
-        );
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "logs-auditoria.csv";
-        link.click();
-        URL.revokeObjectURL(url);
-        showToast(
-            "Relatório Exportado",
-            "O arquivo CSV dos registros exibidos foi baixado.",
-        );
-    });
-
     // --- 4. Correção do Botão ABRIR CHAMADO e Modal ---
     const btnChamado = document.getElementById("btn-chamado");
     const modalChamado = document.getElementById("modal-chamado");

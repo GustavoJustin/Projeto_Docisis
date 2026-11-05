@@ -281,6 +281,7 @@ function inicializarCadastroFuncionario() {
                             .value.replace(/\D/g, ""),
                         email: document.getElementById("input-email").value.trim(),
                         senha,
+                        foto: await prepararFoto(inputFoto?.files?.[0]),
                     }),
                 });
                 const resultado = await response.json();

@@ -35,6 +35,7 @@ describe("AuthService", () => {
       cpf: "123.456.789-01",
       email: " Maria@Email.com ",
       senha: "Senha123",
+      foto: "data:image/jpeg;base64,aGVsbG8=",
     });
 
     expect(CargosRepository.garantirCargoFuncionario).toHaveBeenCalledTimes(1);
@@ -44,6 +45,7 @@ describe("AuthService", () => {
         cpf: "12345678901",
         email: "maria@email.com",
         id_cargos: 2,
+        foto: "data:image/jpeg;base64,aGVsbG8=",
       }),
     );
     expect(resultado).toEqual({ sucesso: true, resultado: 15 });
@@ -57,6 +59,7 @@ describe("AuthService", () => {
       nome: "Maria Oliveira",
       email: "maria@email.com",
       senha,
+      foto: "data:image/jpeg;base64,aGVsbG8=",
     });
 
     const resultado = await AuthService.login({
@@ -67,5 +70,6 @@ describe("AuthService", () => {
     expect(AuthRepository.buscarPorEmail).toHaveBeenCalledWith("maria@email.com");
     expect(resultado.token).toEqual(expect.any(String));
     expect(resultado.funcionario.email).toBe("maria@email.com");
+    expect(resultado.funcionario.foto).toBe("data:image/jpeg;base64,aGVsbG8=");
   });
 });

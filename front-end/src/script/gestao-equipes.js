@@ -123,10 +123,11 @@ async function inicializarGestaoEquipes() {
         localStorage.getItem("docegestao_perfil_v1") || "null",
       );
       const userId = String(usuario.id_funcionario || usuario.email || "");
+      if (typeof usuario.foto === "string" && usuario.foto) return usuario.foto;
       if (perfil?.userId === userId && typeof perfil.foto === "string") {
         return perfil.foto;
       }
-      return localStorage.getItem("docegestao_foto_perfil") || "";
+      return "";
     } catch (error) {
       console.error("Não foi possível carregar a foto do perfil:", error);
       return "";

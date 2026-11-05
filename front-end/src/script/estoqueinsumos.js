@@ -94,28 +94,20 @@ function salvarEstoqueParaNotificacoes(products) {
 }
 
 function corNivelEstoque(percentual) {
-  if (percentual <= 25) return "#ef4444";
-  if (percentual <= 50) return "#ea580c";
-  if (percentual <= 75) return "#facc15";
+  if (percentual <= 0) return "#ef4444";
+  if (percentual <= 50) return "#eab308";
+  if (percentual <= 75) return "#eab308";
   return "#10b981";
 }
 
 function criarCardProduto(product) {
   const item = normalizarProdutoEstoque(product);
-  const diasValidade = diasAteValidade(item.validade);
-  const vencido = diasValidade !== null && diasValidade < 0;
-  const proximoVencimento = diasValidade !== null && diasValidade >= 0 && diasValidade <= 7;
-  const percentualEstoque = item.maximo > 0 ? (item.quantidade / item.maximo) * 100 : 0;
-  const estoqueCritico = item.quantidade <= 0 || percentualEstoque <= 25;
-  const estoqueProximoCritico = percentualEstoque > 25 && percentualEstoque <= 50;
-  const estoqueMedio = percentualEstoque > 50 && percentualEstoque <= 75;
-  const corLateral = vencido || estoqueCritico
-    ? "#ef4444"
-    : proximoVencimento || estoqueProximoCritico
-      ? "#ea580c"
-      : estoqueMedio
-        ? "#facc15"
-        : null;
+  const classificacao = window.estoqueClassificacao.classificar(item);
+  const alertaPrincipal = window.estoqueClassificacao.obterAlerta(classificacao.status);
+  const vencido = classificacao.estados.includes("vencido");
+  const proximoVencimento = classificacao.estados.includes("prox-vencimento");
+  const diasValidade = classificacao.diasValidade;
+  const corLateral = alertaPrincipal?.cor || null;
   const card = document.createElement("article");
   card.className =
     `cartao-produto h-full ${corLateral ? "border-0" : "border border-black/10"} rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm`;
@@ -128,6 +120,7 @@ function criarCardProduto(product) {
   card.dataset.categoria = item.categoria;
   card.dataset.unidade = item.unidade;
   card.dataset.validade = item.validade;
+  card.dataset.alertStatus = classificacao.status || "";
 
   const body = document.createElement("div");
   const imageArea = document.createElement("div");
@@ -175,7 +168,9 @@ function criarCardProduto(product) {
   category.textContent = item.descricao || `Categoria: ${item.categoria}`;
   if (vencido || proximoVencimento) {
     const validade = document.createElement("p");
-    validade.className = `text-[10px] font-semibold ${vencido ? "text-red-600" : "text-orange-600"}`;
+    validade.className = "text-[10px] font-semibold";
+    validade.style.color = window.estoqueClassificacao
+      .obterAlerta(vencido ? "vencido" : "prox-vencimento").cor;
     validade.textContent = vencido
       ? `VENCIDO · validade ${dataEstoquePtBr(item.validade)}`
       : `PRÓXIMO DO VENCIMENTO · ${dataEstoquePtBr(item.validade)}${
@@ -236,7 +231,9 @@ function atualizarApresentacaoQuantidade(card, product) {
   }
   if (progress) {
     progress.style.width = `${percentage}%`;
-    progress.style.backgroundColor = corNivelEstoque(percentage);
+    const classificacao = window.estoqueClassificacao.classificar(product);
+    const alerta = window.estoqueClassificacao.obterAlerta(classificacao.status);
+    progress.style.backgroundColor = alerta?.cor || corNivelEstoque(percentage);
   }
   if (quantityValue) {
     quantityValue.firstChild.textContent = `${quantity} `;
@@ -429,6 +426,14 @@ async function inicializarEstoque() {
     sortedProducts.forEach((product) => {
       grid.insertBefore(criarCardProduto(product), cardAdicionar || null);
     });
+    const contadorAlertas = document.querySelector("#estoque-total-alertas span");
+    if (contadorAlertas) {
+      contadorAlertas.textContent = String(
+        sortedProducts.filter((product) =>
+          window.estoqueClassificacao.classificar(product).status,
+        ).length,
+      );
+    }
     atualizarContadoresCategorias();
     salvarEstoqueParaNotificacoes(products);
     applyFilters();

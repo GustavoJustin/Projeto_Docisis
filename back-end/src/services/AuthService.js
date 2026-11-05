@@ -115,6 +115,7 @@ class AuthService {
         nome: funcionario.nome,
         email: funcionario.email,
         id_cargos: funcionario.id_cargos,
+        foto: funcionario.foto || null,
       },
     };
   }

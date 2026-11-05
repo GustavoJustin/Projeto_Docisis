@@ -90,8 +90,8 @@ const HEADER_HTML = `
       role="presentation">
       <section role="dialog" aria-modal="true" aria-labelledby="header-notifications-title"
         class="absolute inset-y-0 right-0 flex w-full max-w-sm flex-col overflow-hidden border-l border-[#E7DED5] text-[#4A3F39] shadow-2xl"
-        style="background-color:#FAFAFA">
-        <div class="flex items-center justify-between border-b border-gray-100 bg-[#F8F6F2] px-5 py-4">
+        style="background-color:#F8F8F8">
+        <div class="flex items-center justify-between px-5 py-4" style="background-color:#EDEAE5">
           <div class="flex items-center gap-3">
             <div>
               <h2 id="header-notifications-title" class="text-lg font-bold text-[#3A2A1A]">Notificações</h2>
@@ -110,7 +110,7 @@ const HEADER_HTML = `
           </div>
         </div>
         <p id="header-notifications-error" class="hidden mx-5 mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800" role="alert"></p>
-        <div id="header-notifications-list" class="flex-1 space-y-3 overflow-y-auto p-5" style="background-color:#FAFAFA">
+        <div id="header-notifications-list" class="flex-1 space-y-3 overflow-y-auto p-5" style="background-color:#F8F8F8">
           <div data-notifications-empty class="flex h-full min-h-64 flex-col items-center justify-center text-center">
             <span class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F5ECE5] text-[#875C46]">
               <i data-lucide="bell-ring" class="h-7 w-7"></i>
@@ -468,6 +468,9 @@ function carregarHeader() {
   const closeSelectedNotification = container.querySelector("#header-close-selected-notification");
   const fotoPerfil = container.querySelector("[data-header-avatar]");
   const fotoMenu = container.querySelector("[data-header-menu-avatar]");
+  const avatarPadraoPerfil = fotoPerfil.getAttribute("src");
+  const avatarPadraoMenu = fotoMenu.getAttribute("src");
+  const avatarPadraoConfiguracoes = settingsProfileAvatar.getAttribute("src");
   const NOTIFICATIONS_KEY = "docegestao_notificacoes_v1";
   const PREFERENCES_KEY = "docegestao_preferencias_v1";
   const PROFILE_KEY = "docegestao_perfil_v1";
@@ -475,7 +478,6 @@ function carregarHeader() {
   const MIGRATED_CALLS_KEY = "docegestao_chamados_migrados_v1";
   let activeDialogTrigger = null;
   let usuarioAtual = null;
-  let selectedProfilePhoto = null;
   let sincronizacaoChamadosAtual = null;
 
   function lerJsonLocalStorage(key, fallback) {
@@ -604,8 +606,8 @@ function carregarHeader() {
     settingsProfileForm.elements.namedItem("nome").value = profile.nome || user.nome || "";
     settingsProfileForm.elements.namedItem("idade").value = profile.idade || "";
     settingsProfileForm.elements.namedItem("email").value = profile.email || user.email || "";
-    const avatar = profile.foto || localStorage.getItem("docegestao_foto_perfil");
-    if (avatar) settingsProfileAvatar.src = avatar;
+    const avatar = user.foto || profile.foto;
+    settingsProfileAvatar.src = avatar || avatarPadraoConfiguracoes;
   }
 
   function abrirAbaConfiguracao(tabName) {
@@ -710,7 +712,7 @@ function carregarHeader() {
     const visibleItems = state.items.filter((item) => {
       if (preferences.all) return false;
       if (item.tipo === "chamado" && preferences.calls) return false;
-      if (["esgotado", "critico", "vencido", "prox-vencimento", "medio"].includes(item.tipo) && preferences.products) return false;
+      if (["esgotado", "critico", "prox-estoque", "vencido", "prox-vencimento", "medio"].includes(item.tipo) && preferences.products) return false;
       return true;
     });
     notificationCount.textContent = String(visibleItems.length);
@@ -727,9 +729,19 @@ function carregarHeader() {
     closeSelectedNotification.classList.toggle("brightness-110", Boolean(selectedItem));
     notificationsList.replaceChildren();
 
+    const stockNotificationCount = state.items.filter((item) =>
+      item.tipo !== "chamado",
+    ).length;
+    const stockNotificationSummary = document.createElement("p");
+    stockNotificationSummary.className = "text-xs font-semibold text-gray-600";
+    stockNotificationSummary.setAttribute("role", "status");
+    stockNotificationSummary.textContent =
+      `Alertas de estoque ativos: ${stockNotificationCount}`;
+    notificationsList.appendChild(stockNotificationSummary);
+
     if (visibleItems.length === 0) {
       const emptyState = document.createElement("div");
-      emptyState.className = "flex h-full min-h-64 flex-col items-center justify-center text-center";
+      emptyState.className = "flex min-h-64 flex-col items-center justify-center text-center";
       emptyState.innerHTML = `
         <span class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F5ECE5] text-[#875C46]">
           <i data-lucide="bell-ring" class="h-7 w-7"></i>
@@ -745,8 +757,9 @@ function carregarHeader() {
     [...visibleItems].sort((first, second) => {
       if (first.tipo === "chamado" && second.tipo !== "chamado") return -1;
       if (first.tipo !== "chamado" && second.tipo === "chamado") return 1;
-      const urgencia = { esgotado: 5, critico: 5, vencido: 4, "prox-vencimento": 3, medio: 2 };
-      const diferencaUrgencia = (urgencia[second.tipo] || 0) - (urgencia[first.tipo] || 0);
+      const urgencia = (item) =>
+        window.estoqueClassificacao.obterAlerta(item.tipo)?.prioridade || 0;
+      const diferencaUrgencia = urgencia(second) - urgencia(first);
       if (diferencaUrgencia !== 0) return diferencaUrgencia;
       return new Date(second.criadaEm) - new Date(first.criadaEm);
     }).forEach((item) => {
@@ -760,34 +773,18 @@ function carregarHeader() {
         `${selectable ? (selected ? "Recolher chamado" : "Expandir chamado") : "Localizar alerta"}: ${item.titulo}`,
       );
       if (selectable) card.setAttribute("aria-pressed", String(selected));
-      const severityClass = item.tipo === "vencido"
-        ? "border-red-300 bg-red-50"
-        : item.tipo === "prox-vencimento"
-          ? "border-orange-300 bg-orange-50"
-        : item.tipo === "medio"
-          ? "border-yellow-300 bg-yellow-50"
-        : item.tipo === "critico" || item.tipo === "esgotado"
-          ? "border-amber-300 bg-amber-50"
-          : item.tipo === "chamado"
-            ? "border-sky-200 bg-sky-50"
-            : "border-[#E9D9CC] bg-[#F8F6F2]";
-      const accentColor = item.tipo === "vencido"
-        ? "#ef4444"
-        : item.tipo === "prox-vencimento"
-          ? "#ea580c"
-          : item.tipo === "medio"
-            ? "#facc15"
-          : item.tipo === "critico" || item.tipo === "esgotado"
-            ? "#f59e0b"
-            : item.tipo === "chamado"
-              ? "#0ea5e9"
-              : "";
-      card.className = `cursor-pointer rounded-xl border-0 p-4 transition-all duration-200 ease-out hover:shadow-md focus:outline-none ${selected ? "shadow-md" : ""} ${severityClass} ${item.lida ? "opacity-80" : ""}`;
+      const alertaEstoque = window.estoqueClassificacao.obterAlerta(item.tipo);
+      card.className = `cursor-pointer rounded-xl border-0 bg-white p-4 transition-all duration-200 ease-out hover:shadow-md focus:outline-none ${selected ? "shadow-md" : ""} ${item.lida ? "opacity-80" : ""}`;
+      card.style.backgroundColor = "#ffffff";
+      if (alertaEstoque) {
+        card.style.borderLeft = `4px solid ${alertaEstoque.cor}`;
+      } else if (item.tipo === "chamado") {
+        card.style.borderLeft = "4px solid #0ea5e9";
+      }
       if (selected) {
         card.style.transform = "translateY(-5px)";
         card.style.boxShadow = "0 8px 18px rgba(58, 42, 26, 0.22)";
       }
-      if (accentColor) card.style.borderLeft = `4px solid ${accentColor}`;
       const ativarNotificacao = () => {
         if (selectable) {
           const currentState = carregarNotificacoes();
@@ -806,6 +803,7 @@ function carregarHeader() {
         if (separatorIndex < 1) return;
         const produtoId = productStateId.slice(0, separatorIndex);
         const status = productStateId.slice(separatorIndex + 1);
+        fecharDialogo(notificationsDialog, notificationsTrigger);
         if (typeof window.navegarDemo === "function") {
           window.navegarDemo("alertas", { localizar: produtoId, status });
         } else {
@@ -855,94 +853,68 @@ function carregarHeader() {
     const state = carregarNotificacoes();
     let inventory = lerJsonLocalStorage("docegestao_estoque_v1", {});
     const activeProducts = {};
-    const today = new Date();
-    const todayString = [
-      today.getFullYear(),
-      String(today.getMonth() + 1).padStart(2, "0"),
-      String(today.getDate()).padStart(2, "0"),
-    ].join("-");
+    const chamadas = state.items.filter((item) => item.tipo === "chamado");
+    const notificacoesExistentes = new Map();
+    state.items
+      .filter((item) => item.tipo !== "chamado")
+      .forEach((item) => {
+        const estadoAnterior = String(item.produtoStateId || "");
+        const separador = estadoAnterior.lastIndexOf(":");
+        const id = String(
+          item.produtoId ||
+            (separador > 0
+              ? estadoAnterior.slice(0, separador)
+              : String(item.id || "").replace(/^produto:/, "").split(":")[0]),
+        );
+        if (id && !notificacoesExistentes.has(id)) {
+          notificacoesExistentes.set(id, item);
+        }
+      });
 
+    const notificacoesProdutos = [];
     Object.entries(inventory).forEach(([key, product]) => {
       if (!product || typeof product !== "object") return;
       const id = String(product.id || key);
-      const name = String(product.nome || "Produto");
-      const quantity = Number(product.quantidade);
-      const maximo = Number(product.maximo);
-      const validExpiry = /^\d{4}-\d{2}-\d{2}$/.test(product.validade || "");
-      const daysUntilExpiry = validExpiry
-        ? Math.floor(
-          (new Date(`${product.validade}T00:00:00`) - new Date(`${todayString}T00:00:00`)) / 86400000,
-        )
-        : null;
-      const statuses = [];
-      if (
-        product.quantidade !== "" &&
-        product.quantidade !== null &&
-        product.quantidade !== undefined &&
-        Number.isFinite(quantity) &&
-        quantity <= 0
-      ) {
-        statuses.push("esgotado");
-      } else if (
-        Number.isFinite(quantity) &&
-        Number.isFinite(maximo) &&
-        maximo > 0 &&
-        quantity / maximo <= 0.25
-      ) {
-        statuses.push("critico");
-      } else if (
-        Number.isFinite(quantity) &&
-        Number.isFinite(maximo) &&
-        maximo > 0 &&
-        quantity / maximo > 0.5 &&
-        quantity / maximo <= 0.75
-      ) {
-        statuses.push("medio");
-      }
-      if (validExpiry && daysUntilExpiry < 0) {
-        statuses.push("vencido");
-      } else if (validExpiry) {
-        if (daysUntilExpiry <= 7) statuses.push("prox-vencimento");
-      }
+      const classificacao = window.estoqueClassificacao.classificar(product);
+      const status = classificacao.status;
+      if (!status) return;
 
-      statuses.forEach((status) => {
-        const stateId = `${id}:${status}`;
-        activeProducts[stateId] = true;
-        const notificationId = `produto:${stateId}`;
-        if (state.items.some((item) => item.id === notificationId)) return;
-        criarNotificacao(
-          state,
-          notificationId,
-          status,
-          status === "vencido"
-            ? "Produto vencido"
-            : status === "prox-vencimento"
-              ? "Produto próximo ao vencimento"
-            : status === "critico"
-              ? "Estoque crítico"
-              : status === "medio"
-                ? "Estoque em nível médio"
-              : "Produto esgotado",
-          status === "esgotado"
-            ? `${name} está sem estoque.`
-            : status === "critico"
-              ? `${name} está com ${quantity} de ${maximo} ${product.unidade || "un"} em estoque.`
-              : status === "medio"
-                ? `${name} está com ${quantity} de ${maximo} ${product.unidade || "un"} em estoque.`
-              : status === "prox-vencimento"
-                  ? `${name} vence em ${product.validade.split("-").reverse().join("/")} (${daysUntilExpiry === 0 ? "hoje" : `em ${daysUntilExpiry} ${daysUntilExpiry === 1 ? "dia" : "dias"}`}).`
-                : `${name} venceu em ${product.validade.split("-").reverse().join("/")}.`,
-          "alertas",
-        );
-        const created = state.items[state.items.length - 1];
-        created.produtoStateId = stateId;
+      const estadoId = `${id}:${status}`;
+      const estadosAtivos = classificacao.estados;
+      const alerta = window.estoqueClassificacao.obterAlerta(status);
+      const mensagem = estadosAtivos
+        .map((estado) =>
+          window.estoqueClassificacao.obterMensagem(
+            product,
+            estado,
+            classificacao.diasValidade,
+          ),
+        )
+        .filter(Boolean)
+        .join(" ");
+      activeProducts[estadoId] = true;
+
+      const anterior = notificacoesExistentes.get(id);
+      const notification = anterior || {
+        id: `produto:${id}`,
+        criadaEm: new Date().toISOString(),
+        lida: false,
+      };
+      if (anterior && anterior.tipo !== status) notification.lida = false;
+      Object.assign(notification, {
+        id: `produto:${id}`,
+        tipo: status,
+        titulo: alerta.titulo,
+        mensagem,
+        pagina: "alertas",
+        produtoId: id,
+        produtoStateId: estadoId,
       });
+      notificacoesProdutos.push(notification);
     });
+
     state.activeProducts = activeProducts;
-    state.items = state.items.filter((item) =>
-      item.tipo === "chamado" || activeProducts[item.produtoStateId],
-    );
-    if (!state.items.some((item) => item.id === state.selectedId)) state.selectedId = null;
+    state.items = [...notificacoesProdutos, ...chamadas];
     try {
       localStorage.setItem("docegestao_estoque_v1", JSON.stringify(inventory));
     } catch (error) {
@@ -984,7 +956,6 @@ function carregarHeader() {
       notification.criadaEm = call.criadoEm || notification.criadaEm;
     });
 
-    state.items = state.items.slice(-100);
     salvarNotificacoes(state);
     renderizarNotificacoes(state);
   }
@@ -1109,7 +1080,7 @@ function carregarHeader() {
       const userName = profile.nome || user?.nome || "Nenhuma conta conectada";
       const userEmail = profile.email || user?.email || "Entre para acessar sua conta";
       const userRole = user?.nome_cargo || (user ? "Conta conectada" : "");
-      const avatar = profile.foto || localStorage.getItem("docegestao_foto_perfil");
+      const avatar = user?.foto || profile.foto;
 
       container.querySelectorAll("[data-header-user-name], [data-header-menu-name]")
         .forEach((element) => {
@@ -1126,14 +1097,24 @@ function carregarHeader() {
       if (accountActionLabel) {
         accountActionLabel.textContent = "Sair";
       }
-      if (avatar) {
-        fotoPerfil.src = avatar;
-        fotoMenu.src = avatar;
-        settingsProfileAvatar.src = avatar;
-      }
+      fotoPerfil.src = avatar || avatarPadraoPerfil;
+      fotoMenu.src = avatar || avatarPadraoMenu;
+      settingsProfileAvatar.src = avatar || avatarPadraoConfiguracoes;
     } catch (error) {
       console.error("Não foi possível carregar os dados da conta:", error);
     }
+  }
+
+  async function sincronizarContaDaSessao() {
+    const token = localStorage.getItem("docegestao_token");
+    if (!token || typeof window.obterFuncionarioAutenticado !== "function") return;
+
+    const user = await window.obterFuncionarioAutenticado();
+    if (token !== localStorage.getItem("docegestao_token") || !user) return;
+
+    usuarioAtual = user;
+    atualizarConta();
+    preencherPerfil();
   }
 
   async function atualizarVisibilidadePreferenciaChamados() {
@@ -1246,33 +1227,36 @@ function carregarHeader() {
     settingsProfileFeedback.textContent = "Atualizando foto...";
     settingsProfileFeedback.className = "min-h-5 text-xs text-gray-500";
     try {
-      selectedProfilePhoto = await prepararFotoPerfil(file);
-      const profile = { ...obterPerfilSalvo(), foto: selectedProfilePhoto };
-      if (salvarPerfilSalvo(profile)) {
-        settingsProfileAvatar.src = selectedProfilePhoto;
-        fotoPerfil.src = selectedProfilePhoto;
-        fotoMenu.src = selectedProfilePhoto;
-        const token = localStorage.getItem("docegestao_token");
-        if (token && usuarioAtual?.id_funcionario) {
-          const response = await fetch("/api/funcionarios/perfil/foto", {
-            method: "PUT",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ foto: selectedProfilePhoto }),
-          });
-          const result = await response.json();
-          if (!response.ok) {
-            throw new Error(result.mensagem || "Não foi possível salvar a foto no sistema.");
-          }
-          settingsProfileFeedback.textContent = "Foto atualizada para sua conta.";
-        } else {
-          settingsProfileFeedback.textContent =
-            "Foto salva neste navegador. Entre na conta para sincronizá-la.";
-        }
-        settingsProfileFeedback.className = "min-h-5 text-xs text-emerald-700";
+      const foto = await prepararFotoPerfil(file);
+      const token = localStorage.getItem("docegestao_token");
+      if (!token || !usuarioAtual?.id_funcionario) {
+        throw new Error("Entre na sua conta para salvar a foto do perfil.");
       }
+
+      const response = await fetch("/api/funcionarios/perfil/foto", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ foto }),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.mensagem || "Não foi possível salvar a foto no sistema.");
+      }
+
+      usuarioAtual = { ...usuarioAtual, foto };
+      try {
+        localStorage.setItem("docegestao_funcionario", JSON.stringify(usuarioAtual));
+      } catch (error) {
+        console.error("Não foi possível atualizar a conta local:", error);
+      }
+      fotoPerfil.src = foto;
+      fotoMenu.src = foto;
+      settingsProfileAvatar.src = foto;
+      settingsProfileFeedback.textContent = "Foto atualizada para sua conta.";
+      settingsProfileFeedback.className = "min-h-5 text-xs text-emerald-700";
     } catch (error) {
       console.error("Não foi possível atualizar a foto do perfil:", error);
       settingsProfileFeedback.textContent = error.message || "Não foi possível carregar essa imagem.";
@@ -1415,15 +1399,15 @@ function carregarHeader() {
   });
 
   function atualizarFoto() {
-    const foto = obterPerfilSalvo().foto || localStorage.getItem("docegestao_foto_perfil");
-    if (!foto) return;
-    fotoPerfil.src = foto;
-    fotoMenu.src = foto;
-    settingsProfileAvatar.src = foto;
+    const foto = usuarioAtual?.foto || obterPerfilSalvo().foto;
+    fotoPerfil.src = foto || avatarPadraoPerfil;
+    fotoMenu.src = foto || avatarPadraoMenu;
+    settingsProfileAvatar.src = foto || avatarPadraoConfiguracoes;
   }
 
   aplicarTema(localStorage.getItem(THEME_KEY) === "dark");
   atualizarConta();
+  void sincronizarContaDaSessao();
   void atualizarVisibilidadePreferenciaChamados();
   atualizarFoto();
   preencherPerfil();
@@ -1437,6 +1421,7 @@ function carregarHeader() {
       });
     }
     atualizarConta();
+    void sincronizarContaDaSessao();
     void atualizarVisibilidadePreferenciaChamados();
     atualizarNotificacoes();
     void sincronizarChamadosNotificacoes();
@@ -1444,6 +1429,7 @@ function carregarHeader() {
   });
   window.addEventListener("storage", () => {
     atualizarConta();
+    void sincronizarContaDaSessao();
     atualizarFoto();
     atualizarNotificacoes();
   });

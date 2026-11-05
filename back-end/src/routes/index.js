@@ -2,19 +2,25 @@ const express = require("express");
 const router = express.Router();
 const autenticar = require("../middleware/authMiddleware"); // JWT: importa o middleware
 const exigirAdministrador = require("../middleware/roleMiddleware");
-const CargosRepository = require("../repositories/CargosRepository");
+const FuncionariosRepository = require("../repositories/FuncionariosRepository");
 
 // JWT: rota de login fica de fora do "autenticar" — senão ninguém consegue nem logar
 const AuthRoutes = require("./AuthRoutes");
 router.use("/login", AuthRoutes);
 router.get("/sessao", autenticar, async (req, res) => {
   try {
-    const cargo = await CargosRepository.buscarCargoId(
-      req.funcionario.id_cargos,
+    const funcionario = await FuncionariosRepository.buscarFuncionarioId(
+      req.funcionario.id_funcionario,
     );
+    if (!funcionario) {
+      return res.status(404).json({
+        sucesso: false,
+        mensagem: "A conta autenticada não foi encontrada.",
+      });
+    }
     res.json({
       sucesso: true,
-      funcionario: { ...req.funcionario, nome_cargo: cargo?.nome_cargo || "" },
+      funcionario,
     });
   } catch (erro) {
     res

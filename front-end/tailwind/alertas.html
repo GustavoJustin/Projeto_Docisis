@@ -90,6 +90,9 @@
             <button data-filter="critico" class="tab-btn px-4 py-2 hover:text-gray-800 transition-all">
               ESTOQUE CRÍTICO
             </button>
+            <button data-filter="prox-estoque" class="tab-btn px-4 py-2 hover:text-gray-800 transition-all">
+              ESTOQUE BAIXO
+            </button>
             <button data-filter="esgotado" class="tab-btn px-4 py-2 hover:text-gray-800 transition-all">
               FORA DE ESTOQUE
             </button>
@@ -388,6 +391,7 @@
   <script> lucide.createIcons(); </script>
   <script src="../src/componentes/footer.js" defer></script>
   <script src="../src/componentes/sidebar.js" defer></script>
+  <script src="../src/script/estoque-classificacao.js" defer></script>
   <script src="../src/componentes/header.js" defer></script>
   <script src="../src/script/estoque-alertas.js" defer></script>
   <script src="../src/script/alertas.js" defer></script>
@@ -587,7 +591,13 @@
   window.closeModal = id => document.getElementById(id)?.classList.add('hidden');
 
   let initialized = false;
-  function initialize() { if (initialized) return; initialized = true; initInventory(); renderAlerts(); }
+  function initialize() {
+    if (initialized) return;
+    initialized = true;
+    if ($('#alertCardsContainer')?.dataset.alertasOrigem === 'api') return;
+    initInventory();
+    renderAlerts();
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize, { once: true });
   else initialize();
 })();
