@@ -44,14 +44,16 @@ function inicializarCadastroFuncionario(root = document, options = {}) {
 
   function updateRoleSelection(selected) {
     const selectedClass =
-      "relative flex items-start p-4 rounded-xl border-2 border-[#875C46] bg-[#FDFBF7] cursor-pointer transition-all";
+      "relative rounded-xl border-2 border-[#875C46] bg-[#FDFBF7] p-4 text-sm font-semibold cursor-pointer transition-all";
     const idleClass =
-      "relative flex items-start p-4 rounded-xl border border-gray-200 bg-white hover:border-[#875C46]/50 cursor-pointer transition-all";
+      "relative rounded-xl border-2 border-gray-200 bg-white p-4 text-sm font-semibold hover:border-[#875C46]/50 cursor-pointer transition-all";
     if (adminCard) {
       adminCard.className = selected === "administrador" ? selectedClass : idleClass;
+      adminCard.style.cssText = "display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.75rem";
     }
     if (employeeCard) {
       employeeCard.className = selected === "funcionario" ? selectedClass : idleClass;
+      employeeCard.style.cssText = "display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.75rem";
     }
     if (adminPermissionContainer) {
       adminPermissionContainer.classList.toggle(
@@ -120,7 +122,7 @@ function inicializarCadastroFuncionario(root = document, options = {}) {
       canCreate = role.includes("admin") &&
         Boolean(Number(result.funcionario?.pode_cadastrar_funcionarios));
       if (!canCreate) {
-        showNotice("Sua conta de administrador não tem permissão para criar funcionários.");
+        showNotice("Sem permissão para cadastrar. Em Editar, habilite “Pode criar funcionários” para sua conta.");
         return;
       }
       clearNotice();
@@ -131,7 +133,7 @@ function inicializarCadastroFuncionario(root = document, options = {}) {
       }
       showNotice(error.message || "Não foi possível validar sua sessão.");
     } finally {
-      submitButton.disabled = !canCreate;
+      submitButton.disabled = false;
       submitButton.textContent = "Criar Conta";
     }
   }
@@ -164,7 +166,9 @@ function inicializarCadastroFuncionario(root = document, options = {}) {
     reader.readAsDataURL(file);
   });
 
-  form.addEventListener("input", clearNotice);
+  form.addEventListener("input", () => {
+    if (canCreate) clearNotice();
+  });
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     clearNotice();
@@ -174,7 +178,7 @@ function inicializarCadastroFuncionario(root = document, options = {}) {
       return;
     }
     if (!canCreate) {
-      showNotice("Sua conta não está autorizada a criar funcionários.");
+      showNotice("Sem permissão para cadastrar. Em Editar, habilite “Pode criar funcionários” para sua conta.");
       return;
     }
 
@@ -212,7 +216,7 @@ function inicializarCadastroFuncionario(root = document, options = {}) {
         method: "POST",
         headers: { ...headers, "Content-Type": "application/json" },
         body: JSON.stringify({
-          nome,
+          nome: name,
           cpf: cpfInput.value.replace(/\D/g, ""),
           email: get("input-email").value.trim(),
           senha: password,

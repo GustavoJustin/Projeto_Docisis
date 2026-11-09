@@ -391,11 +391,6 @@ async function inicializarGestaoEquipes(event = {}) {
   }
 
   async function abrirCriacaoFuncionario() {
-    if (!canCreateEmployees) {
-      showNotice("Sua conta de administrador não tem permissão para criar funcionários.", "error");
-      return;
-    }
-
     createButton.disabled = true;
     try {
       createContent.innerHTML = `
@@ -440,13 +435,13 @@ async function inicializarGestaoEquipes(event = {}) {
           <fieldset class="rounded-xl border border-gray-200 p-5">
             <legend class="px-1 text-sm font-bold text-[#6D4936]">Cargo e permissões</legend>
             <div class="grid gap-3 sm:grid-cols-2">
-              <label id="card-admin" class="flex cursor-pointer items-center justify-between rounded-lg border border-gray-200 p-3 text-sm font-semibold">
-                Administrador
-                <input type="radio" name="nivel_acesso" value="administrador" required class="accent-[#875C46]">
+              <label id="card-admin" class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border-2 border-gray-200 bg-white p-4 text-sm font-semibold transition-all">
+                <span>Administrador</span>
+                <input type="radio" name="nivel_acesso" value="administrador" required class="accent-[#875C46]" style="margin:0;width:1rem;height:1rem;flex:none">
               </label>
-              <label id="card-func" class="flex cursor-pointer items-center justify-between rounded-lg border border-gray-200 p-3 text-sm font-semibold">
-                Funcionário
-                <input type="radio" name="nivel_acesso" value="funcionario" checked class="accent-[#875C46]">
+              <label id="card-func" class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border-2 border-gray-200 bg-white p-4 text-sm font-semibold transition-all">
+                <span>Funcionário</span>
+                <input type="radio" name="nivel_acesso" value="funcionario" checked class="accent-[#875C46]" style="margin:0;width:1rem;height:1rem;flex:none">
               </label>
             </div>
             <div id="admin-permissions-container" class="mt-4 hidden grid gap-3 sm:grid-cols-2">
@@ -656,13 +651,10 @@ async function inicializarGestaoEquipes(event = {}) {
             canCreateEmployees = Boolean(member.pode_cadastrar_funcionarios);
             canDeleteEmployees = Boolean(member.pode_excluir_funcionarios);
             if (createButton) {
-              createButton.disabled = !canCreateEmployees;
-              createButton.classList.toggle("opacity-50", !canCreateEmployees);
-              createButton.classList.toggle("cursor-default", !canCreateEmployees);
-              createButton.classList.toggle("hover:bg-[#6D4936]", canCreateEmployees);
-              createButton.title = canCreateEmployees
-                ? "Criar funcionário"
-                : "Sua conta de administrador não pode criar funcionários";
+              createButton.disabled = false;
+              createButton.classList.remove("opacity-50", "cursor-default");
+              createButton.classList.add("hover:bg-[#6D4936]");
+              createButton.title = "Criar funcionário";
             }
           }
           roleSummary.textContent = selectedCargo.nome_cargo;
@@ -773,13 +765,10 @@ async function inicializarGestaoEquipes(event = {}) {
     void loadMembers();
   });
   if (createButton) {
-    createButton.disabled = !canCreateEmployees;
-    createButton.classList.toggle("opacity-50", !canCreateEmployees);
-    createButton.classList.toggle("cursor-default", !canCreateEmployees);
-    createButton.classList.toggle("hover:bg-[#6D4936]", canCreateEmployees);
-    createButton.title = canCreateEmployees
-      ? "Criar funcionário"
-      : "Sua conta de administrador não pode criar funcionários";
+    createButton.disabled = false;
+    createButton.classList.remove("opacity-50", "cursor-default");
+    createButton.classList.add("hover:bg-[#6D4936]");
+    createButton.title = "Criar funcionário";
   }
   if (tableBody.dataset.polling !== "true") {
     tableBody.dataset.polling = "true";

@@ -20,13 +20,13 @@ const paginasDemo = {
   },
   historico: {
     arquivo: "historicoCompleto.html",
-    titulo: "Histórico Completo",
+    titulo: "Histórico de Movimentações",
     ativo: "historico",
     modais: ["modal-filtros-historico", "modal-exportar-pdf"],
   },
   funcionarios: {
     arquivo: "gestao-equipes.html",
-    titulo: "Gestão de Equipes",
+    titulo: "Gestão de Funcionários",
     ativo: "funcionarios",
     modais: ["confirm-removal-modal", "create-employee-modal", "edit-employee-modal"],
   },

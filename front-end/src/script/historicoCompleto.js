@@ -99,10 +99,7 @@
         const date = rowDate(row);
         const type = normalized(row.dataset.tipo || row.cells[2]?.textContent);
         const textMatches = normalized(row.textContent).includes(query);
-        const isAjuste = selectedType === "ajuste" &&
-          (type === "ajuste" ||
-            normalized(row.cells[5]?.textContent).includes("dados do produto atualizados"));
-        const typeMatches = selectedType === "todos" || type === selectedType || isAjuste;
+        const typeMatches = selectedType === "todos" || type === selectedType;
         const dateMatches = !selectedDate || date === selectedDate;
         return textMatches && typeMatches && dateMatches;
       });
@@ -126,9 +123,14 @@
 
     function criarLinhaMovimentacao(movimentacao) {
       const linha = document.createElement("tr");
-      const tipo = String(movimentacao.tipo || "").toUpperCase();
+      const tipoOriginal = String(movimentacao.tipo || "").toUpperCase();
       const descricao = String(movimentacao.descricao || "Ajuste de estoque");
       const descricaoNormalizada = normalized(descricao);
+      const tipo = descricaoNormalizada.includes("dados do produto atualizados")
+        ? "AJUSTE"
+        : tipoOriginal === "SAIDA"
+          ? "SAÍDA"
+          : tipoOriginal;
       const entrada = tipo === "ENTRADA";
       const saida = tipo === "SAIDA" || tipo === "SAÍDA";
       const eventoProduto = descricaoNormalizada.includes("removido do estoque")

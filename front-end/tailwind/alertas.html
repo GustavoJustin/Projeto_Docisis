@@ -75,12 +75,12 @@
 
       <div class="space-y-6">
         <section class="rounded-2xl border border-pink-100 bg-[#FCE8EE]/70 p-5 text-[#882E40]" aria-labelledby="weekly-summary-title">
-          <div class="flex flex-col items-center gap-2 text-center">
-            <div>
+          <div class="flex items-center justify-between gap-4">
+            <div class="min-w-0">
               <h2 id="weekly-summary-title" class="text-xs font-bold uppercase tracking-widest">Resumo da semana</h2>
               <p class="mt-1 text-xs text-rose-800/70">Acompanhe os itens que precisam de atenção.</p>
             </div>
-            <div class="flex items-baseline gap-2">
+            <div class="flex shrink-0 items-baseline gap-2">
               <span id="totalAlertsCount" class="text-3xl font-extrabold text-[#7A2838]">0</span>
               <span class="text-sm font-bold text-[#7A2838]">alertas ativos</span>
             </div>
@@ -100,22 +100,22 @@
             id="filterTabs">
             <button data-filter="all"
               aria-pressed="true" class="tab-btn shrink-0 rounded-lg bg-white px-4 py-2 text-gray-800 shadow-sm transition-all">
-              TODOS ALERTAS
+              Todos alertas
             </button>
             <button data-filter="vencido" aria-pressed="false" class="tab-btn shrink-0 rounded-lg px-4 py-2 text-gray-500 transition-all hover:text-gray-800">
-              VENCIDOS
+              Vencidos
             </button>
             <button data-filter="prox-vencimento" aria-pressed="false" class="tab-btn shrink-0 rounded-lg px-4 py-2 text-gray-500 transition-all hover:text-gray-800">
-              PRÓX. VENCIMENTO
+              Próx. vencimento
             </button>
             <button data-filter="critico" aria-pressed="false" class="tab-btn shrink-0 rounded-lg px-4 py-2 text-gray-500 transition-all hover:text-gray-800">
-              ESTOQUE CRÍTICO
+              Estoque crítico
             </button>
             <button data-filter="prox-estoque" aria-pressed="false" class="tab-btn shrink-0 rounded-lg px-4 py-2 text-gray-500 transition-all hover:text-gray-800">
-              ESTOQUE BAIXO
+              Estoque baixo
             </button>
             <button data-filter="esgotado" aria-pressed="false" class="tab-btn shrink-0 rounded-lg px-4 py-2 text-gray-500 transition-all hover:text-gray-800">
-              FORA DE ESTOQUE
+              Fora de estoque
             </button>
           </div>
 

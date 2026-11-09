@@ -275,7 +275,9 @@ const HEADER_HTML = `
                   <input type="email" name="email" required maxlength="254"
                     class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-[#875C46]">
                 </label>
-                <p id="settings-profile-feedback" class="min-h-5 text-xs text-gray-500" role="status"></p>
+                <div class="flex h-12 items-center overflow-hidden">
+                  <p id="settings-profile-feedback" class="w-full truncate text-xs text-gray-500" role="status"></p>
+                </div>
                 <button type="submit"
                   class="rounded-lg bg-[#784E38] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#633e2c]">
                   Salvar alterações
@@ -525,6 +527,8 @@ function carregarHeader() {
   let sincronizacaoChamadosAtual = null;
   let chamadoEmDetalhe = null;
   let profileFeedbackTimeout = null;
+  let settingsProfilePhotoFile = null;
+  let settingsProfilePhotoPreviewUrl = null;
 
   function lerJsonLocalStorage(key, fallback) {
     try {
@@ -740,8 +744,7 @@ function carregarHeader() {
       return true;
     } catch (error) {
       console.error("Não foi possível salvar as informações do perfil:", error);
-      settingsProfileFeedback.textContent = "Não foi possível salvar. A foto pode ser muito grande.";
-      settingsProfileFeedback.className = "min-h-5 text-xs text-red-600";
+      exibirFeedbackPerfil("Não foi possível salvar. A foto pode ser muito grande.", "error");
       return false;
     }
   }
@@ -750,14 +753,14 @@ function carregarHeader() {
     window.clearTimeout(profileFeedbackTimeout);
     settingsProfileFeedback.textContent = mensagem;
     settingsProfileFeedback.className = tipo === "error"
-      ? "inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800"
+      ? "w-full truncate rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800"
       : tipo === "success"
-        ? "inline-flex rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800"
-        : "inline-flex rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-600";
+        ? "w-full truncate rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-800"
+        : "w-full truncate rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-600";
     if (temporario && mensagem) {
       profileFeedbackTimeout = window.setTimeout(() => {
         settingsProfileFeedback.textContent = "";
-        settingsProfileFeedback.className = "min-h-5 text-xs text-gray-500";
+        settingsProfileFeedback.className = "w-full truncate text-xs text-gray-500";
       }, 4500);
     }
   }
@@ -805,7 +808,8 @@ function carregarHeader() {
     settingsProfileForm.elements.namedItem("idade").value = profile.idade || "";
     settingsProfileForm.elements.namedItem("email").value = user.email || profile.email || "";
     const avatar = user.foto || profile.foto;
-    settingsProfileAvatar.src = avatar || avatarPadraoConfiguracoes;
+    settingsProfileAvatar.src =
+      settingsProfilePhotoPreviewUrl || avatar || avatarPadraoConfiguracoes;
   }
 
   function abrirAbaConfiguracao(tabName) {
@@ -1435,51 +1439,13 @@ function carregarHeader() {
     aplicarTema(document.documentElement.dataset.theme !== "dark");
   });
 
-  settingsProfilePhoto.addEventListener("change", async () => {
+  settingsProfilePhoto.addEventListener("change", () => {
     const file = settingsProfilePhoto.files?.[0];
     if (!file) return;
-    exibirFeedbackPerfil("Atualizando foto...", "info", false);
-    try {
-      const foto = await prepararFotoPerfil(file);
-      const token = localStorage.getItem("docegestao_token");
-      if (!token || !usuarioAtual?.id_funcionario) {
-        throw new Error("Entre na sua conta para salvar a foto do perfil.");
-      }
-      if (foto === usuarioAtual.foto) {
-        exibirFeedbackPerfil("Esta foto já está salva na sua conta.");
-        return;
-      }
-
-      const response = await fetch("/api/funcionarios/perfil/foto", {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ foto }),
-      });
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.mensagem || "Não foi possível salvar a foto no sistema.");
-      }
-
-      usuarioAtual = { ...usuarioAtual, foto };
-      try {
-        localStorage.setItem("docegestao_funcionario", JSON.stringify(usuarioAtual));
-      } catch (error) {
-        console.error("Não foi possível atualizar a conta local:", error);
-      }
-      fotoPerfil.src = foto;
-      fotoMenu.src = foto;
-      settingsProfileAvatar.src = foto;
-      notificarPerfilAtualizado();
-      exibirFeedbackPerfil("Foto de perfil atualizada e salva na sua conta.", "success");
-    } catch (error) {
-      console.error("Não foi possível atualizar a foto do perfil:", error);
-      exibirFeedbackPerfil(error.message || "Não foi possível carregar essa imagem.", "error");
-    } finally {
-      settingsProfilePhoto.value = "";
-    }
+    if (settingsProfilePhotoPreviewUrl) URL.revokeObjectURL(settingsProfilePhotoPreviewUrl);
+    settingsProfilePhotoFile = file;
+    settingsProfilePhotoPreviewUrl = URL.createObjectURL(file);
+    settingsProfileAvatar.src = settingsProfilePhotoPreviewUrl;
   });
 
   settingsProfileForm.addEventListener("submit", async (event) => {
@@ -1503,17 +1469,11 @@ function carregarHeader() {
     const nomeAlterado = nome !== String(usuarioAtual?.nome || "");
     const emailAlterado = email !== String(usuarioAtual?.email || "").toLowerCase();
     const idadeAlterada = age !== (savedProfile.idade ?? null);
-    if (!nomeAlterado && !emailAlterado && !idadeAlterada) {
+    if (!nomeAlterado && !emailAlterado && !idadeAlterada && !settingsProfilePhotoFile) {
       exibirFeedbackPerfil("Nenhuma alteração foi feita.");
       return;
     }
 
-    const profile = {
-      ...obterPerfilSalvo(),
-      nome,
-      idade: age,
-      email,
-    };
     const token = localStorage.getItem("docegestao_token");
     const submitButton = settingsProfileForm.querySelector('button[type="submit"]');
     if (!token || !usuarioAtual?.id_funcionario) {
@@ -1526,32 +1486,60 @@ function carregarHeader() {
     }
     exibirFeedbackPerfil("Salvando alterações...", "info", false);
     try {
+      const foto = settingsProfilePhotoFile
+        ? await prepararFotoPerfil(settingsProfilePhotoFile)
+        : usuarioAtual?.foto || savedProfile.foto;
       if (nomeAlterado || emailAlterado) {
         const response = await fetch("/api/funcionarios/perfil", {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ nome, email }),
-      });
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.mensagem || "Não foi possível salvar as alterações do perfil.");
-      }
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ nome, email }),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.mensagem || "Não foi possível salvar as alterações do perfil.");
+        }
 
         usuarioAtual = { ...usuarioAtual, ...result.dados };
         localStorage.setItem("docegestao_funcionario", JSON.stringify(usuarioAtual));
       }
+      const fotoAlterada = Boolean(settingsProfilePhotoFile && foto !== usuarioAtual?.foto);
+      if (fotoAlterada) {
+        const response = await fetch("/api/funcionarios/perfil/foto", {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ foto }),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.mensagem || "Não foi possível salvar a foto do perfil.");
+        }
+        usuarioAtual = { ...usuarioAtual, foto };
+        localStorage.setItem("docegestao_funcionario", JSON.stringify(usuarioAtual));
+      }
+      const profile = {
+        ...obterPerfilSalvo(),
+        nome,
+        idade: age,
+        email,
+        foto,
+      };
       if (!salvarPerfilSalvo(profile)) return;
       atualizarConta();
-      if (nomeAlterado || emailAlterado) notificarPerfilAtualizado();
-      exibirFeedbackPerfil(
-        nomeAlterado || emailAlterado
-          ? "Perfil atualizado e salvo na sua conta."
-          : "Preferências do perfil atualizadas.",
-        "success",
-      );
+      if (nomeAlterado || emailAlterado || fotoAlterada) notificarPerfilAtualizado();
+      settingsProfilePhotoFile = null;
+      settingsProfilePhoto.value = "";
+      if (settingsProfilePhotoPreviewUrl) {
+        URL.revokeObjectURL(settingsProfilePhotoPreviewUrl);
+        settingsProfilePhotoPreviewUrl = null;
+      }
+      exibirFeedbackPerfil("Alterações salvas.", "success");
     } catch (error) {
       console.error("Não foi possível atualizar o perfil:", error);
       exibirFeedbackPerfil(error.message || "Não foi possível salvar as alterações.", "error");

@@ -27,7 +27,7 @@ const SIDEBAR_HTML = `
           </a>
 
           <!-- Alertas -->
-          <a href="./alerta.html" data-page="alertas"
+          <a href="./alertas.html" data-page="alertas"
             class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
             <i data-lucide="bell" class="w-5 h-5"></i>
             <span>Alertas</span>
