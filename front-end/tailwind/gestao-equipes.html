@@ -17,6 +17,7 @@
 
   <!-- Estilos e ícones compartilhados -->
   <link rel="stylesheet" href="../src/css/output.css" />
+  <link rel="stylesheet" href="../src/css/responsive.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Dependências específicas: copie e ative apenas as necessárias para a página. -->
@@ -118,7 +119,7 @@
         <!-- Filtros e Busca -->
         <div
           class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center">
-          <div class="relative w-full md:w-80">
+          <div class="relative w-full md:flex-1">
             <input type="text" id="search-member" placeholder="Buscar por nome ou e-mail..."
               class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#875C46]" />
             <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor"
@@ -129,16 +130,16 @@
           </div>
 
           <div class="flex items-center gap-2 text-xs">
-            <button data-filter="all"
+            <button data-filter="all" aria-pressed="true"
               class="filter-role bg-[#875C46] text-white px-3 py-1.5 rounded-lg font-medium transition-colors">
               Todos
             </button>
-            <button data-filter="Administrador"
-              class="filter-role bg-gray-100 text-gray-600 hover:bg-gray-200 px-3 py-1.5 rounded-lg font-medium transition-colors">
+            <button data-filter="Administrador" aria-pressed="false"
+              class="filter-role bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg font-medium transition-colors">
               Admins
             </button>
-            <button data-filter="Funcionário"
-              class="filter-role bg-gray-100 text-gray-600 hover:bg-gray-200 px-3 py-1.5 rounded-lg font-medium transition-colors">
+            <button data-filter="Funcionário" aria-pressed="false"
+              class="filter-role bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg font-medium transition-colors">
               Funcionários
             </button>
           </div>
@@ -229,9 +230,9 @@
     </main>
 
     <div id="create-employee-modal"
-      class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/50 p-4 backdrop-blur-md"
       role="dialog" aria-modal="true" aria-labelledby="create-employee-title">
-      <section class="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+      <section class="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
         <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
           <h2 id="create-employee-title" class="text-lg font-bold text-[#6D4936]">Novo funcionário</h2>
           <button id="create-employee-close" type="button" class="rounded-lg px-3 py-1 text-xl text-gray-500 hover:bg-gray-100" aria-label="Fechar">
@@ -243,13 +244,13 @@
     </div>
 
     <div id="edit-employee-modal"
-      class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      class="fixed inset-0 z-[80] hidden items-center justify-center bg-black/50 p-4 backdrop-blur-md"
       role="dialog" aria-modal="true" aria-labelledby="edit-employee-title">
       <section class="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
         <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
           <div>
-            <h2 id="edit-employee-title" class="text-lg font-bold text-[#6D4936]">Editar acessos</h2>
-            <p class="mt-1 text-xs text-gray-500">As senhas atuais são protegidas e não podem ser consultadas. Você pode definir uma nova senha.</p>
+            <h2 id="edit-employee-title" class="text-lg font-bold text-[#6D4936]">Editar contas</h2>
+            <p class="mt-1 text-xs text-gray-500">Altere o cargo, as permissões e a senha corporativa.</p>
           </div>
           <button id="edit-employee-close" type="button" class="rounded-lg px-3 py-1 text-xl text-gray-500 hover:bg-gray-100" aria-label="Fechar">
             &times;

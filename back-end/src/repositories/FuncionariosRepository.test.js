@@ -23,6 +23,7 @@ describe("FuncionariosRepository.prepararSchemaAutenticacao", () => {
         .mockResolvedValueOnce([[], []])
         .mockResolvedValueOnce([{}, []])
         .mockResolvedValueOnce([{}, []])
+        .mockResolvedValueOnce([{}, []])
         .mockResolvedValueOnce([employees, []]);
 
       await expect(FuncionariosRepository.listarFuncionario()).resolves.toEqual(employees);
@@ -33,7 +34,10 @@ describe("FuncionariosRepository.prepararSchemaAutenticacao", () => {
       expect(pool.query.mock.calls[2][0]).toContain(
         "ADD COLUMN pode_cadastrar_funcionarios",
       );
-      expect(pool.query.mock.calls[3][0]).toContain("f.foto");
+      expect(pool.query.mock.calls[3][0]).toContain(
+        "ADD COLUMN pode_excluir_funcionarios",
+      );
+      expect(pool.query.mock.calls[4][0]).toContain("f.foto");
     });
 
     test("updates an employee profile photo", async () => {
@@ -42,6 +46,7 @@ describe("FuncionariosRepository.prepararSchemaAutenticacao", () => {
         .mockResolvedValueOnce([[
           { Field: "foto" },
           { Field: "pode_cadastrar_funcionarios" },
+          { Field: "pode_excluir_funcionarios" },
         ], []])
         .mockResolvedValueOnce([{ affectedRows: 1 }, []]);
 

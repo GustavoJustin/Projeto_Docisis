@@ -57,27 +57,19 @@ const SIDEBAR_HTML = `
       </div>
     </div>
 
-    <!-- Rodapé: Botão Novo Item -->
-    <div class="p-5">
-      <a href="./materia-prima.html" id="btn-novo-sidebar"
-        class="w-full bg-cocoa-700 hover:bg-cocoa-800 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer text-sm">
-        <span class="text-base font-normal">+</span>
-        <span>Nova Movimentação</span>
-      </a>
-    </div>
   </aside>
 `
 let sessaoUsuarioAtual = null;
 let tokenSessaoUsuarioAtual = null;
 
-async function obterFuncionarioAutenticado() {
+async function obterFuncionarioAutenticado(forcarAtualizacao = false) {
   const token = localStorage.getItem("docegestao_token");
   if (!token) {
     sessaoUsuarioAtual = null;
     tokenSessaoUsuarioAtual = null;
     return null;
   }
-  if (token === tokenSessaoUsuarioAtual) {
+  if (!forcarAtualizacao && token === tokenSessaoUsuarioAtual) {
     try {
       const usuarioLocal = JSON.parse(
         localStorage.getItem("docegestao_funcionario") || "null",

@@ -6,6 +6,7 @@ jest.mock("../repositories/ProdutosRepository", () => ({
   deletarProduto: jest.fn(),
   listarMovimentacoesEstoque: jest.fn(),
   registrarAjusteEstoque: jest.fn(),
+  registrarEventoEstoque: jest.fn(),
 }));
 
 const ProdutoRepository = require("../repositories/ProdutosRepository");
@@ -81,6 +82,10 @@ describe("ProdutosService inventory integration", () => {
         data_chegada: "2026-11-01",
         validade: "2027-01-01",
       }),
+      expect.objectContaining({
+        usuario: "Sistema",
+        descricao: "Produto adicionado ao estoque.",
+      }),
     );
   });
 
@@ -94,9 +99,15 @@ describe("ProdutosService inventory integration", () => {
     await expect(
       ProdutoService.atualizarProduto(5, { quantidade: 8 }),
     ).resolves.toMatchObject({ sucesso: true });
-    expect(ProdutoRepository.atualizarProduto).toHaveBeenCalledWith(5, {
-      quantidade: 8,
-    });
+    expect(ProdutoRepository.atualizarProduto).toHaveBeenCalledWith(
+      5,
+      { quantidade: 8 },
+      expect.objectContaining({
+        tipo: "ENTRADA",
+        quantidade_anterior: 5,
+        quantidade_nova: 8,
+      }),
+    );
 
     await expect(
       ProdutoService.atualizarProduto(5, { quantidade: -1 }),
@@ -211,7 +222,7 @@ describe("ProdutosService inventory integration", () => {
     await expect(ProdutoService.deletarProduto(5)).resolves.toMatchObject({
       sucesso: true,
     });
-    expect(ProdutoRepository.deletarProduto).toHaveBeenCalledWith(5);
+    expect(ProdutoRepository.deletarProduto).toHaveBeenCalledWith(5, "Sistema");
   });
 
   test("keeps the existing legacy product creation contract", async () => {
@@ -225,12 +236,18 @@ describe("ProdutosService inventory integration", () => {
       nome: "Chocolate em pó",
     });
 
-    expect(ProdutoRepository.cadastrarProduto).toHaveBeenCalledWith({
-      marca: "Nestle",
-      lote: "L-2026",
-      tipo: "Chocolate",
-      validade: null,
-      id_fornecedor: 1,
-    });
+    expect(ProdutoRepository.cadastrarProduto).toHaveBeenCalledWith(
+      {
+        marca: "Nestle",
+        lote: "L-2026",
+        tipo: "Chocolate",
+        validade: null,
+        id_fornecedor: 1,
+      },
+      expect.objectContaining({
+        usuario: "Sistema",
+        descricao: "Produto adicionado ao estoque.",
+      }),
+    );
   });
 });

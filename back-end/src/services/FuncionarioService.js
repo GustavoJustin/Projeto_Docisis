@@ -3,6 +3,19 @@ const CargosRepository = require('../repositories/CargosRepository')
 const HistoricoContaRepository = require('../repositories/HistoricoContaRepository')
 const bcrypt = require('bcryptjs') // JWT: usado só pra transformar a senha em hash antes de salvar
 
+function normalizarCargo(nome) {
+    return String(nome || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+}
+
+function lerPermissao(valor, campo) {
+    if (typeof valor === 'boolean') return valor ? 1 : 0
+    if (valor === 0 || valor === 1) return valor
+    throw { status: 400, mensagem: `A permissão ${campo} deve ser booleana.` }
+}
+
 class FuncionarioService {
     async listarFuncionario() {
         const funcionarios = await FuncionarioRepository.listarFuncionario()
@@ -72,6 +85,7 @@ class FuncionarioService {
             email: email.trim().toLowerCase(),
             senha: senhaHash, // JWT: salva o hash, não a senha crua
             pode_cadastrar_funcionarios: ehAdministrador && dados.pode_cadastrar_funcionarios === true ? 1 : 0,
+            pode_excluir_funcionarios: ehAdministrador && dados.pode_excluir_funcionarios === true ? 1 : 0,
             ...(foto ? { foto } : {})
         }
 
@@ -96,7 +110,7 @@ class FuncionarioService {
         return { sucesso: true, mensagem: "Sucesso ao cadastrar", resultado }
     }
 
-    async atualizarFuncionario(id, dados) {
+    async atualizarFuncionario(id, dados, atorId) {
         if(!id || isNaN(id)) {
             throw { status: 400, mensagem: "Id inválido" }
         }
@@ -108,7 +122,17 @@ class FuncionarioService {
         }
 
         const funcionarioAtualizado = {}
-        const {cpf: cpfInformado, id_cargos, nome, email, senha} = dados
+        let nomeCargoAlvo = funcionario.nome_cargo
+        let alterouCargo = false
+        const {
+            cpf: cpfInformado,
+            id_cargos,
+            nome,
+            email,
+            senha,
+            pode_cadastrar_funcionarios,
+            pode_excluir_funcionarios,
+        } = dados
         const cpf = cpfInformado === undefined
             ? undefined
             : String(cpfInformado).replace(/\D/g, '')
@@ -124,7 +148,16 @@ class FuncionarioService {
             if(typeof id_cargos != "number" || id_cargos <= 0) {
                 throw { status: 400, mensagem: "O id cargos deve ser um número positivo" }
             }
+            if (String(id) === String(atorId) && Number(funcionario.id_cargos) !== id_cargos) {
+                throw { status: 400, mensagem: "Não é possível alterar o próprio cargo. Peça a outro administrador." }
+            }
+            const cargo = await CargosRepository.buscarCargoId(id_cargos)
+            if (!cargo) {
+                throw { status: 404, mensagem: "Cargo não encontrado." }
+            }
             funcionarioAtualizado.id_cargos = id_cargos
+            nomeCargoAlvo = cargo.nome_cargo
+            alterouCargo = true
         }
 
         if(nome !== undefined && nome.trim() != "") funcionarioAtualizado.nome = nome.trim()
@@ -137,6 +170,45 @@ class FuncionarioService {
                 throw { status: 400, mensagem: "Senha deve ter no mínimo 6 caracteres" }
             }
             funcionarioAtualizado.senha = await bcrypt.hash(senha, 10)
+        }
+
+        const ehAdministrador = normalizarCargo(nomeCargoAlvo).includes('admin')
+        const temPermissoes =
+            pode_cadastrar_funcionarios !== undefined ||
+            pode_excluir_funcionarios !== undefined
+
+        const podeCadastrar = pode_cadastrar_funcionarios === undefined
+            ? Number(funcionario.pode_cadastrar_funcionarios) || 0
+            : lerPermissao(pode_cadastrar_funcionarios, 'de criação de funcionários')
+        const podeExcluir = pode_excluir_funcionarios === undefined
+            ? Number(funcionario.pode_excluir_funcionarios) || 0
+            : lerPermissao(pode_excluir_funcionarios, 'de remoção de funcionários')
+
+        if (ehAdministrador && (temPermissoes || alterouCargo)) {
+            funcionarioAtualizado.pode_cadastrar_funcionarios =
+                alterouCargo && !temPermissoes ? 0 : podeCadastrar
+            funcionarioAtualizado.pode_excluir_funcionarios =
+                alterouCargo && !temPermissoes ? 0 : podeExcluir
+        } else if (!ehAdministrador && (temPermissoes || alterouCargo)) {
+            funcionarioAtualizado.pode_cadastrar_funcionarios = 0
+            funcionarioAtualizado.pode_excluir_funcionarios = 0
+        }
+
+        if (
+            alterouCargo &&
+            !ehAdministrador &&
+            normalizarCargo(funcionario.nome_cargo).includes('admin')
+        ) {
+            const funcionarios = await FuncionarioRepository.listarFuncionario()
+            const administradores = funcionarios.filter((item) =>
+                normalizarCargo(item.nome_cargo).includes('admin'),
+            )
+            if (administradores.length <= 1) {
+                throw {
+                    status: 409,
+                    mensagem: "Não é possível alterar o cargo do último administrador cadastrado.",
+                }
+            }
         }
 
         if(Object.keys(funcionarioAtualizado).length == 0) {

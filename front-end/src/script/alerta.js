@@ -42,9 +42,10 @@ const paginasDemo = {
     ativo: "estoque",
   },
   cadastro: {
-    arquivo: "cadastroFuncionario.html",
+    arquivo: "gestao-equipes.html",
     titulo: "Cadastro de Funcionário",
     ativo: "funcionarios",
+    modais: ["confirm-removal-modal", "create-employee-modal", "edit-employee-modal"],
   },
   login: {
     arquivo: "pagina-login.html",
@@ -251,7 +252,7 @@ async function carregarPaginaAtual() {
     return;
   }
 
-  if (pagina === "funcionarios" && !(await usuarioEhAdministrador())) {
+  if (["funcionarios", "cadastro"].includes(pagina) && !(await usuarioEhAdministrador())) {
     urlAtual.searchParams.set("pagina", "estoque");
     window.history.replaceState({}, "", urlAtual);
     await carregarPaginaAtual();

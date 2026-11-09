@@ -64,6 +64,7 @@ class AuthService {
         id_cargos: funcionario.id_cargos,
         foto: funcionario.foto || null,
         pode_cadastrar_funcionarios: funcionario.pode_cadastrar_funcionarios || 0,
+        pode_excluir_funcionarios: funcionario.pode_excluir_funcionarios || 0,
       },
     };
   }

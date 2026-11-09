@@ -20,6 +20,8 @@
     const cancelExportButton = $("btn-cancelar-exportacao");
     const refreshButton = $("btn-atualizar-historico");
     const summary = $("resumo-paginacao");
+    const paginaAnterior = $("historico-pagina-anterior");
+    const proximaPagina = $("historico-proxima-pagina");
 
     // Cards de resumo
     const cardEntradas = $("card-entradas-total");
@@ -38,6 +40,9 @@
     let filteredRows = [...rows];
     let activeTypeFilter = "todos";
     let activeDateFilter = "";
+    let paginaAtual = 1;
+    let carregando = false;
+    const movimentacoesPorPagina = 20;
 
     const normalized = (value) =>
       String(value || "")
@@ -61,9 +66,9 @@
     }
 
     function updateCards() {
-      const total = filteredRows.length;
-      const entradas = filteredRows.filter((r) => normalized(r.dataset.tipo) === "entrada").length;
-      const saidas = filteredRows.filter((r) => normalized(r.dataset.tipo) === "saida").length;
+      const total = rows.length;
+      const entradas = rows.filter((r) => normalized(r.dataset.tipo) === "entrada").length;
+      const saidas = rows.filter((r) => normalized(r.dataset.tipo) === "saida").length;
       const pct = (n) => (total ? Math.round((n / total) * 100) : 0);
 
       if (cardEntradas) cardEntradas.textContent = entradas;
@@ -71,9 +76,8 @@
       if (cardSaidas) cardSaidas.textContent = saidas;
       if (cardSaidasInfo) cardSaidasInfo.textContent = `${pct(saidas)}% das movimentações`;
 
-      // Usuário com mais ações no filtro atual
       const counts = {};
-      filteredRows.forEach((r) => {
+      rows.forEach((r) => {
         const user = rowUser(r);
         if (user) counts[user] = (counts[user] || 0) + 1;
       });
@@ -95,28 +99,50 @@
         const date = rowDate(row);
         const type = normalized(row.dataset.tipo || row.cells[2]?.textContent);
         const textMatches = normalized(row.textContent).includes(query);
-        const typeMatches = selectedType === "todos" || type === selectedType;
+        const isAjuste = selectedType === "ajuste" &&
+          (type === "ajuste" ||
+            normalized(row.cells[5]?.textContent).includes("dados do produto atualizados"));
+        const typeMatches = selectedType === "todos" || type === selectedType || isAjuste;
         const dateMatches = !selectedDate || date === selectedDate;
         return textMatches && typeMatches && dateMatches;
       });
 
-      const visible = new Set(filteredRows);
-      rows.forEach((row) => {
-        row.hidden = !visible.has(row);
-      });
+      const totalPaginas = Math.max(1, Math.ceil(filteredRows.length / movimentacoesPorPagina));
+      paginaAtual = Math.min(paginaAtual, totalPaginas);
+      const inicio = (paginaAtual - 1) * movimentacoesPorPagina;
+      const fim = Math.min(inicio + movimentacoesPorPagina, filteredRows.length);
+      const visible = new Set(filteredRows.slice(inicio, fim));
+      rows.forEach((row) => { row.hidden = !visible.has(row); });
 
       if (summary) {
         summary.textContent = filteredRows.length
-          ? `Mostrando ${filteredRows.length} de ${rows.length} registros`
+          ? `${inicio + 1}–${fim} de ${filteredRows.length} movimentações · página ${paginaAtual} de ${totalPaginas}`
           : "Nenhum registro encontrado";
       }
+      if (paginaAnterior) paginaAnterior.disabled = paginaAtual <= 1;
+      if (proximaPagina) proximaPagina.disabled = paginaAtual >= totalPaginas;
       updateCards();
     }
 
     function criarLinhaMovimentacao(movimentacao) {
       const linha = document.createElement("tr");
       const tipo = String(movimentacao.tipo || "").toUpperCase();
+      const descricao = String(movimentacao.descricao || "Ajuste de estoque");
+      const descricaoNormalizada = normalized(descricao);
       const entrada = tipo === "ENTRADA";
+      const saida = tipo === "SAIDA" || tipo === "SAÍDA";
+      const eventoProduto = descricaoNormalizada.includes("removido do estoque")
+        ? "Remoção de produto"
+        : descricaoNormalizada.includes("adicionado ao estoque")
+          ? "Cadastro de produto"
+          : descricaoNormalizada.includes("dados do produto atualizados")
+            ? "Atualização do produto"
+            : "";
+      const classeQuantidade = entrada
+        ? "text-emerald-600"
+        : saida
+          ? "text-rose-600"
+          : "text-amber-700";
       linha.dataset.tipo = tipo;
       linha.className = "border-b border-stone-50";
 
@@ -133,10 +159,14 @@
         { texto: tipo, classe: "py-3" },
         { texto: String(movimentacao.nome_produto || "Produto"), classe: "py-3 font-medium text-stone-800" },
         {
-          texto: `${entrada ? "+" : "-"} ${quantidade} ${movimentacao.unidade || "un"}`,
-          classe: `py-3 font-medium ${entrada ? "text-emerald-600" : "text-rose-600"}`,
+          texto: entrada
+            ? `+ ${quantidade} ${movimentacao.unidade || "un"}`
+            : saida
+              ? `- ${quantidade} ${movimentacao.unidade || "un"}`
+              : "—",
+          classe: `py-3 font-medium ${classeQuantidade}`,
         },
-        { texto: String(movimentacao.descricao || "Ajuste de estoque"), classe: "py-3 text-stone-500" },
+        { texto: descricao, classe: "py-3 text-stone-500" },
       ];
 
       campos.forEach((campo, indice) => {
@@ -154,10 +184,19 @@
           usuarioContainer.append(avatar, nome);
           celula.appendChild(usuarioContainer);
         } else if (indice === 2) {
+          const grupo = document.createElement("div");
+          grupo.className = "flex flex-col items-start gap-1";
           const etiqueta = document.createElement("span");
-          etiqueta.className = `inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${entrada ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-600"}`;
+          etiqueta.className = `inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${entrada ? "bg-emerald-50 text-emerald-700" : saida ? "bg-rose-50 text-rose-600" : "bg-amber-50 text-amber-700"}`;
           etiqueta.textContent = tipo;
-          celula.appendChild(etiqueta);
+          grupo.appendChild(etiqueta);
+          if (eventoProduto) {
+            const evento = document.createElement("span");
+            evento.className = "text-[10px] font-semibold uppercase tracking-wide text-stone-500";
+            evento.textContent = eventoProduto;
+            grupo.appendChild(evento);
+          }
+          celula.appendChild(grupo);
         } else {
           celula.textContent = campo.texto;
         }
@@ -167,6 +206,8 @@
     }
 
     async function carregarMovimentacoes() {
+      if (carregando) return;
+      carregando = true;
       if (refreshButton) {
         refreshButton.disabled = true;
         refreshButton.textContent = "Atualizando...";
@@ -213,6 +254,7 @@
         tableBody.appendChild(linhaErro);
         console.error("Não foi possível carregar o histórico de movimentações:", error);
       } finally {
+        carregando = false;
         if (refreshButton) {
           refreshButton.disabled = false;
           refreshButton.textContent = "Atualizar histórico";
@@ -246,7 +288,20 @@
       if (event.target === filtersModal) fecharModalFiltros();
     });
     refreshButton?.addEventListener("click", () => void carregarMovimentacoes());
-    searchInput?.addEventListener("input", renderRows);
+    searchInput?.addEventListener("input", () => {
+      paginaAtual = 1;
+      renderRows();
+    });
+    paginaAnterior?.addEventListener("click", () => {
+      if (paginaAtual > 1) {
+        paginaAtual -= 1;
+        renderRows();
+      }
+    });
+    proximaPagina?.addEventListener("click", () => {
+      paginaAtual += 1;
+      renderRows();
+    });
 
     const fecharModalExportacao = () => {
       exportModal?.classList.add("hidden");
@@ -359,6 +414,12 @@
     });
 
     await carregarMovimentacoes();
+    if (tableBody.dataset.polling !== "true") {
+      tableBody.dataset.polling = "true";
+      window.setInterval(() => {
+        if (!document.hidden && tableBody.isConnected) void carregarMovimentacoes();
+      }, 15000);
+    }
   }
 
   window.inicializarHistorico = initHistorico;

@@ -17,6 +17,7 @@
 
   <!-- Estilos e ícones compartilhados -->
   <link rel="stylesheet" href="../src/css/output.css" />
+  <link rel="stylesheet" href="../src/css/responsive.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Dependências específicas: copie e ative apenas as necessárias para a página. -->
@@ -73,27 +74,47 @@
     <main class="relative flex min-w-0 flex-1 flex-col p-10">
 
       <div class="space-y-6">
+        <section class="rounded-2xl border border-pink-100 bg-[#FCE8EE]/70 p-5 text-[#882E40]" aria-labelledby="weekly-summary-title">
+          <div class="flex flex-col items-center gap-2 text-center">
+            <div>
+              <h2 id="weekly-summary-title" class="text-xs font-bold uppercase tracking-widest">Resumo da semana</h2>
+              <p class="mt-1 text-xs text-rose-800/70">Acompanhe os itens que precisam de atenção.</p>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="totalAlertsCount" class="text-3xl font-extrabold text-[#7A2838]">0</span>
+              <span class="text-sm font-bold text-[#7A2838]">alertas ativos</span>
+            </div>
+          </div>
+        </section>
+
+        <label class="relative block w-full">
+          <span class="sr-only">Buscar alertas por nome de produto</span>
+          <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"></i>
+          <input id="searchInput" type="search" autocomplete="off" placeholder="Buscar alerta por produto..."
+            class="w-full rounded-xl border border-gray-200 bg-white py-3 pl-10 pr-4 text-sm text-gray-700 outline-none transition focus:border-[#875C46] focus:ring-2 focus:ring-[#875C46]/20" />
+        </label>
+
         <!-- Tabs & Sorting -->
         <div class="flex flex-wrap items-center justify-between gap-4">
-          <div class="flex items-center gap-2 bg-gray-200/50 p-1 rounded-xl text-xs font-bold text-gray-500"
+          <div class="flex max-w-full items-center gap-1 overflow-x-auto rounded-xl bg-gray-200/50 p-1 pb-1 text-xs font-bold text-gray-500"
             id="filterTabs">
             <button data-filter="all"
-              class="tab-btn bg-white text-gray-800 px-4 py-2 rounded-lg shadow-sm transition-all">
+              aria-pressed="true" class="tab-btn shrink-0 rounded-lg bg-white px-4 py-2 text-gray-800 shadow-sm transition-all">
               TODOS ALERTAS
             </button>
-            <button data-filter="vencido" class="tab-btn px-4 py-2 hover:text-gray-800 transition-all">
+            <button data-filter="vencido" aria-pressed="false" class="tab-btn shrink-0 rounded-lg px-4 py-2 text-gray-500 transition-all hover:text-gray-800">
               VENCIDOS
             </button>
-            <button data-filter="prox-vencimento" class="tab-btn px-4 py-2 hover:text-gray-800 transition-all">
+            <button data-filter="prox-vencimento" aria-pressed="false" class="tab-btn shrink-0 rounded-lg px-4 py-2 text-gray-500 transition-all hover:text-gray-800">
               PRÓX. VENCIMENTO
             </button>
-            <button data-filter="critico" class="tab-btn px-4 py-2 hover:text-gray-800 transition-all">
+            <button data-filter="critico" aria-pressed="false" class="tab-btn shrink-0 rounded-lg px-4 py-2 text-gray-500 transition-all hover:text-gray-800">
               ESTOQUE CRÍTICO
             </button>
-            <button data-filter="prox-estoque" class="tab-btn px-4 py-2 hover:text-gray-800 transition-all">
+            <button data-filter="prox-estoque" aria-pressed="false" class="tab-btn shrink-0 rounded-lg px-4 py-2 text-gray-500 transition-all hover:text-gray-800">
               ESTOQUE BAIXO
             </button>
-            <button data-filter="esgotado" class="tab-btn px-4 py-2 hover:text-gray-800 transition-all">
+            <button data-filter="esgotado" aria-pressed="false" class="tab-btn shrink-0 rounded-lg px-4 py-2 text-gray-500 transition-all hover:text-gray-800">
               FORA DE ESTOQUE
             </button>
           </div>
@@ -252,35 +273,6 @@
             </div>
           </div>
 
-          <!-- Weekly summary: span the full grid width -->
-          <div class="lg:col-span-2">
-            <div class="bg-[#FCE8EE]/70 rounded-2xl p-6 border border-pink-100 space-y-6">
-              <div class="flex items-center justify-between text-[#882E40]">
-                <span class="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5">
-                  RESUMO DA SEMANA
-                </span>
-              </div>
-
-              <div>
-                <div id="totalAlertsCount" class="text-4xl font-extrabold text-[#7A2838]">
-                  3
-                </div>
-                <div class="text-sm font-bold text-[#7A2838] mt-1">
-                  Alertas Ativos
-                </div>
-                <p class="text-xs text-rose-800/70 mt-1 leading-relaxed">
-                  Sua atenção é necessária para evitar perdas e manter a
-                  produção.
-                </p>
-              </div>
-              <p class="text-xs text-rose-800/70 mt-1 leading-relaxed">
-                Sua atenção é necessária para evitar perdas e manter a
-                produção.
-              </p>
-            </div>
-
-            </div>
-
       <!-- Toast Notification Overlay -->
       <div id="toastNotification"
         class="fixed bottom-6 right-8 bg-[#2D3748] text-white rounded-xl p-4 shadow-xl hidden items-center gap-3 border border-gray-700 max-w-md transition-all duration-300 z-40">
@@ -394,8 +386,7 @@
   <script src="../src/script/estoque-classificacao.js" defer></script>
   <script src="../src/componentes/header.js" defer></script>
   <script src="../src/script/estoque-alertas.js" defer></script>
-  <script src="../src/script/alertas.js" defer></script>
-<script>
+<script type="application/json">
 /* DoceGestão: comportamentos da página de estoque e sincronização dos alertas.
    As duas páginas devem estar na mesma origem/domínio para compartilhar localStorage. */
 (() => {

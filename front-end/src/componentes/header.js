@@ -119,13 +119,6 @@ const HEADER_HTML = `
             <p class="mt-1 text-xs text-gray-500">Você não tem novas notificações</p>
           </div>
         </div>
-        <div class="flex justify-end border-t border-gray-100 px-5 py-3">
-          <button type="button" id="header-close-selected-notification"
-            class="rounded-lg bg-[#784E38] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#633e2c] disabled:cursor-not-allowed disabled:opacity-50"
-            disabled>
-            Fechar notificação
-          </button>
-        </div>
       </section>
     </div>
 
@@ -151,6 +144,10 @@ const HEADER_HTML = `
             class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-50">
             Cancelar
           </button>
+          <button type="button" id="header-call-details-close-call"
+            class="rounded-lg border border-[#784E38] px-4 py-2 text-sm font-semibold text-[#784E38] transition hover:bg-[#F8F6F2] disabled:cursor-not-allowed disabled:opacity-50">
+            Fechar chamado
+          </button>
           <button type="button" id="header-call-details-action"
             class="rounded-lg bg-[#784E38] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#633e2c] disabled:cursor-not-allowed disabled:opacity-50">
             Resolver chamado
@@ -159,19 +156,15 @@ const HEADER_HTML = `
       </section>
     </div>
 
-    <aside id="header-active-call-banner" class="fixed bottom-4 left-1/2 z-[80] hidden w-[min(42rem,calc(100vw-2rem))] -translate-x-1/2 items-center justify-between gap-4 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-[#4A3F39] shadow-2xl"
+    <aside id="header-active-call-banner" class="fixed bottom-4 right-4 z-[80] hidden w-[min(32rem,calc(100vw-2rem))] items-center justify-between gap-4 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-[#4A3F39] shadow-2xl"
       aria-live="polite">
       <div id="header-active-call-drag-handle" class="min-w-0 flex-1 cursor-move select-none" style="touch-action:none">
         <p class="text-xs font-bold uppercase tracking-wide text-[#784E38]">Chamado em resolução</p>
         <p id="header-active-call-text" class="mt-1 truncate text-sm font-medium"></p>
       </div>
-      <button type="button" id="header-active-call-close"
-        class="shrink-0 rounded-lg bg-[#784E38] px-4 py-2 text-xs font-bold text-white shadow-md transition hover:bg-[#633e2c]">
-        Fechar chamado
-      </button>
     </aside>
 
-    <div id="header-settings-dialog" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+    <div id="header-settings-dialog" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/40 p-4 backdrop-blur-md"
       role="presentation">
       <section role="dialog" aria-modal="true" aria-labelledby="header-settings-title"
         class="flex h-[min(90vh,42rem)] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-white/50 bg-white shadow-2xl">
@@ -253,7 +246,7 @@ const HEADER_HTML = `
 
             <section data-settings-panel="profile" aria-labelledby="settings-profile-title" class="hidden">
               <h3 id="settings-profile-title" class="text-base font-bold text-gray-800">Perfil</h3>
-              <p class="mt-1 text-sm text-gray-500">Atualize as informações exibidas neste navegador.</p>
+              <p class="mt-1 text-sm text-gray-500">Atualize as informações salvas na sua conta.</p>
               <div class="mt-6 flex flex-wrap items-center gap-4">
                 <img data-settings-avatar
                   src="../src/img/avatar-padrao.svg"
@@ -507,17 +500,16 @@ function carregarHeader() {
   const cancelLogoutButton = container.querySelector("#header-cancel-logout");
   const confirmLogoutButton = container.querySelector("#header-confirm-logout");
   const accountActionLabel = container.querySelector("[data-header-account-action-label]");
-  const closeSelectedNotification = container.querySelector("#header-close-selected-notification");
   const callDetailsDialog = container.querySelector("#header-call-details-dialog");
   const callDetailsStatus = container.querySelector("#header-call-details-status");
   const callDetailsDescription = container.querySelector("#header-call-details-description");
   const callDetailsMetadata = container.querySelector("#header-call-details-metadata");
   const callDetailsError = container.querySelector("#header-call-details-error");
   const callDetailsAction = container.querySelector("#header-call-details-action");
+  const callDetailsCloseCall = container.querySelector("#header-call-details-close-call");
   const activeCallBanner = container.querySelector("#header-active-call-banner");
   const activeCallDragHandle = container.querySelector("#header-active-call-drag-handle");
   const activeCallText = container.querySelector("#header-active-call-text");
-  const activeCallClose = container.querySelector("#header-active-call-close");
   const fotoPerfil = container.querySelector("[data-header-avatar]");
   const fotoMenu = container.querySelector("[data-header-menu-avatar]");
   const avatarPadraoPerfil = fotoPerfil.getAttribute("src");
@@ -532,6 +524,7 @@ function carregarHeader() {
   let usuarioAtual = null;
   let sincronizacaoChamadosAtual = null;
   let chamadoEmDetalhe = null;
+  let profileFeedbackTimeout = null;
 
   function lerJsonLocalStorage(key, fallback) {
     try {
@@ -599,9 +592,6 @@ function carregarHeader() {
     activeCallBanner.classList.toggle("flex", Boolean(chamadoAtivo));
     if (chamadoAtivo) {
       activeCallText.textContent = `#${chamadoAtivo.callId}: ${chamadoAtivo.mensagem}`;
-      activeCallClose.dataset.callId = chamadoAtivo.callId;
-    } else {
-      delete activeCallClose.dataset.callId;
     }
   }
 
@@ -645,13 +635,10 @@ function carregarHeader() {
 
     const responsavel = usuarioResponsavelPeloChamado(chamado);
     const emResolucao = chamado.status === "em_resolucao";
-    callDetailsAction.textContent = responsavel
-      ? "Fechar chamado"
-      : emResolucao
-        ? "Em resolução"
-        : "Resolver chamado";
-    callDetailsAction.disabled = emResolucao && !responsavel;
-    callDetailsAction.dataset.action = responsavel ? "concluir" : "assumir";
+    callDetailsAction.textContent = emResolucao ? "Em resolução" : "Resolver chamado";
+    callDetailsAction.disabled = emResolucao;
+    callDetailsAction.dataset.action = "assumir";
+    callDetailsCloseCall.disabled = emResolucao && !responsavel;
     callDetailsDialog.classList.remove("hidden");
     callDetailsDialog.classList.add("flex");
     window.lucide?.createIcons();
@@ -759,16 +746,20 @@ function carregarHeader() {
     }
   }
 
-  function exibirAvisoPerfil(mensagem, tipo = "success") {
-    const aviso = document.createElement("div");
-    aviso.className = tipo === "error"
-      ? "fixed left-1/2 top-20 z-[120] -translate-x-1/2 rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-800 shadow-xl"
-      : "fixed left-1/2 top-20 z-[120] -translate-x-1/2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-sm font-semibold text-emerald-800 shadow-xl";
-    aviso.setAttribute("role", tipo === "error" ? "alert" : "status");
-    aviso.setAttribute("aria-live", tipo === "error" ? "assertive" : "polite");
-    aviso.textContent = mensagem;
-    document.body.appendChild(aviso);
-    window.setTimeout(() => aviso.remove(), 4500);
+  function exibirFeedbackPerfil(mensagem, tipo = "info", temporario = true) {
+    window.clearTimeout(profileFeedbackTimeout);
+    settingsProfileFeedback.textContent = mensagem;
+    settingsProfileFeedback.className = tipo === "error"
+      ? "inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800"
+      : tipo === "success"
+        ? "inline-flex rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800"
+        : "inline-flex rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-600";
+    if (temporario && mensagem) {
+      profileFeedbackTimeout = window.setTimeout(() => {
+        settingsProfileFeedback.textContent = "";
+        settingsProfileFeedback.className = "min-h-5 text-xs text-gray-500";
+      }, 4500);
+    }
   }
 
   function notificarPerfilAtualizado() {
@@ -810,9 +801,9 @@ function carregarHeader() {
   function preencherPerfil() {
     const user = usuarioAtual || {};
     const profile = obterPerfilSalvo();
-    settingsProfileForm.elements.namedItem("nome").value = profile.nome || user.nome || "";
+    settingsProfileForm.elements.namedItem("nome").value = user.nome || profile.nome || "";
     settingsProfileForm.elements.namedItem("idade").value = profile.idade || "";
-    settingsProfileForm.elements.namedItem("email").value = profile.email || user.email || "";
+    settingsProfileForm.elements.namedItem("email").value = user.email || profile.email || "";
     const avatar = user.foto || profile.foto;
     settingsProfileAvatar.src = avatar || avatarPadraoConfiguracoes;
   }
@@ -932,13 +923,6 @@ function carregarHeader() {
       state.selectedId = null;
       salvarNotificacoes(state);
     }
-    const selectedCallCanClose =
-      selectedItem?.status === "em_resolucao" &&
-      usuarioResponsavelPeloChamado(selectedItem);
-    closeSelectedNotification.textContent = "Fechar chamado";
-    closeSelectedNotification.disabled = !selectedCallCanClose;
-    closeSelectedNotification.classList.toggle("shadow-md", selectedCallCanClose);
-    closeSelectedNotification.classList.toggle("brightness-110", selectedCallCanClose);
     notificationsList.replaceChildren();
 
     const stockNotificationCount = state.items.filter((item) =>
@@ -1063,29 +1047,6 @@ function carregarHeader() {
         owner.textContent = `Em resolução por ${item.responsavelNome || "um funcionário"}`;
         card.appendChild(owner);
       }
-      if (
-        item.tipo === "chamado" &&
-        item.status === "em_resolucao" &&
-        usuarioResponsavelPeloChamado(item)
-      ) {
-        const closeCallButton = document.createElement("button");
-        closeCallButton.type = "button";
-        closeCallButton.className = "mt-3 rounded-lg bg-[#784E38] px-3 py-2 text-xs font-bold text-white transition hover:bg-[#633e2c]";
-        closeCallButton.textContent = "Fechar chamado";
-        closeCallButton.addEventListener("click", async (event) => {
-          event.stopPropagation();
-          closeCallButton.disabled = true;
-          try {
-            await executarAcaoChamado(item, "concluir");
-          } catch (error) {
-            console.error("Não foi possível concluir o chamado:", error);
-            exibirErroNotificacoes(error.message || "Não foi possível concluir o chamado.");
-            closeCallButton.disabled = false;
-          }
-        });
-        card.appendChild(closeCallButton);
-      }
-
       notificationsList.appendChild(card);
     });
     window.lucide?.createIcons();
@@ -1356,11 +1317,11 @@ function carregarHeader() {
     }
   }
 
-  async function sincronizarContaDaSessao() {
+  async function sincronizarContaDaSessao(forcarAtualizacao = false) {
     const token = localStorage.getItem("docegestao_token");
     if (!token || typeof window.obterFuncionarioAutenticado !== "function") return;
 
-    const user = await window.obterFuncionarioAutenticado();
+    const user = await window.obterFuncionarioAutenticado(forcarAtualizacao);
     if (token !== localStorage.getItem("docegestao_token") || !user) return;
 
     usuarioAtual = user;
@@ -1414,9 +1375,11 @@ function carregarHeader() {
     }
   }
 
-  function abrirDialogo(dialog, trigger) {
+  function abrirDialogo(dialog, trigger, { preservarNotificacoes = false } = {}) {
     fecharPerfil();
-    fecharDialogo(notificationsDialog, notificationsTrigger);
+    if (!preservarNotificacoes) {
+      fecharDialogo(notificationsDialog, notificationsTrigger);
+    }
     fecharDialogo(settingsDialog, settingsTrigger);
     activeDialogTrigger = trigger;
     dialog.classList.remove("hidden");
@@ -1457,7 +1420,7 @@ function carregarHeader() {
   container.querySelectorAll("[data-open-header-settings]").forEach((button) => {
     button.addEventListener("click", () => {
       preencherPerfil();
-      abrirDialogo(settingsDialog, settingsTrigger);
+      abrirDialogo(settingsDialog, settingsTrigger, { preservarNotificacoes: true });
       abrirAbaConfiguracao("notifications");
     });
   });
@@ -1475,13 +1438,16 @@ function carregarHeader() {
   settingsProfilePhoto.addEventListener("change", async () => {
     const file = settingsProfilePhoto.files?.[0];
     if (!file) return;
-    settingsProfileFeedback.textContent = "Atualizando foto...";
-    settingsProfileFeedback.className = "min-h-5 text-xs text-gray-500";
+    exibirFeedbackPerfil("Atualizando foto...", "info", false);
     try {
       const foto = await prepararFotoPerfil(file);
       const token = localStorage.getItem("docegestao_token");
       if (!token || !usuarioAtual?.id_funcionario) {
         throw new Error("Entre na sua conta para salvar a foto do perfil.");
+      }
+      if (foto === usuarioAtual.foto) {
+        exibirFeedbackPerfil("Esta foto já está salva na sua conta.");
+        return;
       }
 
       const response = await fetch("/api/funcionarios/perfil/foto", {
@@ -1507,14 +1473,10 @@ function carregarHeader() {
       fotoMenu.src = foto;
       settingsProfileAvatar.src = foto;
       notificarPerfilAtualizado();
-      settingsProfileFeedback.textContent = "Foto de perfil atualizada e salva na sua conta.";
-      settingsProfileFeedback.className = "inline-flex rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800";
-      exibirAvisoPerfil("Foto de perfil atualizada com sucesso.");
+      exibirFeedbackPerfil("Foto de perfil atualizada e salva na sua conta.", "success");
     } catch (error) {
       console.error("Não foi possível atualizar a foto do perfil:", error);
-      settingsProfileFeedback.textContent = error.message || "Não foi possível carregar essa imagem.";
-      settingsProfileFeedback.className = "inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800";
-      exibirAvisoPerfil(settingsProfileFeedback.textContent, "error");
+      exibirFeedbackPerfil(error.message || "Não foi possível carregar essa imagem.", "error");
     } finally {
       settingsProfilePhoto.value = "";
     }
@@ -1526,16 +1488,23 @@ function carregarHeader() {
     const ageText = String(formData.get("idade") || "").trim();
     const age = ageText ? Number(ageText) : null;
     if (ageText && (!Number.isInteger(age) || age < 1 || age > 120)) {
-      settingsProfileFeedback.textContent = "Informe uma idade entre 1 e 120 anos.";
-      settingsProfileFeedback.className = "inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800";
+      exibirFeedbackPerfil("Informe uma idade entre 1 e 120 anos.", "error");
       return;
     }
 
     const nome = String(formData.get("nome") || "").trim();
     const email = String(formData.get("email") || "").trim().toLowerCase();
     if (!nome || !email) {
-      settingsProfileFeedback.textContent = "Informe seu nome e e-mail.";
-      settingsProfileFeedback.className = "inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800";
+      exibirFeedbackPerfil("Informe seu nome e e-mail.", "error");
+      return;
+    }
+
+    const savedProfile = obterPerfilSalvo();
+    const nomeAlterado = nome !== String(usuarioAtual?.nome || "");
+    const emailAlterado = email !== String(usuarioAtual?.email || "").toLowerCase();
+    const idadeAlterada = age !== (savedProfile.idade ?? null);
+    if (!nomeAlterado && !emailAlterado && !idadeAlterada) {
+      exibirFeedbackPerfil("Nenhuma alteração foi feita.");
       return;
     }
 
@@ -1548,18 +1517,17 @@ function carregarHeader() {
     const token = localStorage.getItem("docegestao_token");
     const submitButton = settingsProfileForm.querySelector('button[type="submit"]');
     if (!token || !usuarioAtual?.id_funcionario) {
-      settingsProfileFeedback.textContent = "Entre na sua conta para salvar as alterações.";
-      settingsProfileFeedback.className = "inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800";
+      exibirFeedbackPerfil("Entre na sua conta para salvar as alterações.", "error");
       return;
     }
     if (submitButton) {
       submitButton.disabled = true;
       submitButton.textContent = "Salvando...";
     }
-    settingsProfileFeedback.textContent = "Salvando alterações...";
-    settingsProfileFeedback.className = "inline-flex rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-600";
+    exibirFeedbackPerfil("Salvando alterações...", "info", false);
     try {
-      const response = await fetch("/api/funcionarios/perfil", {
+      if (nomeAlterado || emailAlterado) {
+        const response = await fetch("/api/funcionarios/perfil", {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1572,19 +1540,21 @@ function carregarHeader() {
         throw new Error(result.mensagem || "Não foi possível salvar as alterações do perfil.");
       }
 
-      usuarioAtual = { ...usuarioAtual, ...result.dados };
-      localStorage.setItem("docegestao_funcionario", JSON.stringify(usuarioAtual));
+        usuarioAtual = { ...usuarioAtual, ...result.dados };
+        localStorage.setItem("docegestao_funcionario", JSON.stringify(usuarioAtual));
+      }
       if (!salvarPerfilSalvo(profile)) return;
       atualizarConta();
-      notificarPerfilAtualizado();
-      settingsProfileFeedback.textContent = "Perfil atualizado e salvo na sua conta.";
-      settingsProfileFeedback.className = "inline-flex rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800";
-      exibirAvisoPerfil("Perfil atualizado com sucesso.");
+      if (nomeAlterado || emailAlterado) notificarPerfilAtualizado();
+      exibirFeedbackPerfil(
+        nomeAlterado || emailAlterado
+          ? "Perfil atualizado e salvo na sua conta."
+          : "Preferências do perfil atualizadas.",
+        "success",
+      );
     } catch (error) {
       console.error("Não foi possível atualizar o perfil:", error);
-      settingsProfileFeedback.textContent = error.message || "Não foi possível salvar as alterações.";
-      settingsProfileFeedback.className = "inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800";
-      exibirAvisoPerfil(settingsProfileFeedback.textContent, "error");
+      exibirFeedbackPerfil(error.message || "Não foi possível salvar as alterações.", "error");
     } finally {
       if (submitButton) {
         submitButton.disabled = false;
@@ -1611,10 +1581,10 @@ function carregarHeader() {
     if (event.key !== "Escape") return;
     if (!callDetailsDialog.classList.contains("hidden")) {
       fecharDetalhesChamado();
-    } else if (!notificationsDialog.classList.contains("hidden")) {
-      fecharDialogo(notificationsDialog, notificationsTrigger);
     } else if (!settingsDialog.classList.contains("hidden")) {
       fecharDialogo(settingsDialog, settingsTrigger);
+    } else if (!notificationsDialog.classList.contains("hidden")) {
+      fecharDialogo(notificationsDialog, notificationsTrigger);
     } else {
       fecharPerfil();
     }
@@ -1646,10 +1616,26 @@ function carregarHeader() {
       callDetailsError.classList.remove("hidden");
     } finally {
       if (callDetailsDialog.isConnected && chamadoEmDetalhe) {
-        callDetailsAction.disabled =
-          chamadoEmDetalhe.status === "em_resolucao" &&
-          !usuarioResponsavelPeloChamado(chamadoEmDetalhe);
+        callDetailsAction.disabled = chamadoEmDetalhe.status === "em_resolucao";
       }
+    }
+  });
+  callDetailsCloseCall.addEventListener("click", async () => {
+    if (!chamadoEmDetalhe || callDetailsCloseCall.disabled) return;
+    const chamado = chamadoEmDetalhe;
+    callDetailsCloseCall.disabled = true;
+    callDetailsError.textContent = "";
+    callDetailsError.classList.add("hidden");
+    try {
+      if (chamado.status === "aberto") {
+        await executarAcaoChamado(chamado, "assumir");
+      }
+      if (chamadoEmDetalhe) await executarAcaoChamado(chamadoEmDetalhe, "concluir");
+      fecharDetalhesChamado();
+    } catch (error) {
+      callDetailsError.textContent = error.message || "Não foi possível fechar o chamado.";
+      callDetailsError.classList.remove("hidden");
+      callDetailsCloseCall.disabled = false;
     }
   });
 
@@ -1688,39 +1674,6 @@ function carregarHeader() {
   };
   activeCallDragHandle.addEventListener("pointerup", terminarArrasteChamado);
   activeCallDragHandle.addEventListener("pointercancel", terminarArrasteChamado);
-
-  closeSelectedNotification.addEventListener("click", async () => {
-    const state = carregarNotificacoes();
-    const selectedItem = state.items.find((item) =>
-      item.id === state.selectedId && item.tipo === "chamado",
-    );
-    if (!selectedItem || closeSelectedNotification.disabled) return;
-    closeSelectedNotification.disabled = true;
-    limparErroNotificacoes();
-    try {
-      await executarAcaoChamado(selectedItem, "concluir");
-    } catch (error) {
-      console.error("Não foi possível concluir o chamado:", error);
-      exibirErroNotificacoes(error.message || "Não foi possível concluir o chamado.");
-      closeSelectedNotification.disabled = false;
-    }
-  });
-  activeCallClose.addEventListener("click", async () => {
-    const callId = activeCallClose.dataset.callId;
-    const chamado = carregarNotificacoes().items.find(
-      (item) => item.tipo === "chamado" && item.callId === callId,
-    );
-    if (!chamado) return;
-    activeCallClose.disabled = true;
-    try {
-      await executarAcaoChamado(chamado, "concluir");
-    } catch (error) {
-      console.error("Não foi possível concluir o chamado:", error);
-      exibirErroNotificacoes(error.message || "Não foi possível concluir o chamado.");
-    } finally {
-      activeCallClose.disabled = false;
-    }
-  });
 
   accountAction.addEventListener("click", () => {
     fecharPerfil();
@@ -1797,7 +1750,9 @@ function carregarHeader() {
     void sincronizarChamadosNotificacoes();
   });
   window.setInterval(() => {
-    if (!document.hidden) void sincronizarChamadosNotificacoes();
+    if (document.hidden) return;
+    void sincronizarChamadosNotificacoes();
+    void sincronizarContaDaSessao(true);
   }, 15000);
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) void sincronizarChamadosNotificacoes();

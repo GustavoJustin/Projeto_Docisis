@@ -3,6 +3,7 @@ const router = express.Router()
 const FuncionariosController = require('../controller/FuncionariosController')
 const exigirAdministrador = require('../middleware/roleMiddleware')
 const exigirPermissaoCriarFuncionarios = require('../middleware/employeeCreationPermissionMiddleware')
+const exigirPermissaoExcluirFuncionarios = require('../middleware/employeeDeletionPermissionMiddleware')
 
 router.get('/', exigirAdministrador, FuncionariosController.listarFuncionarios)
 router.patch('/perfil', FuncionariosController.atualizarPerfil)
@@ -11,6 +12,6 @@ router.get('/:id', exigirAdministrador, FuncionariosController.buscarFuncionario
 router.post('/', exigirAdministrador, exigirPermissaoCriarFuncionarios, FuncionariosController.cadastrarFuncionario)
 router.patch('/:id/senha', exigirAdministrador, FuncionariosController.redefinirSenha)
 router.put('/:id', exigirAdministrador, FuncionariosController.atualizarFuncionario)
-router.delete('/:id', exigirAdministrador, FuncionariosController.deletarFuncionario)
+router.delete('/:id', exigirAdministrador, exigirPermissaoExcluirFuncionarios, FuncionariosController.deletarFuncionario)
 
 module.exports = router

@@ -16,6 +16,11 @@ class FuncionarioRepository {
                         'ALTER TABLE tbl_funcionarios ADD COLUMN pode_cadastrar_funcionarios TINYINT(1) NOT NULL DEFAULT 1',
                     )
                 }
+                if (!existentes.has('pode_excluir_funcionarios')) {
+                    await pool.query(
+                        'ALTER TABLE tbl_funcionarios ADD COLUMN pode_excluir_funcionarios TINYINT(1) NOT NULL DEFAULT 0',
+                    )
+                }
             })().catch((erro) => {
                 this.preparacaoColunaFoto = null
                 throw erro
@@ -263,7 +268,8 @@ class FuncionarioRepository {
         await this.garantirColunaFoto()
         const [rows] = await pool.query(`
             SELECT f.id_funcionario, f.id_cargos, f.cpf, f.nome, f.email,
-                   f.foto, f.pode_cadastrar_funcionarios, c.nome_cargo
+                   f.foto, f.pode_cadastrar_funcionarios,
+                   f.pode_excluir_funcionarios, c.nome_cargo
             FROM tbl_funcionarios f
             JOIN tbl_cargos c ON c.id_cargos = f.id_cargos
             ORDER BY f.id_funcionario
@@ -275,7 +281,8 @@ class FuncionarioRepository {
         await this.garantirColunaFoto()
         const [rows] = await pool.query(`
             SELECT f.id_funcionario, f.id_cargos, f.cpf, f.nome, f.email,
-                   f.foto, f.pode_cadastrar_funcionarios, c.nome_cargo
+                   f.foto, f.pode_cadastrar_funcionarios,
+                   f.pode_excluir_funcionarios, c.nome_cargo
             FROM tbl_funcionarios f
             JOIN tbl_cargos c ON c.id_cargos = f.id_cargos
             WHERE f.id_funcionario = ?

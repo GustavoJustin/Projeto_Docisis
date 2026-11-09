@@ -55,19 +55,12 @@ async function requisitarEstoque(url, options = {}) {
   return result;
 }
 
-document.addEventListener("click", (event) => {
-  const target = event.target instanceof Element ? event.target : null;
-  const botaoSidebar = target?.closest("#btn-novo-sidebar");
-  if (!botaoSidebar || !document.getElementById("grid-produtos")) return;
-  event.preventDefault();
-  document.getElementById("modal-insumo")?.classList.remove("hidden");
-  limparErroModal("erro-form-insumo");
-});
-
 function normalizarProdutoEstoque(product) {
   return {
     id: String(product.id ?? product.id_produtos),
     nome: String(product.nome || product.marca || "Insumo"),
+    marca: String(product.marca || ""),
+    lote: String(product.lote || ""),
     categoria: String(product.categoria || product.tipo || "Outros"),
     descricao: String(product.descricao || product.categoria || product.tipo || ""),
     unidade: String(product.unidade || "un"),
@@ -110,7 +103,7 @@ function criarCardProduto(product) {
   const corLateral = alertaPrincipal?.cor || null;
   const card = document.createElement("article");
   card.className =
-    `cartao-produto h-full cursor-pointer ${corLateral ? "border-0" : "border border-black/10"} rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm`;
+    `cartao-produto h-full cursor-pointer ${corLateral ? "border-0" : "border border-black/10"} rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg`;
   card.tabIndex = 0;
   card.setAttribute("role", "group");
   card.setAttribute("aria-label", `Ver detalhes de ${item.nome}`);
@@ -312,6 +305,9 @@ async function inicializarEstoque() {
   const modalDetalhes = document.getElementById("modal-detalhes-produto");
   const detalhesImagem = document.getElementById("detalhes-produto-imagem");
   const detalhesConteudo = document.getElementById("detalhes-produto-conteudo");
+  const detalhesNivel = document.getElementById("detalhes-produto-nivel");
+  const detalhesBarra = document.getElementById("detalhes-produto-barra");
+  const detalhesAtualizar = document.getElementById("detalhes-produto-atualizar");
   const formInsumo = document.getElementById("form-novo-insumo");
   const cardAdicionar = document.getElementById("btn-card-adicionar");
   const botaoConfirmarExclusao = document.getElementById("btn-confirmar-exclusao");
@@ -344,7 +340,7 @@ async function inicializarEstoque() {
   let productToDelete = null;
   let activeCategory = "Tudo";
   let paginaAtual = 1;
-  const produtosPorPagina = 30;
+  const produtosPorPagina = 20;
   const filterButtons = [...document.querySelectorAll(".filtro-btn")];
   const search = document.getElementById("input-busca");
   const infoPaginacao = document.getElementById("estoque-paginacao-info");
@@ -494,6 +490,8 @@ async function inicializarEstoque() {
     if (!produto || !modalDetalhes || !detalhesConteudo || !detalhesImagem) return;
     const valores = [
       ["Categoria", produto.categoria],
+      ["Marca", produto.marca || "Não informada"],
+      ["Lote", produto.lote || "Não informado"],
       ["Descrição", produto.descricao || "Não informada"],
       ["Estoque atual", `${produto.quantidade} ${produto.unidade}`],
       ["Limite máximo", `${produto.maximo} ${produto.unidade}`],
@@ -513,6 +511,19 @@ async function inicializarEstoque() {
       grupo.append(titulo, descricao);
       detalhesConteudo.appendChild(grupo);
     });
+    const percentual = produto.maximo > 0
+      ? Math.min(100, Math.max(0, (produto.quantidade / produto.maximo) * 100))
+      : 0;
+    const classificacao = window.estoqueClassificacao.classificar(produto);
+    const alerta = window.estoqueClassificacao.obterAlerta(classificacao.status);
+    if (detalhesNivel) {
+      detalhesNivel.textContent = `${produto.quantidade}/${produto.maximo} ${produto.unidade}`;
+    }
+    if (detalhesBarra) {
+      detalhesBarra.style.width = `${percentual}%`;
+      detalhesBarra.style.backgroundColor = alerta?.cor || corNivelEstoque(percentual);
+      detalhesBarra.parentElement.setAttribute("aria-valuenow", String(Math.round(percentual)));
+    }
     detalhesImagem.replaceChildren();
     if (produto.imagem) {
       const image = document.createElement("img");
@@ -530,7 +541,9 @@ async function inicializarEstoque() {
       detalhesImagem.classList.add("text-4xl", "font-semibold", "text-brand-brown");
       detalhesImagem.textContent = produto.nome.charAt(0).toUpperCase();
     }
-    document.getElementById("detalhes-produto-titulo").textContent = produto.nome;
+    const titulo = document.getElementById("detalhes-produto-titulo");
+    titulo.textContent = produto.nome;
+    titulo.dataset.productId = String(produto.id);
     modalDetalhes.classList.remove("hidden");
     modalDetalhes.classList.add("flex");
   }
@@ -780,6 +793,13 @@ async function inicializarEstoque() {
     abrirDetalhesProduto(produto);
   });
   document.getElementById("fechar-detalhes-produto")?.addEventListener("click", fecharDetalhesProduto);
+  detalhesAtualizar?.addEventListener("click", () => {
+    const id = document.getElementById("detalhes-produto-titulo")?.dataset.productId;
+    const card = [...grid.querySelectorAll(".cartao-produto")]
+      .find((item) => item.dataset.id === id);
+    fecharDetalhesProduto();
+    if (card) abrirModalAtualizacao(card);
+  });
   modalDetalhes?.addEventListener("click", (event) => {
     if (event.target === modalDetalhes) fecharDetalhesProduto();
   });
@@ -984,6 +1004,12 @@ async function inicializarEstoque() {
   });
 
   await carregarProdutos();
+  if (grid.dataset.estoquePolling !== "true") {
+    grid.dataset.estoquePolling = "true";
+    window.setInterval(() => {
+      if (!document.hidden && grid.isConnected) void carregarProdutos();
+    }, 15000);
+  }
   const produtoParaLocalizar = new URLSearchParams(window.location.search).get("localizar");
   if (produtoParaLocalizar) {
     const card = localizarCardProduto(produtoParaLocalizar);

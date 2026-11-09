@@ -48,7 +48,11 @@ class FuncionariosController {
 
     async atualizarFuncionario(req, res) {
         try {
-            const resultado = await FuncionarioService.atualizarFuncionario(req.params.id, req.body)
+            const resultado = await FuncionarioService.atualizarFuncionario(
+                req.params.id,
+                req.body,
+                req.funcionario.id_funcionario,
+            )
             res.json(resultado)
 
         } catch (erro) {

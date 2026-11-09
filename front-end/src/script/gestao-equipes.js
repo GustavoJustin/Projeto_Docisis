@@ -1,4 +1,4 @@
-async function inicializarGestaoEquipes() {
+async function inicializarGestaoEquipes(event = {}) {
   const tableBody = document.getElementById("team-table-body");
   const searchInput = document.getElementById("search-member");
   if (!tableBody || !searchInput) return;
@@ -21,6 +21,10 @@ async function inicializarGestaoEquipes() {
   }
 
   const roleButtons = document.querySelectorAll(".filter-role");
+  roleButtons.forEach((button) => {
+    const selected = button.dataset.filter === "all";
+    button.setAttribute("aria-pressed", String(selected));
+  });
   const createButton = document.getElementById("btn-novo-funcionario");
   const editButton = document.getElementById("btn-editar-funcionario");
   const createModal = document.getElementById("create-employee-modal");
@@ -35,7 +39,8 @@ async function inicializarGestaoEquipes() {
 
   let selectedRole = "all";
   let members = [];
-  const canCreateEmployees = Boolean(Number(usuario?.pode_cadastrar_funcionarios));
+  let canCreateEmployees = Boolean(Number(usuario?.pode_cadastrar_funcionarios));
+  let canDeleteEmployees = Boolean(Number(usuario?.pode_excluir_funcionarios));
   let membroParaExcluir = null;
   let botaoDeExclusaoAtual = null;
   const modalExclusao = document.getElementById("confirm-removal-modal");
@@ -211,8 +216,14 @@ async function inicializarGestaoEquipes() {
       const removeButton = document.createElement("button");
       removeButton.type = "button";
       removeButton.className =
-        "text-rose-500 hover:text-rose-700 font-semibold";
+        canDeleteEmployees
+          ? "text-rose-500 transition-colors hover:text-rose-700 font-semibold"
+          : "cursor-default text-rose-300 opacity-50 font-semibold";
       removeButton.textContent = "Remover";
+      removeButton.disabled = !canDeleteEmployees;
+      removeButton.title = canDeleteEmployees
+        ? "Remover funcionário"
+        : "Sua conta não pode remover funcionários";
       removeButton.addEventListener("click", () =>
         abrirConfirmacaoExclusao(member, removeButton),
       );
@@ -261,6 +272,10 @@ async function inicializarGestaoEquipes() {
   }
 
   function abrirConfirmacaoExclusao(member, button) {
+    if (!canDeleteEmployees) {
+      showNotice("Sua conta de administrador não tem permissão para remover funcionários.", "error");
+      return;
+    }
     if (!modalExclusao || !botaoConfirmarExclusao || !botaoCancelarExclusao) {
       showNotice("Não foi possível abrir a confirmação de exclusão.", "error");
       return;
@@ -351,6 +366,7 @@ async function inicializarGestaoEquipes() {
       selectedRole = button.dataset.filter;
       roleButtons.forEach((item) => {
         const selected = item === button;
+        item.setAttribute("aria-pressed", String(selected));
         item.classList.toggle("bg-[#875C46]", selected);
         item.classList.toggle("text-white", selected);
         item.classList.toggle("bg-gray-100", !selected);
@@ -382,18 +398,75 @@ async function inicializarGestaoEquipes() {
 
     createButton.disabled = true;
     try {
-      const url = new URL("./cadastroFuncionario.html", window.location.href);
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error("Não foi possível carregar o formulário de criação.");
-      }
-      const html = await response.text();
-      const page = new DOMParser().parseFromString(html, "text/html");
-      const sourceForm = page.querySelector("#form-cadastro");
-      if (!sourceForm) throw new Error("O formulário de criação não foi encontrado.");
-
-      const form = document.importNode(sourceForm, true);
-      createContent.replaceChildren(form);
+      createContent.innerHTML = `
+        <form id="form-cadastro" novalidate class="mx-auto max-w-3xl space-y-5">
+          <div id="cadastro-alert" class="hidden rounded-xl border px-4 py-3 text-sm" role="alert" aria-live="polite">
+            <span id="cadastro-alert-text"></span>
+          </div>
+          <div class="grid gap-5 md:grid-cols-[10rem_minmax(0,1fr)]">
+            <section class="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-[#FAF8F5] p-5 text-center">
+              <label id="photo-dropzone" class="relative mb-3 flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-[#875C46]/40 bg-white">
+                <span id="upload-placeholder" class="text-xs font-semibold text-[#875C46]">Enviar foto</span>
+                <img id="photo-preview" class="absolute inset-0 hidden h-full w-full object-cover" alt="Prévia da foto de perfil">
+                <input type="file" id="input-foto" class="absolute inset-0 h-full w-full cursor-pointer opacity-0" accept="image/*">
+              </label>
+              <p class="text-[11px] text-gray-500">Imagem até 2 MB</p>
+            </section>
+            <section class="space-y-4 rounded-xl border border-gray-200 p-5">
+              <label class="block text-xs font-semibold text-gray-700">Nome completo
+                <input id="input-nome" required maxlength="120" class="mt-1.5 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="Nome do funcionário">
+              </label>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <label class="block text-xs font-semibold text-gray-700">CPF
+                  <input id="input-cpf" required minlength="14" maxlength="14" pattern="\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}" class="mt-1.5 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="000.000.000-00">
+                </label>
+                <label class="block text-xs font-semibold text-gray-700">Idade (opcional)
+                  <input id="input-idade" type="number" min="1" max="120" class="mt-1.5 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+                </label>
+              </div>
+              <label class="block text-xs font-semibold text-gray-700">E-mail
+                <input id="input-email" type="email" required maxlength="254" class="mt-1.5 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm" placeholder="nome@empresa.com">
+              </label>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <label class="block text-xs font-semibold text-gray-700">Senha inicial
+                  <input id="input-senha" type="password" required minlength="6" autocomplete="new-password" class="mt-1.5 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+                </label>
+                <label class="block text-xs font-semibold text-gray-700">Confirmar senha
+                  <input id="input-confirma-senha" type="password" required minlength="6" autocomplete="new-password" class="mt-1.5 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+                </label>
+              </div>
+            </section>
+          </div>
+          <fieldset class="rounded-xl border border-gray-200 p-5">
+            <legend class="px-1 text-sm font-bold text-[#6D4936]">Cargo e permissões</legend>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label id="card-admin" class="flex cursor-pointer items-center justify-between rounded-lg border border-gray-200 p-3 text-sm font-semibold">
+                Administrador
+                <input type="radio" name="nivel_acesso" value="administrador" required class="accent-[#875C46]">
+              </label>
+              <label id="card-func" class="flex cursor-pointer items-center justify-between rounded-lg border border-gray-200 p-3 text-sm font-semibold">
+                Funcionário
+                <input type="radio" name="nivel_acesso" value="funcionario" checked class="accent-[#875C46]">
+              </label>
+            </div>
+            <div id="admin-permissions-container" class="mt-4 hidden grid gap-3 sm:grid-cols-2">
+              <label class="flex items-center gap-2 rounded-lg bg-[#F8F6F2] p-3 text-xs">
+                <input id="admin-create-permission" type="checkbox" class="accent-[#875C46]">
+                Pode criar funcionários
+              </label>
+              <label class="flex items-center gap-2 rounded-lg bg-[#F8F6F2] p-3 text-xs">
+                <input id="admin-delete-permission" type="checkbox" class="accent-[#875C46]">
+                Pode remover funcionários
+              </label>
+            </div>
+          </fieldset>
+          <div class="flex flex-wrap justify-end gap-3">
+            <button type="button" id="btn-cancelar" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50">Cancelar</button>
+            <button type="submit" class="rounded-lg bg-[#875C46] px-5 py-2 text-sm font-semibold text-white hover:bg-[#6D4936]">Criar conta</button>
+          </div>
+        </form>`;
+      const form = createContent.querySelector("#form-cadastro");
+      if (!form) throw new Error("Não foi possível criar o formulário de cadastro.");
       abrirModal(createModal);
       window.inicializarCadastroFuncionario(form, {
         onCancel: () => fecharModal(createModal),
@@ -425,7 +498,7 @@ async function inicializarGestaoEquipes() {
     return { wrapper, input };
   }
 
-  function renderEditList() {
+  async function renderEditList() {
     if (!editList) return;
     editList.replaceChildren();
     if (members.length === 0) {
@@ -436,21 +509,181 @@ async function inicializarGestaoEquipes() {
       return;
     }
 
+    const token = localStorage.getItem("docegestao_token");
+    let cargos;
+    try {
+      if (!token) throw new Error("Sua sessão expirou. Entre novamente.");
+      const response = await fetch("/api/cargos", {
+        headers: { Authorization: "Bearer " + token },
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.mensagem || "Não foi possível carregar os cargos.");
+      }
+      cargos = result.dados || [];
+    } catch (error) {
+      const failure = document.createElement("p");
+      failure.className = "rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800";
+      failure.setAttribute("role", "alert");
+      failure.textContent = error.message || "Não foi possível carregar os cargos.";
+      editList.append(failure);
+      return;
+    }
+
     members.forEach((member) => {
-      const card = document.createElement("article");
-      card.className = "mb-3 rounded-xl border border-gray-200 p-4 last:mb-0";
+      const card = document.createElement("details");
+      card.className = "group mb-2 rounded-xl border border-gray-200 bg-white p-3 last:mb-0";
+      const summary = document.createElement("summary");
+      summary.className = "flex cursor-pointer list-none items-center justify-between gap-3";
       const details = document.createElement("div");
-      details.className = "min-w-0";
+      details.className = "mt-3 space-y-3 border-t border-gray-100 pt-3";
       const name = document.createElement("p");
       name.className = "truncate text-sm font-semibold text-gray-800";
       name.textContent = member.nome || "Sem nome";
       const email = document.createElement("p");
       email.className = "truncate text-xs text-gray-500";
       email.textContent = member.email || "E-mail não informado";
+      const roleSummary = document.createElement("span");
+      roleSummary.className = "shrink-0 rounded-full bg-[#F5ECE5] px-2.5 py-1 text-[11px] font-semibold text-[#784E38]";
+      roleSummary.textContent = member.nome_cargo || "Sem cargo";
+      const identity = document.createElement("div");
+      identity.className = "min-w-0";
+      identity.append(name, email);
+      summary.append(identity, roleSummary);
+      const accessForm = document.createElement("form");
+      accessForm.className = "grid gap-3";
+      const roleLabel = document.createElement("label");
+      roleLabel.className = "grid gap-1 text-xs font-semibold text-gray-700";
+      roleLabel.append(document.createTextNode("Cargo"));
+      const roleSelect = document.createElement("select");
+      roleSelect.required = true;
+      roleSelect.className = "w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm";
+      cargos.forEach((cargo) => {
+        const option = document.createElement("option");
+        option.value = String(cargo.id_cargos);
+        option.textContent = cargo.nome_cargo;
+        option.selected = Number(member.id_cargos) === Number(cargo.id_cargos);
+        roleSelect.append(option);
+      });
+      const isSelf = String(member.id_funcionario) === String(usuario?.id_funcionario);
+      if (isSelf) {
+        roleSelect.disabled = true;
+        roleSelect.title = "Peça a outro administrador para alterar seu próprio cargo.";
+      }
+      roleLabel.append(roleSelect);
+      const permissions = document.createElement("div");
+      permissions.className = "gap-2 sm:grid-cols-2";
+      const createPermission = document.createElement("input");
+      createPermission.type = "checkbox";
+      createPermission.className = "accent-[#875C46]";
+      createPermission.checked = Boolean(Number(member.pode_cadastrar_funcionarios));
+      const deletePermission = document.createElement("input");
+      deletePermission.type = "checkbox";
+      deletePermission.className = "accent-[#875C46]";
+      deletePermission.checked = Boolean(Number(member.pode_excluir_funcionarios));
+      const createPermissionLabel = document.createElement("label");
+      createPermissionLabel.className = "flex items-center gap-2 rounded-lg bg-[#F8F6F2] p-3 text-xs";
+      createPermissionLabel.append(createPermission, document.createTextNode("Pode criar funcionários"));
+      const deletePermissionLabel = document.createElement("label");
+      deletePermissionLabel.className = "flex items-center gap-2 rounded-lg bg-[#F8F6F2] p-3 text-xs";
+      deletePermissionLabel.append(deletePermission, document.createTextNode("Pode remover funcionários"));
+      permissions.append(createPermissionLabel, deletePermissionLabel);
+      const isAdminRole = (cargoId) => normalizarCargo(
+        cargos.find((cargo) => String(cargo.id_cargos) === String(cargoId))?.nome_cargo,
+      ).includes("admin");
+      const atualizarPermissoesVisiveis = () => {
+        permissions.style.display = isAdminRole(roleSelect.value) ? "grid" : "none";
+      };
+      roleSelect.addEventListener("change", atualizarPermissoesVisiveis);
+      atualizarPermissoesVisiveis();
+      const accessStatus = document.createElement("p");
+      accessStatus.className = "hidden text-xs";
+      accessStatus.setAttribute("role", "status");
+      const saveAccess = document.createElement("button");
+      saveAccess.type = "submit";
+      saveAccess.className = "justify-self-start rounded-lg bg-[#875C46] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#6D4936]";
+      saveAccess.textContent = "Salvar cargo e permissões";
+      accessForm.append(roleLabel, permissions, accessStatus, saveAccess);
+      accessForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const selectedCargo = cargos.find(
+          (cargo) => String(cargo.id_cargos) === String(roleSelect.value),
+        );
+        if (!selectedCargo) {
+          accessStatus.textContent = "Selecione um cargo válido.";
+          accessStatus.className = "text-xs text-red-700";
+          return;
+        }
+        saveAccess.disabled = true;
+        saveAccess.textContent = "Salvando...";
+        try {
+          const response = await fetch(`/api/funcionarios/${member.id_funcionario}`, {
+            method: "PUT",
+            headers: {
+              Authorization: "Bearer " + token,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id_cargos: Number(roleSelect.value),
+              pode_cadastrar_funcionarios: isAdminRole(roleSelect.value) && createPermission.checked,
+              pode_excluir_funcionarios: isAdminRole(roleSelect.value) && deletePermission.checked,
+            }),
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.mensagem || "Não foi possível atualizar a conta.");
+          }
+          Object.assign(member, {
+            id_cargos: Number(roleSelect.value),
+            nome_cargo: selectedCargo.nome_cargo,
+            pode_cadastrar_funcionarios: isAdminRole(roleSelect.value) && createPermission.checked ? 1 : 0,
+            pode_excluir_funcionarios: isAdminRole(roleSelect.value) && deletePermission.checked ? 1 : 0,
+          });
+          if (isSelf) {
+            const usuarioAtualizado = {
+              ...usuario,
+              id_cargos: member.id_cargos,
+              nome_cargo: member.nome_cargo,
+              pode_cadastrar_funcionarios: member.pode_cadastrar_funcionarios,
+              pode_excluir_funcionarios: member.pode_excluir_funcionarios,
+            };
+            try {
+              Object.assign(usuario, usuarioAtualizado);
+              localStorage.setItem("docegestao_funcionario", JSON.stringify(usuarioAtualizado));
+            } catch (error) {
+              console.error("A conta foi atualizada, mas não foi possível atualizar a sessão local:", error);
+            }
+            canCreateEmployees = Boolean(member.pode_cadastrar_funcionarios);
+            canDeleteEmployees = Boolean(member.pode_excluir_funcionarios);
+            if (createButton) {
+              createButton.disabled = !canCreateEmployees;
+              createButton.classList.toggle("opacity-50", !canCreateEmployees);
+              createButton.classList.toggle("cursor-default", !canCreateEmployees);
+              createButton.classList.toggle("hover:bg-[#6D4936]", canCreateEmployees);
+              createButton.title = canCreateEmployees
+                ? "Criar funcionário"
+                : "Sua conta de administrador não pode criar funcionários";
+            }
+          }
+          roleSummary.textContent = selectedCargo.nome_cargo;
+          updateCounts();
+          renderMembers();
+          accessStatus.textContent = "Cargo e permissões atualizados.";
+          accessStatus.className = "text-xs text-emerald-700";
+        } catch (error) {
+          accessStatus.textContent = error.message || "Não foi possível atualizar a conta.";
+          accessStatus.className = "text-xs text-red-700";
+        } finally {
+          accessStatus.classList.remove("hidden");
+          saveAccess.disabled = false;
+          saveAccess.textContent = "Salvar cargo e permissões";
+        }
+      });
+      details.append(accessForm);
       const passwordInfo = document.createElement("p");
-      passwordInfo.className = "mt-1 text-[11px] text-gray-400";
+      passwordInfo.className = "text-[11px] text-gray-400";
       passwordInfo.textContent = "Senha corporativa: protegida (não exibida)";
-      details.append(name, email, passwordInfo);
+      details.append(passwordInfo);
 
       const resetButton = document.createElement("button");
       resetButton.type = "button";
@@ -516,15 +749,16 @@ async function inicializarGestaoEquipes() {
           submit.textContent = "Salvar nova senha";
         }
       });
-      card.append(details, resetButton, resetForm);
+      details.append(resetButton, resetForm);
+      card.append(summary, details);
       editList.append(card);
     });
   }
 
   createButton?.addEventListener("click", abrirCriacaoFuncionario);
   editButton?.addEventListener("click", () => {
-    renderEditList();
     abrirModal(editModal);
+    void renderEditList();
   });
   document.getElementById("create-employee-close")?.addEventListener("click", () => fecharModal(createModal));
   document.getElementById("edit-employee-close")?.addEventListener("click", () => fecharModal(editModal));
@@ -538,9 +772,26 @@ async function inicializarGestaoEquipes() {
     if (!tableBody.isConnected) return;
     void loadMembers();
   });
-  if (createButton) createButton.hidden = !canCreateEmployees;
+  if (createButton) {
+    createButton.disabled = !canCreateEmployees;
+    createButton.classList.toggle("opacity-50", !canCreateEmployees);
+    createButton.classList.toggle("cursor-default", !canCreateEmployees);
+    createButton.classList.toggle("hover:bg-[#6D4936]", canCreateEmployees);
+    createButton.title = canCreateEmployees
+      ? "Criar funcionário"
+      : "Sua conta de administrador não pode criar funcionários";
+  }
+  if (tableBody.dataset.polling !== "true") {
+    tableBody.dataset.polling = "true";
+    window.setInterval(() => {
+      if (!document.hidden && tableBody.isConnected) void loadMembers();
+    }, 15000);
+  }
 
   await loadMembers();
+  if (event.detail?.pagina === "cadastro") {
+    await abrirCriacaoFuncionario();
+  }
 }
 
 document.addEventListener("demo:page-loaded", inicializarGestaoEquipes);

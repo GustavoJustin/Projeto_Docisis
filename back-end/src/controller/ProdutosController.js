@@ -75,7 +75,7 @@ class ProdutosController {
 
     async cadastrarProduto(req, res) {
         try {
-            const resultado = await ProdutoService.cadastrarProduto(req.body)
+            const resultado = await ProdutoService.cadastrarProduto(req.body, req.funcionario)
             res.status(201).json(resultado)
         } catch (erro) {
             res.status(erro.status || 500).json({
@@ -88,7 +88,7 @@ class ProdutosController {
 
     async atualizarProduto(req, res) {
         try {
-            const resultado = await ProdutoService.atualizarProduto(req.params.id, req.body)
+            const resultado = await ProdutoService.atualizarProduto(req.params.id, req.body, req.funcionario)
             res.json(resultado)
         } catch (erro) {
             res.status(erro.status || 500).json({
@@ -101,7 +101,7 @@ class ProdutosController {
 
     async deletarProduto(req, res) {
         try {
-            const resultado = await ProdutoService.deletarProduto(req.params.id)
+            const resultado = await ProdutoService.deletarProduto(req.params.id, req.funcionario)
             res.json(resultado)
         } catch (erro) {
             res.status(erro.status || 500).json({

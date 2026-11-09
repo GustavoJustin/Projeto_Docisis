@@ -17,7 +17,8 @@ function inicializarCadastroFuncionario(root = document, options = {}) {
   const adminCard = get("card-admin");
   const employeeCard = get("card-func");
   const adminPermission = get("admin-create-permission");
-  const adminPermissionContainer = get("admin-create-permission-container");
+  const adminDeletePermission = get("admin-delete-permission");
+  const adminPermissionContainer = get("admin-permissions-container");
   const roleInputs = form.querySelectorAll('input[name="nivel_acesso"]');
   let canCreate = false;
 
@@ -218,6 +219,8 @@ function inicializarCadastroFuncionario(root = document, options = {}) {
           id_cargos: Number(cargo.id_cargos),
           pode_cadastrar_funcionarios:
             selectedRole === "administrador" && Boolean(adminPermission?.checked),
+          pode_excluir_funcionarios:
+            selectedRole === "administrador" && Boolean(adminDeletePermission?.checked),
           foto: await preparePhoto(inputFoto?.files?.[0]),
         }),
       });

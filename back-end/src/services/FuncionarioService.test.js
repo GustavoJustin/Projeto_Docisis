@@ -90,6 +90,22 @@ describe("FuncionarioService.cadastrarFuncionario", () => {
     );
   });
 
+  test("stores the delete permission only for an explicitly authorized admin", async () => {
+    CargosRepository.buscarCargoId.mockResolvedValue({ nome_cargo: "Administrador" });
+    await FuncionarioService.cadastrarFuncionario({
+      cpf: "12345678999",
+      id_cargos: 1,
+      nome: "Admin",
+      email: "admin@example.com",
+      senha: "123456",
+      pode_excluir_funcionarios: true,
+    });
+
+    expect(FuncionariosRepository.cadastrarFuncionario).toHaveBeenCalledWith(
+      expect.objectContaining({ pode_excluir_funcionarios: 1 }),
+    );
+  });
+
   test("does not grant employee accounts the permission to create employees", async () => {
     await FuncionarioService.cadastrarFuncionario({
       cpf: "12345678999",
@@ -245,5 +261,92 @@ describe("FuncionarioService.atualizarFotoPerfil", () => {
     await expect(FuncionarioService.atualizarFotoPerfil(5, "not-an-image")).rejects
       .toMatchObject({ status: 400 });
     expect(FuncionariosRepository.atualizarFotoPerfil).not.toHaveBeenCalled();
+  });
+});
+
+describe("FuncionarioService.atualizarFuncionario access settings", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    FuncionariosRepository.buscarFuncionarioId.mockResolvedValue({
+      id_funcionario: 5,
+      id_cargos: 1,
+      nome_cargo: "Funcionário",
+      pode_cadastrar_funcionarios: 0,
+      pode_excluir_funcionarios: 0,
+    });
+    FuncionariosRepository.atualizarFuncionario.mockResolvedValue(1);
+    CargosRepository.buscarCargoId.mockResolvedValue({ nome_cargo: "Administrador" });
+  });
+
+  test("saves the selected administrator role and permissions", async () => {
+    await FuncionarioService.atualizarFuncionario(5, {
+      id_cargos: 2,
+      pode_cadastrar_funcionarios: true,
+      pode_excluir_funcionarios: false,
+    }, 9);
+
+    expect(FuncionariosRepository.atualizarFuncionario).toHaveBeenCalledWith(5, {
+      id_cargos: 2,
+      pode_cadastrar_funcionarios: 1,
+      pode_excluir_funcionarios: 0,
+    });
+  });
+
+  test("clears administrator permissions when changing to a non-admin role", async () => {
+    FuncionariosRepository.buscarFuncionarioId.mockResolvedValue({
+      id_funcionario: 5,
+      id_cargos: 2,
+      nome_cargo: "Administrador",
+      pode_cadastrar_funcionarios: 1,
+      pode_excluir_funcionarios: 1,
+    });
+    CargosRepository.buscarCargoId.mockResolvedValue({ nome_cargo: "Funcionário" });
+    FuncionariosRepository.listarFuncionario.mockResolvedValue([
+      { nome_cargo: "Administrador" },
+      { nome_cargo: "Administrador" },
+    ]);
+
+    await FuncionarioService.atualizarFuncionario(5, { id_cargos: 1 }, 9);
+
+    expect(FuncionariosRepository.atualizarFuncionario).toHaveBeenCalledWith(5, {
+      id_cargos: 1,
+      pode_cadastrar_funcionarios: 0,
+      pode_excluir_funcionarios: 0,
+    });
+  });
+
+  test("prevents demoting the last administrator", async () => {
+    FuncionariosRepository.buscarFuncionarioId.mockResolvedValue({
+      id_funcionario: 5,
+      id_cargos: 2,
+      nome_cargo: "Administrador",
+    });
+    CargosRepository.buscarCargoId.mockResolvedValue({ nome_cargo: "Funcionário" });
+    FuncionariosRepository.listarFuncionario.mockResolvedValue([
+      { nome_cargo: "Administrador" },
+    ]);
+
+    await expect(
+      FuncionarioService.atualizarFuncionario(5, { id_cargos: 1 }, 9),
+    ).rejects.toMatchObject({ status: 409 });
+    expect(FuncionariosRepository.atualizarFuncionario).not.toHaveBeenCalled();
+  });
+
+  test("prevents an administrator from changing their own role", async () => {
+    await expect(
+      FuncionarioService.atualizarFuncionario(5, { id_cargos: 2 }, 5),
+    ).rejects.toMatchObject({ status: 400 });
+    expect(CargosRepository.buscarCargoId).not.toHaveBeenCalled();
+    expect(FuncionariosRepository.atualizarFuncionario).not.toHaveBeenCalled();
+  });
+
+  test("rejects malformed administrator permissions", async () => {
+    await expect(
+      FuncionarioService.atualizarFuncionario(5, {
+        id_cargos: 2,
+        pode_cadastrar_funcionarios: "sim",
+      }, 9),
+    ).rejects.toMatchObject({ status: 400 });
+    expect(FuncionariosRepository.atualizarFuncionario).not.toHaveBeenCalled();
   });
 });

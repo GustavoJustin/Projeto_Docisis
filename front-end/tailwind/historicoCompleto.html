@@ -17,6 +17,7 @@
 
   <!-- Estilos e ícones compartilhados -->
   <link rel="stylesheet" href="../src/css/output.css" />
+  <link rel="stylesheet" href="../src/css/responsive.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
@@ -43,7 +44,7 @@
             Histórico de Movimentações
           </h1>
           <p class="mt-1 text-sm text-stone-400">
-            Acompanhe todas as entradas e saídas do estoque em tempo real.
+            Acompanhe todas as movimentações do estoque em tempo real.
           </p>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -174,9 +175,20 @@
           </tbody>
         </table>
 
-        <div class="mt-4 flex items-center justify-between text-sm text-stone-400">
+        <nav class="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-stone-400"
+          aria-label="Paginação do histórico">
           <p id="resumo-paginacao">Mostrando 5 de 5 registros</p>
-        </div>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" id="historico-pagina-anterior"
+              class="rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs font-semibold text-amber-900 transition hover:bg-amber-50 hover:shadow-sm disabled:opacity-40">
+              &larr; Anterior
+            </button>
+            <button type="button" id="historico-proxima-pagina"
+              class="rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs font-semibold text-amber-900 transition hover:bg-amber-50 hover:shadow-sm disabled:opacity-40">
+              Próxima &rarr;
+            </button>
+          </div>
+        </nav>
       </div>
 
       <!-- Cartões de resumo -->
@@ -227,6 +239,7 @@
             <option value="todos">Todos os tipos</option>
             <option value="ENTRADA">Entrada</option>
             <option value="SAÍDA">Saída</option>
+            <option value="AJUSTE">Ajuste</option>
           </select>
         </div>
         <div>

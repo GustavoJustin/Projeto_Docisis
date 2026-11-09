@@ -76,14 +76,6 @@
     acoes.style.width = "180px";
     acoes.style.maxWidth = "100%";
     acoes.style.flexShrink = "0";
-    if (alertaEstoque) {
-      const atualizar = document.createElement("button");
-      atualizar.type = "button";
-      atualizar.dataset.action = "atualizar";
-      atualizar.className = "w-full rounded-lg bg-[#784E38] px-3 py-2 text-xs font-semibold text-white hover:bg-[#633e2c]";
-      atualizar.textContent = "Atualizar estoque";
-      acoes.appendChild(atualizar);
-    }
     const localizar = document.createElement("button");
     localizar.type = "button";
     localizar.dataset.action = "localizar";
@@ -174,6 +166,7 @@
         nome: String(produto.nome || produto.marca || "Insumo"),
         descricao: String(produto.descricao || produto.categoria || produto.tipo || ""),
         categoria: String(produto.categoria || produto.tipo || "Outros"),
+        imagem: String(produto.imagem || ""),
         unidade: String(produto.unidade || "un"),
         quantidade: Number(produto.quantidade) || 0,
         maximo: Number(produto.maximo) || 1,
@@ -208,23 +201,20 @@
       aplicarFiltros();
       destacarAlertaDaNotificacao(container);
       container.onclick = (event) => {
-        const botao = event.target.closest("[data-action='atualizar'], [data-action='localizar']");
+        const botao = event.target.closest("[data-action='localizar']");
         if (!botao) return;
         const card = botao.closest(".alert-card");
         if (!card) return;
         const pagina = new URL(window.location.href);
         const produtoId = card.dataset.id;
-        const localizar = botao.dataset.action === "localizar";
-        const parametros = localizar
-          ? { localizar: produtoId }
-          : { produto: produtoId };
+        const parametros = { localizar: produtoId };
         if (typeof window.navegarDemo === "function") {
           window.navegarDemo("estoque", parametros);
         } else {
           pagina.pathname = pagina.pathname.replace(/alertas?\.html$/i, "painel.html");
           pagina.search = "";
           pagina.searchParams.set("pagina", "estoque");
-          pagina.searchParams.set(localizar ? "localizar" : "produto", produtoId);
+          pagina.searchParams.set("localizar", produtoId);
           window.location.assign(pagina);
         }
       };
@@ -246,6 +236,11 @@
     document.querySelectorAll("#filterTabs .tab-btn").forEach((botao) => {
       const ativo = botao === event.target.closest("#filterTabs .tab-btn");
       botao.setAttribute("aria-pressed", String(ativo));
+      botao.classList.toggle("bg-white", ativo);
+      botao.classList.toggle("text-gray-800", ativo);
+      botao.classList.toggle("shadow-sm", ativo);
+      botao.classList.toggle("text-gray-500", !ativo);
+      botao.classList.toggle("hover:text-gray-800", !ativo);
     });
     aplicarFiltros();
   });
@@ -263,6 +258,13 @@
     }
     cards.forEach((card) => container.appendChild(card));
   });
+  const alertContainer = document.getElementById("alertCardsContainer");
+  if (alertContainer && alertContainer.dataset.polling !== "true") {
+    alertContainer.dataset.polling = "true";
+    window.setInterval(() => {
+      if (!document.hidden && alertContainer.isConnected) void inicializarAlertasEstoque();
+    }, 15000);
+  }
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       if (document.getElementById("alertCardsContainer") &&
