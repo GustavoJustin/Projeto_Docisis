@@ -1,273 +1,125 @@
-
 function inicializarLogin() {
-    const modal = document.getElementById("modal-esqueci");
-    const btnAbrir = document.getElementById("btn-abrir-esqueci");
-    const btnFechar = document.getElementById("btn-fechar-esqueci");
-    const btnCancelar = document.getElementById("btn-cancelar-esqueci");
-    const formRecuperacao = document.getElementById("form-recuperacao");
-    const msgErro = document.getElementById("mensagem-erro");
-    const msgSucesso = document.getElementById("mensagem-sucesso");
-    const btnEnviar = document.getElementById("btn-enviar-esqueci");
-    const formLogin = document.getElementById("form-login");
-    const modalContato = document.getElementById("modal-contato");
-    const contatoStatus = document.getElementById("contato-status");
-    const contatoInfo = document.getElementById("contato-info");
-    const contatoNome = document.getElementById("contato-nome");
-    const contatoEmail = document.getElementById("contato-email");
-    const contatoTelefone = document.getElementById("contato-telefone");
-    const contatoInstagram = document.getElementById("contato-instagram");
-    const loginAlert = document.getElementById("login-alert");
-    const loginAlertText = document.getElementById("login-alert-text");
-    const loginAlertLink = document.getElementById("login-alert-link");
+  const formLogin = document.getElementById("form-login");
+  if (!formLogin || formLogin.dataset.loginInicializado === "true") return;
+  formLogin.dataset.loginInicializado = "true";
 
-    const avisoCadastro = sessionStorage.getItem("docegestao_aviso_login");
-    if (avisoCadastro && loginAlert && loginAlertText) {
-        loginAlertText.textContent = avisoCadastro;
-        loginAlertLink?.classList.add("hidden");
-        loginAlert.classList.remove(
-            "hidden",
-            "border-amber-200",
-            "bg-amber-50",
-            "text-amber-800",
-        );
-        loginAlert.classList.add(
-            "border-emerald-200",
-            "bg-emerald-50",
-            "text-emerald-800",
-        );
-        sessionStorage.removeItem("docegestao_aviso_login");
+  const loginAlert = document.getElementById("login-alert");
+  const loginAlertText = document.getElementById("login-alert-text");
+  const modalContato = document.getElementById("modal-contato");
+  const contatoStatus = document.getElementById("contato-status");
+  const contatoInfo = document.getElementById("contato-info");
+
+  async function abrirContato() {
+    if (!modalContato || !contatoStatus || !contatoInfo) return;
+    modalContato.style.display = "flex";
+    contatoInfo.style.display = "none";
+    contatoStatus.textContent = "Buscando contato cadastrado...";
+
+    try {
+      const response = await fetch("/api/login/contato");
+      const resultado = await response.json();
+      if (!response.ok) {
+        throw new Error(resultado.mensagem || "Não foi possível consultar o contato.");
+      }
+
+      const contato = resultado.contato;
+      if (!contato) {
+        contatoStatus.textContent = "O contato do administrador não está configurado.";
+        return;
+      }
+      document.getElementById("contato-nome").textContent = contato.nome || "";
+      const email = document.getElementById("contato-email");
+      email.textContent = contato.email || "";
+      if (contato.email) email.href = `mailto:${contato.email}`;
+
+      const telefone = String(contato.telefone || "").trim();
+      const telefoneLink = document.getElementById("contato-telefone");
+      const numero = telefone.replace(/\D/g, "");
+      telefoneLink.textContent = telefone || "Não configurado";
+      if (numero) {
+        telefoneLink.href = `https://wa.me/${numero.startsWith("55") ? numero : `55${numero}`}`;
+        telefoneLink.target = "_blank";
+        telefoneLink.rel = "noopener noreferrer";
+      } else {
+        telefoneLink.removeAttribute("href");
+      }
+
+      const instagram = String(contato.instagram || "").trim().replace(/^@/, "");
+      const instagramLink = document.getElementById("contato-instagram");
+      instagramLink.textContent = instagram ? `@${instagram}` : "Não configurado";
+      if (instagram) {
+        instagramLink.href = `https://www.instagram.com/${encodeURIComponent(instagram)}/`;
+        instagramLink.target = "_blank";
+        instagramLink.rel = "noopener noreferrer";
+      } else {
+        instagramLink.removeAttribute("href");
+      }
+
+      contatoStatus.textContent = "Para solicitar acesso ou ajuda, entre em contato com:";
+      contatoInfo.style.display = "block";
+    } catch (error) {
+      contatoStatus.textContent =
+        error.message || "Não foi possível consultar o contato do administrador.";
     }
+  }
 
-    async function abrirContato() {
-        modalContato.style.display = "flex";
-        contatoInfo.style.display = "none";
-        contatoStatus.textContent = "Buscando contato cadastrado...";
+  function fecharContato() {
+    if (modalContato) modalContato.style.display = "none";
+  }
 
-        function mostrarContato(contato, mensagem) {
-            contatoStatus.textContent = mensagem;
-            contatoNome.textContent = contato.nome;
-            contatoEmail.textContent = contato.email;
-            contatoEmail.href = `mailto:${contato.email}`;
-            const telefone = (contato.telefone || "").trim();
-            const numeroWhatsApp = telefone.replace(/\D/g, "");
-            contatoTelefone.textContent =
-                numeroWhatsApp.length === 11
-                    ? `(${numeroWhatsApp.slice(0, 2)}) ${numeroWhatsApp.slice(2, 7)}-${numeroWhatsApp.slice(7)}`
-                    : telefone || "Não configurado";
-            if (numeroWhatsApp) {
-                const numeroInternacional = numeroWhatsApp.startsWith("55")
-                    ? numeroWhatsApp
-                    : `55${numeroWhatsApp}`;
-                contatoTelefone.href = `https://wa.me/${numeroInternacional}`;
-                contatoTelefone.target = "_blank";
-                contatoTelefone.rel = "noopener noreferrer";
-            } else {
-                contatoTelefone.removeAttribute("href");
-            }
+  document.getElementById("btn-abrir-contato")?.addEventListener("click", abrirContato);
+  document.getElementById("btn-fechar-contato")?.addEventListener("click", fecharContato);
+  document.getElementById("btn-fechar-contato-footer")?.addEventListener("click", fecharContato);
+  modalContato?.addEventListener("click", (event) => {
+    if (event.target === modalContato) fecharContato();
+  });
 
-            const usuarioInstagram = (contato.instagram || "")
-                .trim()
-                .replace(/^@/, "");
-            contatoInstagram.textContent = usuarioInstagram
-                ? `@${usuarioInstagram}`
-                : "Não configurado";
-            if (usuarioInstagram) {
-                contatoInstagram.href = `https://www.instagram.com/${encodeURIComponent(usuarioInstagram)}/`;
-                contatoInstagram.target = "_blank";
-                contatoInstagram.rel = "noopener noreferrer";
-            } else {
-                contatoInstagram.removeAttribute("href");
-            }
-            contatoInfo.style.display = "block";
-        }
+  formLogin.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const submitButton = formLogin.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    if (loginAlert) loginAlert.classList.add("hidden");
 
-        try {
-            const response = await fetch("/api/login/contato");
-            const resultado = await response.json();
-            const contato = resultado.contato;
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: document.getElementById("email").value,
+          senha: document.getElementById("senha").value,
+        }),
+      });
+      const resultado = await response.json();
+      if (!response.ok || !resultado.token) {
+        throw new Error(resultado.mensagem || "E-mail ou senha inválidos.");
+      }
 
-            if (!response.ok) throw new Error(resultado.mensagem);
-            if (!contato) {
-                mostrarContato(
-                    {
-                        nome: "Geraldo",
-                        email: "geraldo_adm@docisis.com",
-                        telefone: "11223459067",
-                        instagram: "",
-                    },
-                    "Contato do administrador:",
-                );
-                return;
-            }
-
-            mostrarContato(
-                contato,
-                "Para solicitar acesso ou ajuda, entre em contato com:",
-            );
-        } catch {
-            mostrarContato(
-                {
-                    nome: "Geraldo",
-                    email: "geraldo_adm@docisis.com",
-                    telefone: "11223459067",
-                    instagram: "",
-                },
-                "Contato do administrador:",
-            );
-        }
+      localStorage.setItem("docegestao_token", resultado.token);
+      localStorage.setItem(
+        "docegestao_funcionario",
+        JSON.stringify(resultado.funcionario),
+      );
+      if (typeof window.navegarDemo === "function") {
+        window.navegarDemo("splash");
+      } else {
+        window.location.href = "./painel.html?pagina=splash";
+      }
+    } catch (error) {
+      if (loginAlert && loginAlertText) {
+        loginAlertText.textContent = error.message || "Não foi possível conectar à API.";
+        loginAlert.classList.remove("hidden");
+      }
+    } finally {
+      submitButton.disabled = false;
     }
-
-    function fecharContato() {
-        modalContato.style.display = "none";
-    }
-
-    document
-        .getElementById("btn-abrir-contato")
-        .addEventListener("click", abrirContato);
-    document
-        .getElementById("btn-fechar-contato")
-        .addEventListener("click", fecharContato);
-    document
-        .getElementById("btn-fechar-contato-footer")
-        .addEventListener("click", fecharContato);
-    modalContato.addEventListener("click", (event) => {
-        if (event.target === modalContato) fecharContato();
-    });
-    if (!window.__loginEscapeHandler) {
-        window.addEventListener("keydown", (event) => {
-            if (event.key !== "Escape") return;
-            const contato = document.getElementById("modal-contato");
-            const recuperacao = document.getElementById("modal-esqueci");
-            if (contato) contato.style.display = "none";
-            if (recuperacao) recuperacao.style.display = "none";
-        });
-        window.__loginEscapeHandler = true;
-    }
-
-    formLogin.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        if (loginAlert) {
-            loginAlert.classList.add("hidden");
-            loginAlertLink?.classList.remove("hidden");
-            loginAlert.classList.remove(
-                "border-red-200",
-                "bg-red-50",
-                "text-red-800",
-                "border-emerald-200",
-                "bg-emerald-50",
-                "text-emerald-800",
-            );
-            loginAlert.classList.add(
-                "border-amber-200",
-                "bg-amber-50",
-                "text-amber-800",
-            );
-        }
-        const btnEntrar = formLogin.querySelector('button[type="submit"]');
-        btnEntrar.disabled = true;
-
-        try {
-            const response = await fetch("/api/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: document.getElementById("email").value,
-                    senha: document.getElementById("senha").value,
-                }),
-            });
-            const resultado = await response.json();
-
-            if (!response.ok || !resultado.token) {
-                throw new Error(
-                    resultado.mensagem || "E-mail ou senha inválidos.",
-                );
-            }
-
-            localStorage.setItem("docegestao_token", resultado.token);
-            localStorage.setItem(
-                "docegestao_funcionario",
-                JSON.stringify(resultado.funcionario),
-            );
-            const destino = new URLSearchParams(window.location.search).get("retorno");
-            if (destino === "cadastro" && typeof window.navegarDemo === "function") {
-                window.navegarDemo("cadastro");
-            } else if (destino === "cadastro") {
-                window.location.href = "./painel.html?pagina=cadastro";
-            } else if (typeof window.navegarDemo === "function") {
-                window.navegarDemo("splash");
-            } else {
-                window.location.href = "./painel.html?pagina=splash";
-            }
-        } catch (erro) {
-            if (loginAlert && loginAlertText) {
-                loginAlertText.textContent =
-                    erro.message || "Não foi possível conectar à API.";
-                loginAlert.classList.remove(
-                    "hidden",
-                    "border-emerald-200",
-                    "bg-emerald-50",
-                    "text-emerald-800",
-                );
-                loginAlert.classList.add(
-                    "border-red-200",
-                    "bg-red-50",
-                    "text-red-800",
-                );
-            }
-        } finally {
-            btnEntrar.disabled = false;
-        }
-    });
-
-    function abrirModal() {
-        modal.style.display = "flex";
-        msgErro.style.display = "none";
-        msgSucesso.style.display = "none";
-        formRecuperacao.reset();
-        btnEnviar.disabled = false;
-        btnEnviar.style.opacity = "1";
-    }
-
-    function fecharModal() {
-        modal.style.display = "none";
-    }
-
-    btnAbrir.addEventListener("click", abrirModal);
-    btnFechar.addEventListener("click", fecharModal);
-    btnCancelar.addEventListener("click", fecharModal);
-
-    modal.addEventListener("click", (e) => {
-        if (e.target === modal) fecharModal();
-    });
-
-    formRecuperacao.addEventListener("submit", (e) => {
-        e.preventDefault();
-
-        const novaSenha = document.getElementById("nova-senha").value;
-        const confirmarSenha =
-            document.getElementById("confirmar-senha").value;
-
-        msgErro.style.display = "none";
-        msgSucesso.style.display = "none";
-
-        if (novaSenha !== confirmarSenha) {
-            msgErro.innerText = "As senhas não coincidem. Digite novamente.";
-            msgErro.style.display = "block";
-            return;
-        }
-
-        if (novaSenha.length < 6) {
-            msgErro.innerText = "A senha precisa ter pelo menos 6 caracteres.";
-            msgErro.style.display = "block";
-            return;
-        }
-
-        msgErro.innerText =
-            "A recuperação de senha ainda não está conectada ao servidor. Entre em contato com o administrador.";
-        msgErro.style.display = "block";
-    });
+  });
 }
 
 document.addEventListener("demo:page-loaded", (event) => {
-    if (event.detail?.pagina === "login") inicializarLogin();
+  if (event.detail?.pagina === "login") inicializarLogin();
 });
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", inicializarLogin, { once: true });
+} else {
+  inicializarLogin();
+}

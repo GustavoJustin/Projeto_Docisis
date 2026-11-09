@@ -110,7 +110,10 @@ function criarCardProduto(product) {
   const corLateral = alertaPrincipal?.cor || null;
   const card = document.createElement("article");
   card.className =
-    `cartao-produto h-full ${corLateral ? "border-0" : "border border-black/10"} rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm`;
+    `cartao-produto h-full cursor-pointer ${corLateral ? "border-0" : "border border-black/10"} rounded-2xl p-3 flex flex-col justify-between bg-white shadow-sm`;
+  card.tabIndex = 0;
+  card.setAttribute("role", "group");
+  card.setAttribute("aria-label", `Ver detalhes de ${item.nome}`);
   card.style.minHeight = "320px";
   if (corLateral) {
     card.style.borderLeft = `4px solid ${corLateral}`;
@@ -257,6 +260,47 @@ function dataEstoquePtBr(valor) {
   return valor ? valor.split("-").reverse().join("/") : "";
 }
 
+function ordenarProdutosEstoque(products) {
+  return [...products].sort((a, b) => {
+    const percentA = a.maximo > 0 ? a.quantidade / a.maximo : 0;
+    const percentB = b.maximo > 0 ? b.quantidade / b.maximo : 0;
+    const criticalA = a.quantidade <= 0 || percentA <= 0.25;
+    const criticalB = b.quantidade <= 0 || percentB <= 0.25;
+    const daysA = diasAteValidade(a.validade);
+    const daysB = diasAteValidade(b.validade);
+    const expiredA = daysA !== null && daysA < 0;
+    const expiredB = daysB !== null && daysB < 0;
+    const nearCriticalA = percentA > 0.25 && percentA <= 0.5;
+    const nearCriticalB = percentB > 0.25 && percentB <= 0.5;
+    const mediumA = percentA > 0.5 && percentA <= 0.75;
+    const mediumB = percentB > 0.5 && percentB <= 0.75;
+    const nearExpirationA = daysA !== null && daysA >= 0 && daysA <= 7;
+    const nearExpirationB = daysB !== null && daysB >= 0 && daysB <= 7;
+    const priorityA = criticalA || expiredA
+      ? 0
+      : nearCriticalA || nearExpirationA
+        ? 1
+        : mediumA
+          ? 2
+          : 3;
+    const priorityB = criticalB || expiredB
+      ? 0
+      : nearCriticalB || nearExpirationB
+        ? 1
+        : mediumB
+          ? 2
+          : 3;
+    if (priorityA !== priorityB) return priorityA - priorityB;
+    if (priorityA === 0) return percentA - percentB;
+    if (priorityA === 1) {
+      const expirationA = daysA === null ? Number.POSITIVE_INFINITY : daysA;
+      const expirationB = daysB === null ? Number.POSITIVE_INFINITY : daysB;
+      if (expirationA !== expirationB) return expirationA - expirationB;
+    }
+    return a.nome.localeCompare(b.nome, "pt-BR");
+  });
+}
+
 async function inicializarEstoque() {
   const grid = document.getElementById("grid-produtos");
   if (!grid || grid.dataset.estoqueInicializado === "true") return;
@@ -265,6 +309,9 @@ async function inicializarEstoque() {
   const modal = document.getElementById("modal-insumo");
   const modalExcluir = document.getElementById("modal-excluir");
   const modalAtualizar = document.getElementById("modal-atualizar-estoque");
+  const modalDetalhes = document.getElementById("modal-detalhes-produto");
+  const detalhesImagem = document.getElementById("detalhes-produto-imagem");
+  const detalhesConteudo = document.getElementById("detalhes-produto-conteudo");
   const formInsumo = document.getElementById("form-novo-insumo");
   const cardAdicionar = document.getElementById("btn-card-adicionar");
   const botaoConfirmarExclusao = document.getElementById("btn-confirmar-exclusao");
@@ -296,8 +343,14 @@ async function inicializarEstoque() {
   let products = [];
   let productToDelete = null;
   let activeCategory = "Tudo";
+  let paginaAtual = 1;
+  const produtosPorPagina = 30;
   const filterButtons = [...document.querySelectorAll(".filtro-btn")];
   const search = document.getElementById("input-busca");
+  const infoPaginacao = document.getElementById("estoque-paginacao-info");
+  const paginaAnterior = document.getElementById("estoque-pagina-anterior");
+  const proximaPagina = document.getElementById("estoque-proxima-pagina");
+  const voltarInicio = document.getElementById("estoque-voltar-inicio");
 
   function atualizarIndicadorCadastro() {
     const quantidade = Number(campoQuantidadeCadastro?.value);
@@ -367,65 +420,43 @@ async function inicializarEstoque() {
   }
 
   function applyFilters() {
-    const term = String(search?.value || "").trim().toLocaleLowerCase("pt-BR");
-    grid.querySelectorAll(".cartao-produto").forEach((card) => {
-      const matchesCategory =
-        activeCategory === "Tudo" || card.dataset.categoria === activeCategory;
-      const matchesTerm = (card.dataset.nome || "").includes(term);
-      card.style.display = matchesCategory && matchesTerm ? "flex" : "none";
-    });
-    if (cardAdicionar) {
-      cardAdicionar.style.minHeight = "320px";
-      cardAdicionar.style.height = "100%";
-      cardAdicionar.style.alignSelf = "stretch";
-      cardAdicionar.style.display =
-        activeCategory === "Tudo" && !term ? "flex" : "none";
-    }
+    paginaAtual = 1;
+    renderProducts();
   }
 
   function renderProducts() {
     grid.querySelectorAll(".cartao-produto").forEach((card) => card.remove());
-    const sortedProducts = [...products].sort((a, b) => {
-      const percentA = a.maximo > 0 ? a.quantidade / a.maximo : 0;
-      const percentB = b.maximo > 0 ? b.quantidade / b.maximo : 0;
-      const criticalA = a.quantidade <= 0 || percentA <= 0.25;
-      const criticalB = b.quantidade <= 0 || percentB <= 0.25;
-      const daysA = diasAteValidade(a.validade);
-      const daysB = diasAteValidade(b.validade);
-      const expiredA = daysA !== null && daysA < 0;
-      const expiredB = daysB !== null && daysB < 0;
-      const nearCriticalA = percentA > 0.25 && percentA <= 0.5;
-      const nearCriticalB = percentB > 0.25 && percentB <= 0.5;
-      const mediumA = percentA > 0.5 && percentA <= 0.75;
-      const mediumB = percentB > 0.5 && percentB <= 0.75;
-      const nearExpirationA = daysA !== null && daysA >= 0 && daysA <= 7;
-      const nearExpirationB = daysB !== null && daysB >= 0 && daysB <= 7;
-      const priorityA = criticalA || expiredA
-        ? 0
-        : nearCriticalA || nearExpirationA
-          ? 1
-          : mediumA
-            ? 2
-            : 3;
-      const priorityB = criticalB || expiredB
-        ? 0
-        : nearCriticalB || nearExpirationB
-          ? 1
-          : mediumB
-            ? 2
-            : 3;
-      if (priorityA !== priorityB) return priorityA - priorityB;
-      if (priorityA === 0) return percentA - percentB;
-      if (priorityA === 1) {
-        const expirationA = daysA === null ? Number.POSITIVE_INFINITY : daysA;
-        const expirationB = daysB === null ? Number.POSITIVE_INFINITY : daysB;
-        if (expirationA !== expirationB) return expirationA - expirationB;
-      }
-      return a.nome.localeCompare(b.nome, "pt-BR");
+    const sortedProducts = ordenarProdutosEstoque(products);
+    const term = String(search?.value || "").trim().toLocaleLowerCase("pt-BR");
+    const filteredProducts = sortedProducts.filter((product) =>
+      (activeCategory === "Tudo" || product.categoria === activeCategory) &&
+      product.nome.toLocaleLowerCase("pt-BR").includes(term),
+    );
+    const totalPaginas = Math.max(1, Math.ceil(filteredProducts.length / produtosPorPagina));
+    paginaAtual = Math.min(paginaAtual, totalPaginas);
+    const inicio = (paginaAtual - 1) * produtosPorPagina;
+    const produtosVisiveis = filteredProducts.slice(inicio, inicio + produtosPorPagina);
+
+    if (cardAdicionar) {
+      cardAdicionar.style.minHeight = "320px";
+      cardAdicionar.style.height = "100%";
+      cardAdicionar.style.alignSelf = "stretch";
+      cardAdicionar.style.display = "flex";
+      grid.prepend(cardAdicionar);
+    }
+    produtosVisiveis.forEach((product) => {
+      grid.appendChild(criarCardProduto(product));
     });
-    sortedProducts.forEach((product) => {
-      grid.insertBefore(criarCardProduto(product), cardAdicionar || null);
-    });
+    if (infoPaginacao) {
+      const faixaInicial = filteredProducts.length ? inicio + 1 : 0;
+      const faixaFinal = Math.min(inicio + produtosPorPagina, filteredProducts.length);
+      infoPaginacao.textContent = filteredProducts.length
+        ? `${faixaInicial}–${faixaFinal} de ${filteredProducts.length} produto(s) · página ${paginaAtual} de ${totalPaginas}`
+        : "Nenhum produto encontrado.";
+    }
+    if (paginaAnterior) paginaAnterior.disabled = paginaAtual <= 1;
+    if (voltarInicio) voltarInicio.disabled = paginaAtual <= 1;
+    if (proximaPagina) proximaPagina.disabled = paginaAtual >= totalPaginas;
     const contadorAlertas = document.querySelector("#estoque-total-alertas span");
     if (contadorAlertas) {
       contadorAlertas.textContent = String(
@@ -436,7 +467,77 @@ async function inicializarEstoque() {
     }
     atualizarContadoresCategorias();
     salvarEstoqueParaNotificacoes(products);
-    applyFilters();
+  }
+
+  function localizarCardProduto(id) {
+    activeCategory = "Tudo";
+    if (search) search.value = "";
+    filterButtons.forEach((button) => {
+      const selected = button.dataset.categoria === "Tudo";
+      button.classList.toggle("bg-white", selected);
+      button.classList.toggle("text-gray-800", selected);
+      button.classList.toggle("shadow-sm", selected);
+      button.classList.toggle("text-gray-500", !selected);
+      button.classList.toggle("hover:text-gray-800", !selected);
+      button.setAttribute("aria-pressed", String(selected));
+    });
+    const index = ordenarProdutosEstoque(products)
+      .findIndex((product) => String(product.id) === String(id));
+    if (index < 0) return null;
+    paginaAtual = Math.floor(index / produtosPorPagina) + 1;
+    renderProducts();
+    return [...grid.querySelectorAll(".cartao-produto")]
+      .find((card) => card.dataset.id === String(id)) || null;
+  }
+
+  function abrirDetalhesProduto(produto) {
+    if (!produto || !modalDetalhes || !detalhesConteudo || !detalhesImagem) return;
+    const valores = [
+      ["Categoria", produto.categoria],
+      ["Descrição", produto.descricao || "Não informada"],
+      ["Estoque atual", `${produto.quantidade} ${produto.unidade}`],
+      ["Limite máximo", `${produto.maximo} ${produto.unidade}`],
+      ["Preço / medida", produto.preco || "Não informado"],
+      ["Data de chegada", dataEstoquePtBr(produto.chegada) || "Não informada"],
+      ["Validade", dataEstoquePtBr(produto.validade) || "Não informada"],
+    ];
+    detalhesConteudo.replaceChildren();
+    valores.forEach(([rotulo, valor]) => {
+      const grupo = document.createElement("div");
+      const titulo = document.createElement("dt");
+      titulo.className = "text-[10px] font-semibold uppercase tracking-wide text-brand-text-muted";
+      titulo.textContent = rotulo;
+      const descricao = document.createElement("dd");
+      descricao.className = "mt-0.5 break-words text-sm text-brand-text-dark";
+      descricao.textContent = valor;
+      grupo.append(titulo, descricao);
+      detalhesConteudo.appendChild(grupo);
+    });
+    detalhesImagem.replaceChildren();
+    if (produto.imagem) {
+      const image = document.createElement("img");
+      image.src = produto.imagem;
+      image.alt = produto.nome;
+      image.className = "max-h-56 w-full object-contain p-3";
+      image.addEventListener("error", () => {
+        image.remove();
+        detalhesImagem.textContent = produto.nome.charAt(0).toUpperCase();
+        detalhesImagem.classList.add("text-4xl", "font-semibold", "text-brand-brown");
+      }, { once: true });
+      detalhesImagem.classList.remove("text-4xl", "font-semibold", "text-brand-brown");
+      detalhesImagem.appendChild(image);
+    } else {
+      detalhesImagem.classList.add("text-4xl", "font-semibold", "text-brand-brown");
+      detalhesImagem.textContent = produto.nome.charAt(0).toUpperCase();
+    }
+    document.getElementById("detalhes-produto-titulo").textContent = produto.nome;
+    modalDetalhes.classList.remove("hidden");
+    modalDetalhes.classList.add("flex");
+  }
+
+  function fecharDetalhesProduto() {
+    modalDetalhes?.classList.add("hidden");
+    modalDetalhes?.classList.remove("flex");
   }
 
   function atualizarContadoresCategorias() {
@@ -665,7 +766,41 @@ async function inicializarEstoque() {
     } else if (event.target.closest(".btn-atualizar")) {
       event.preventDefault();
       abrirModalAtualizacao(card);
+    } else {
+      const produto = products.find((item) => String(item.id) === card.dataset.id);
+      abrirDetalhesProduto(produto);
     }
+  });
+  grid.addEventListener("keydown", (event) => {
+    const card = event.target.closest(".cartao-produto");
+    if (!card || !["Enter", " "].includes(event.key)) return;
+    if (event.target.closest(".btn-excluir, .btn-atualizar")) return;
+    event.preventDefault();
+    const produto = products.find((item) => String(item.id) === card.dataset.id);
+    abrirDetalhesProduto(produto);
+  });
+  document.getElementById("fechar-detalhes-produto")?.addEventListener("click", fecharDetalhesProduto);
+  modalDetalhes?.addEventListener("click", (event) => {
+    if (event.target === modalDetalhes) fecharDetalhesProduto();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !modalDetalhes?.classList.contains("hidden")) {
+      fecharDetalhesProduto();
+    }
+  });
+  paginaAnterior?.addEventListener("click", () => {
+    if (paginaAtual > 1) {
+      paginaAtual -= 1;
+      renderProducts();
+    }
+  });
+  proximaPagina?.addEventListener("click", () => {
+    paginaAtual += 1;
+    renderProducts();
+  });
+  voltarInicio?.addEventListener("click", () => {
+    paginaAtual = 1;
+    renderProducts();
   });
 
   formInsumo?.addEventListener("submit", async (event) => {
@@ -727,6 +862,7 @@ async function inicializarEstoque() {
         ...payload,
         id: result.resultado,
       }));
+      paginaAtual = 1;
       renderProducts();
       fecharModal();
       imagemSelecionada = "";
@@ -850,8 +986,7 @@ async function inicializarEstoque() {
   await carregarProdutos();
   const produtoParaLocalizar = new URLSearchParams(window.location.search).get("localizar");
   if (produtoParaLocalizar) {
-    const card = [...grid.querySelectorAll(".cartao-produto")]
-      .find((item) => item.dataset.id === produtoParaLocalizar);
+    const card = localizarCardProduto(produtoParaLocalizar);
     if (card) {
       card.scrollIntoView({ behavior: "smooth", block: "center" });
       card.style.outline = "3px solid #ef4444";
@@ -869,8 +1004,7 @@ async function inicializarEstoque() {
   }
   const produtoInicial = new URLSearchParams(window.location.search).get("produto");
   if (produtoInicial) {
-    const card = [...grid.querySelectorAll(".cartao-produto")]
-      .find((item) => item.dataset.id === produtoInicial);
+    const card = localizarCardProduto(produtoInicial);
     if (card) abrirModalAtualizacao(card);
   }
 }

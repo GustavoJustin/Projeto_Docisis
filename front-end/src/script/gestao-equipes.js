@@ -21,7 +21,12 @@ async function inicializarGestaoEquipes() {
   }
 
   const roleButtons = document.querySelectorAll(".filter-role");
-  const createLink = document.querySelector("#conteudo-principal a[href='cadastroFuncionario.html']");
+  const createButton = document.getElementById("btn-novo-funcionario");
+  const editButton = document.getElementById("btn-editar-funcionario");
+  const createModal = document.getElementById("create-employee-modal");
+  const createContent = document.getElementById("create-employee-content");
+  const editModal = document.getElementById("edit-employee-modal");
+  const editList = document.getElementById("edit-employee-list");
   const table = tableBody.closest("table");
   const tableContainer = table?.parentElement;
   if (!table || !tableContainer) return;
@@ -30,6 +35,7 @@ async function inicializarGestaoEquipes() {
 
   let selectedRole = "all";
   let members = [];
+  const canCreateEmployees = Boolean(Number(usuario?.pode_cadastrar_funcionarios));
   let membroParaExcluir = null;
   let botaoDeExclusaoAtual = null;
   const modalExclusao = document.getElementById("confirm-removal-modal");
@@ -53,19 +59,6 @@ async function inicializarGestaoEquipes() {
           ? "mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
           : "mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800";
     notice.hidden = !message;
-  }
-
-  function configureCreateLink(hasSession) {
-    if (!createLink) return;
-    createLink.href = hasSession
-      ? "?pagina=cadastro"
-      : "?pagina=cadastroPublico";
-    const label = createLink.querySelector("[data-create-label]");
-    if (label) {
-      label.textContent = hasSession
-        ? "Novo Funcionário"
-        : "Criar conta de funcionário";
-    }
   }
 
   function normalizarCargo(cargo) {
@@ -136,17 +129,14 @@ async function inicializarGestaoEquipes() {
 
   function criarAvatar(member) {
     const foto = obterFotoPerfilDoUsuario(member);
-    if (foto) {
-      const avatar = document.createElement("img");
-      avatar.src = foto;
-      avatar.alt = `Foto de ${member.nome || "funcionário"}`;
-      avatar.className = "w-9 h-9 rounded-full object-cover";
-      avatar.addEventListener("error", () => {
-        avatar.replaceWith(criarAvatarInicial(member));
-      }, { once: true });
-      return avatar;
-    }
-    return criarAvatarInicial(member);
+    const avatar = document.createElement("img");
+    avatar.src = foto || "../src/img/avatar-padrao.svg";
+    avatar.alt = `Foto de ${member.nome || "funcionário"}`;
+    avatar.className = "w-9 h-9 rounded-full object-cover";
+    avatar.addEventListener("error", () => {
+      avatar.replaceWith(criarAvatarInicial(member));
+    }, { once: true });
+    return avatar;
   }
 
   function criarAvatarInicial(member) {
@@ -239,18 +229,15 @@ async function inicializarGestaoEquipes() {
     updateCounts();
     const token = localStorage.getItem("docegestao_token");
     if (!token) {
-      configureCreateLink(false);
       showNotice(
-        "Nenhuma sessão de administrador está ativa. Use “Criar conta de funcionário” para se cadastrar e depois entrar no sistema.",
+        "Entre com uma conta de administrador para consultar a equipe.",
         "info",
-        "error",
       );
       updateCounts();
       renderMembers();
       return;
     }
 
-    configureCreateLink(true);
     try {
       const response = await fetch("/api/funcionarios", {
         headers: { Authorization: `Bearer ${token}` },
@@ -268,7 +255,6 @@ async function inicializarGestaoEquipes() {
       if (error.message === "Token inválido ou expirado") {
         localStorage.removeItem("docegestao_token");
         localStorage.removeItem("docegestao_funcionario");
-        configureCreateLink(false);
       }
       showNotice(error.message || "Não foi possível conectar ao servidor.", "error");
     }
@@ -373,6 +359,186 @@ async function inicializarGestaoEquipes() {
       renderMembers();
     });
   });
+
+  function abrirModal(modal) {
+    if (!modal) return;
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+    document.body.classList.add("overflow-hidden");
+  }
+
+  function fecharModal(modal) {
+    if (!modal) return;
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+    document.body.classList.remove("overflow-hidden");
+  }
+
+  async function abrirCriacaoFuncionario() {
+    if (!canCreateEmployees) {
+      showNotice("Sua conta de administrador não tem permissão para criar funcionários.", "error");
+      return;
+    }
+
+    createButton.disabled = true;
+    try {
+      const url = new URL("./cadastroFuncionario.html", window.location.href);
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Não foi possível carregar o formulário de criação.");
+      }
+      const html = await response.text();
+      const page = new DOMParser().parseFromString(html, "text/html");
+      const sourceForm = page.querySelector("#form-cadastro");
+      if (!sourceForm) throw new Error("O formulário de criação não foi encontrado.");
+
+      const form = document.importNode(sourceForm, true);
+      createContent.replaceChildren(form);
+      abrirModal(createModal);
+      window.inicializarCadastroFuncionario(form, {
+        onCancel: () => fecharModal(createModal),
+        onSuccess: async ({ nome }) => {
+          fecharModal(createModal);
+          await loadMembers();
+          showNotice(`Funcionário ${nome} criado com sucesso.`);
+        },
+      });
+    } catch (error) {
+      showNotice(error.message || "Não foi possível abrir o formulário de criação.", "error");
+    } finally {
+      createButton.disabled = false;
+    }
+  }
+
+  function criarCampoSenha(labelText, autocomplete) {
+    const wrapper = document.createElement("label");
+    wrapper.className = "grid gap-1 text-xs font-medium text-gray-700";
+    wrapper.append(document.createTextNode(labelText));
+    const input = document.createElement("input");
+    input.type = "password";
+    input.required = true;
+    input.minLength = 6;
+    input.autocomplete = autocomplete;
+    input.className = "w-full rounded-lg border border-gray-200 px-3 py-2 text-sm";
+    input.placeholder = "Mínimo de 6 caracteres";
+    wrapper.append(input);
+    return { wrapper, input };
+  }
+
+  function renderEditList() {
+    if (!editList) return;
+    editList.replaceChildren();
+    if (members.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "rounded-xl border border-gray-200 p-4 text-sm text-gray-500";
+      empty.textContent = "Nenhum funcionário cadastrado.";
+      editList.append(empty);
+      return;
+    }
+
+    members.forEach((member) => {
+      const card = document.createElement("article");
+      card.className = "mb-3 rounded-xl border border-gray-200 p-4 last:mb-0";
+      const details = document.createElement("div");
+      details.className = "min-w-0";
+      const name = document.createElement("p");
+      name.className = "truncate text-sm font-semibold text-gray-800";
+      name.textContent = member.nome || "Sem nome";
+      const email = document.createElement("p");
+      email.className = "truncate text-xs text-gray-500";
+      email.textContent = member.email || "E-mail não informado";
+      const passwordInfo = document.createElement("p");
+      passwordInfo.className = "mt-1 text-[11px] text-gray-400";
+      passwordInfo.textContent = "Senha corporativa: protegida (não exibida)";
+      details.append(name, email, passwordInfo);
+
+      const resetButton = document.createElement("button");
+      resetButton.type = "button";
+      resetButton.className = "mt-3 rounded-lg border border-[#875C46]/30 px-3 py-2 text-xs font-semibold text-[#875C46] hover:bg-[#FDFBF7]";
+      resetButton.textContent = "Redefinir senha";
+      const resetForm = document.createElement("form");
+      resetForm.className = "mt-3 gap-3 rounded-lg bg-gray-50 p-3";
+      resetForm.style.display = "none";
+      resetForm.append(document.createTextNode(`Definir nova senha para ${member.nome || "este funcionário"}`));
+      const newPassword = criarCampoSenha("Nova senha", "new-password");
+      const confirmPassword = criarCampoSenha("Confirmar nova senha", "new-password");
+      const resetStatus = document.createElement("p");
+      resetStatus.className = "hidden text-xs";
+      resetStatus.setAttribute("role", "status");
+      const submit = document.createElement("button");
+      submit.type = "submit";
+      submit.className = "rounded-lg bg-[#875C46] px-4 py-2 text-xs font-semibold text-white hover:bg-[#6D4936]";
+      submit.textContent = "Salvar nova senha";
+      resetForm.append(newPassword.wrapper, confirmPassword.wrapper, resetStatus, submit);
+      resetButton.addEventListener("click", () => {
+        resetForm.style.display = resetForm.style.display === "none" ? "grid" : "none";
+        if (resetForm.style.display !== "none") newPassword.input.focus();
+      });
+      resetForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        resetStatus.classList.add("hidden");
+        if (newPassword.input.value !== confirmPassword.input.value) {
+          resetStatus.textContent = "As senhas digitadas não coincidem.";
+          resetStatus.className = "text-xs text-red-700";
+          return;
+        }
+
+        const token = localStorage.getItem("docegestao_token");
+        if (!token) {
+          resetStatus.textContent = "Sua sessão expirou. Entre novamente para redefinir senhas.";
+          resetStatus.className = "text-xs text-red-700";
+          return;
+        }
+        submit.disabled = true;
+        submit.textContent = "Salvando...";
+        try {
+          const response = await fetch(`/api/funcionarios/${member.id_funcionario}/senha`, {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ senha: newPassword.input.value }),
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.mensagem || "Não foi possível redefinir a senha.");
+          }
+          resetForm.reset();
+          resetForm.style.display = "none";
+          resetStatus.textContent = `Senha de ${member.nome || "funcionário"} redefinida com sucesso.`;
+          resetStatus.className = "text-xs text-emerald-700";
+        } catch (error) {
+          resetStatus.textContent = error.message || "Não foi possível conectar ao servidor.";
+          resetStatus.className = "text-xs text-red-700";
+        } finally {
+          submit.disabled = false;
+          submit.textContent = "Salvar nova senha";
+        }
+      });
+      card.append(details, resetButton, resetForm);
+      editList.append(card);
+    });
+  }
+
+  createButton?.addEventListener("click", abrirCriacaoFuncionario);
+  editButton?.addEventListener("click", () => {
+    renderEditList();
+    abrirModal(editModal);
+  });
+  document.getElementById("create-employee-close")?.addEventListener("click", () => fecharModal(createModal));
+  document.getElementById("edit-employee-close")?.addEventListener("click", () => fecharModal(editModal));
+  createModal?.addEventListener("click", (event) => {
+    if (event.target === createModal) fecharModal(createModal);
+  });
+  editModal?.addEventListener("click", (event) => {
+    if (event.target === editModal) fecharModal(editModal);
+  });
+  window.addEventListener("docegestao:perfil-atualizado", () => {
+    if (!tableBody.isConnected) return;
+    void loadMembers();
+  });
+  if (createButton) createButton.hidden = !canCreateEmployees;
 
   await loadMembers();
 }

@@ -1,403 +1,279 @@
-function inicializarCadastroFuncionario() {
-    const form = document.getElementById("form-cadastro");
-    if (!form) return;
-    const cadastroPublico =
-        form.dataset.cadastroPublico === "true" ||
-        new URLSearchParams(window.location.search).get("cadastro-publico") === "1";
-    const inputFoto = document.getElementById("input-foto");
-    const photoPreview = document.getElementById("photo-preview");
-    const uploadPlaceholder = document.getElementById("upload-placeholder");
-    const btnCancelar = document.getElementById("btn-cancelar");
-    const alertBox = document.getElementById("cadastro-alert");
-    const alertText = document.getElementById("cadastro-alert-text");
-    const radioNivel = document.querySelectorAll(
-        'input[name="nivel_acesso"]',
-    );
-    const cardAdmin = document.getElementById("card-admin");
-    const cardFunc = document.getElementById("card-func");
-    const botaoEnviar =
-        form.querySelector('button[type="submit"]') ||
-        document.querySelector('button[type="submit"][form="form-cadastro"]');
-    let administradorAutorizado = cadastroPublico;
+function inicializarCadastroFuncionario(root = document, options = {}) {
+  const form =
+    root instanceof HTMLFormElement
+      ? root
+      : root.querySelector?.("#form-cadastro");
+  if (!form || form.dataset.cadastroInicializado === "true") return;
+  form.dataset.cadastroInicializado = "true";
 
-    if (cadastroPublico) {
-        const loginLink = document.getElementById("cadastro-alert-link");
-        if (loginLink) {
-            loginLink.href = "./painel.html?pagina=login";
-            loginLink.textContent = "Voltar ao login";
-        }
-        const headerUserProfile = document.getElementById("header-user-profile");
-        if (headerUserProfile) headerUserProfile.style.display = "none";
-        const titulo = form.querySelector("h2");
-        if (titulo) titulo.textContent = "Criar conta de funcionário";
-        if (cardAdmin) {
-            cardAdmin.style.display = "none";
-            const radioAdmin = cardAdmin.querySelector('input[name="nivel_acesso"]');
-            if (radioAdmin) radioAdmin.disabled = true;
-            const radioFuncionario = document.querySelector(
-                'input[name="nivel_acesso"][value="funcionario"]',
-            );
-            if (radioFuncionario) radioFuncionario.checked = true;
-            cardAdmin.parentElement.classList.remove("md:grid-cols-2");
-        }
+  const get = (id) => form.querySelector(`#${id}`);
+  const inputFoto = get("input-foto");
+  const photoPreview = get("photo-preview");
+  const uploadPlaceholder = get("upload-placeholder");
+  const alertBox = get("cadastro-alert");
+  const alertText = get("cadastro-alert-text");
+  const submitButton = form.querySelector('button[type="submit"]');
+  const cancelButton = get("btn-cancelar");
+  const adminCard = get("card-admin");
+  const employeeCard = get("card-func");
+  const adminPermission = get("admin-create-permission");
+  const adminPermissionContainer = get("admin-create-permission-container");
+  const roleInputs = form.querySelectorAll('input[name="nivel_acesso"]');
+  let canCreate = false;
+
+  function showNotice(message, success = false) {
+    if (!alertBox || !alertText) return;
+    alertText.textContent = message;
+    alertBox.className = success
+      ? "rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
+      : "rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800";
+  }
+
+  function clearNotice() {
+    if (alertBox) alertBox.classList.add("hidden");
+    if (alertText) alertText.textContent = "";
+  }
+
+  function normalizedRole(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  }
+
+  function updateRoleSelection(selected) {
+    const selectedClass =
+      "relative flex items-start p-4 rounded-xl border-2 border-[#875C46] bg-[#FDFBF7] cursor-pointer transition-all";
+    const idleClass =
+      "relative flex items-start p-4 rounded-xl border border-gray-200 bg-white hover:border-[#875C46]/50 cursor-pointer transition-all";
+    if (adminCard) {
+      adminCard.className = selected === "administrador" ? selectedClass : idleClass;
+    }
+    if (employeeCard) {
+      employeeCard.className = selected === "funcionario" ? selectedClass : idleClass;
+    }
+    if (adminPermissionContainer) {
+      adminPermissionContainer.classList.toggle(
+        "hidden",
+        selected !== "administrador",
+      );
+    }
+    if (selected !== "administrador" && adminPermission) {
+      adminPermission.checked = false;
+    }
+  }
+
+  function setCpfMask(input) {
+    let value = input.value.replace(/\D/g, "").slice(0, 11);
+    value = value.replace(/(\d{3})(\d)/, "$1.$2");
+    value = value.replace(/(\d{3})(\d)/, "$1.$2");
+    value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    input.value = value;
+  }
+
+  async function preparePhoto(file) {
+    if (!file) return null;
+    if (!file.type.startsWith("image/")) {
+      throw new Error("Escolha um arquivo de imagem.");
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      throw new Error("A imagem deve ter no máximo 2 MB.");
     }
 
-    function pedirLoginAdministrador(mensagem) {
-        administradorAutorizado = false;
-        if (botaoEnviar) botaoEnviar.disabled = true;
-        const loginLink = document.getElementById("cadastro-alert-link");
-        if (loginLink) {
-            loginLink.href = "./painel.html?pagina=login&retorno=cadastro";
-            loginLink.textContent = "Entrar como administrador";
-        }
-        mostrarAviso(mensagem, "erro", true);
+    const image = await createImageBitmap(file);
+    try {
+      const scale = Math.min(1, 512 / Math.max(image.width, image.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(image.width * scale));
+      canvas.height = Math.max(1, Math.round(image.height * scale));
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Não foi possível processar a foto.");
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL("image/jpeg", 0.82);
+    } finally {
+      image.close();
+    }
+  }
+
+  async function validateAdminAccess() {
+    const token = localStorage.getItem("docegestao_token");
+    if (!token) {
+      showNotice("Entre com uma conta de administrador autorizada para criar funcionários.");
+      return;
     }
 
-    async function validarAcessoAdministrador() {
-        if (cadastroPublico) return;
+    submitButton.disabled = true;
+    submitButton.textContent = "Verificando acesso...";
+    try {
+      const response = await fetch("/api/sessao", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        const error = new Error(result.mensagem || "Não foi possível validar sua sessão.");
+        error.status = response.status;
+        throw error;
+      }
 
-        const token = localStorage.getItem("docegestao_token");
-        if (!token) {
-            pedirLoginAdministrador(
-                "Para cadastrar um funcionário, entre primeiro com uma conta de administrador.",
-            );
-            return;
-        }
+      const role = normalizedRole(result.funcionario?.nome_cargo);
+      canCreate = role.includes("admin") &&
+        Boolean(Number(result.funcionario?.pode_cadastrar_funcionarios));
+      if (!canCreate) {
+        showNotice("Sua conta de administrador não tem permissão para criar funcionários.");
+        return;
+      }
+      clearNotice();
+    } catch (error) {
+      if (error.status === 401) {
+        localStorage.removeItem("docegestao_token");
+        localStorage.removeItem("docegestao_funcionario");
+      }
+      showNotice(error.message || "Não foi possível validar sua sessão.");
+    } finally {
+      submitButton.disabled = !canCreate;
+      submitButton.textContent = "Criar Conta";
+    }
+  }
 
-        if (botaoEnviar) {
-            botaoEnviar.disabled = true;
-            botaoEnviar.textContent = "Verificando acesso...";
-        }
+  roleInputs.forEach((radio) => {
+    radio.addEventListener("change", () => updateRoleSelection(radio.value));
+  });
+  updateRoleSelection(form.querySelector('input[name="nivel_acesso"]:checked')?.value);
 
-        try {
-            const response = await fetch("/api/sessao", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            const resultado = await response.json();
-            if (!response.ok) {
-                throw new Error(
-                    resultado.mensagem || "Não foi possível validar sua sessão.",
-                );
-            }
+  const cpfInput = get("input-cpf");
+  cpfInput?.addEventListener("input", () => setCpfMask(cpfInput));
+  const phoneInput = get("input-telefone");
+  phoneInput?.addEventListener("input", () => {
+    let value = phoneInput.value.replace(/\D/g, "").slice(0, 11);
+    value = value.replace(/^(\d{2})(\d)/, "($1) $2");
+    value = value.replace(/(\d{5})(\d)/, "$1-$2");
+    phoneInput.value = value;
+  });
 
-            const nomeCargo = (resultado.funcionario?.nome_cargo || "")
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "")
-                .toLowerCase();
-            if (!nomeCargo.includes("admin")) {
-                pedirLoginAdministrador(
-                    "Esta conta não tem permissão para cadastrar funcionários. Entre com uma conta de administrador.",
-                );
-                return;
-            }
+  inputFoto?.addEventListener("change", () => {
+    const file = inputFoto.files?.[0];
+    if (!file || !photoPreview || !uploadPlaceholder) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      photoPreview.src = event.target.result;
+      photoPreview.classList.remove("hidden");
+      uploadPlaceholder.classList.add("hidden");
+    };
+    reader.onerror = () => showNotice("Não foi possível carregar a foto selecionada.");
+    reader.readAsDataURL(file);
+  });
 
-            administradorAutorizado = true;
-            limparAviso();
-        } catch (erro) {
-            localStorage.removeItem("docegestao_token");
-            localStorage.removeItem("docegestao_funcionario");
-            pedirLoginAdministrador(
-                erro.message || "Não foi possível validar sua sessão.",
-            );
-        } finally {
-            if (botaoEnviar && administradorAutorizado) {
-                botaoEnviar.disabled = false;
-                botaoEnviar.textContent = "Criar Conta";
-            }
-        }
+  form.addEventListener("input", clearNotice);
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    clearNotice();
+    if (!form.checkValidity()) {
+      showNotice("Confira os campos obrigatórios e corrija os dados destacados.");
+      form.querySelector(":invalid")?.focus();
+      return;
+    }
+    if (!canCreate) {
+      showNotice("Sua conta não está autorizada a criar funcionários.");
+      return;
     }
 
-    function voltarAoLogin() {
-        if (typeof window.navegarDemo === "function") {
-            window.navegarDemo("login");
-        } else {
-            window.location.href = "./painel.html?pagina=login";
-        }
+    const password = get("input-senha").value;
+    if (password !== get("input-confirma-senha").value) {
+      showNotice("As senhas digitadas não coincidem. Verifique e tente novamente.");
+      return;
     }
 
-    function mostrarAviso(mensagem, tipo = "erro", mostrarLink = false) {
-        if (!alertBox || !alertText) return;
-        alertText.textContent = mensagem;
-        alertBox.classList.remove(
-            "hidden",
-            "border-amber-200",
-            "bg-amber-50",
-            "text-amber-800",
-            "border-emerald-200",
-            "bg-emerald-50",
-            "text-emerald-800",
-            "border-red-200",
-            "bg-red-50",
-            "text-red-800",
-        );
-        alertBox.classList.add(
-            tipo === "sucesso"
-                ? "border-emerald-200"
-                : "border-red-200",
-            tipo === "sucesso" ? "bg-emerald-50" : "bg-red-50",
-            tipo === "sucesso" ? "text-emerald-800" : "text-red-800",
-        );
-        const loginLink = document.getElementById("cadastro-alert-link");
-        if (loginLink) loginLink.classList.toggle("hidden", !mostrarLink);
+    const selectedRole = form.querySelector('input[name="nivel_acesso"]:checked')?.value;
+    const name = get("input-nome").value.trim();
+    const originalButtonText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = "Salvando...";
+
+    try {
+      const token = localStorage.getItem("docegestao_token");
+      if (!token) throw new Error("Sua sessão expirou. Entre novamente.");
+      const headers = { Authorization: `Bearer ${token}` };
+      const cargosResponse = await fetch("/api/cargos", { headers });
+      const cargosResult = await cargosResponse.json();
+      if (!cargosResponse.ok) {
+        const error = new Error(cargosResult.mensagem || "Não foi possível consultar os cargos.");
+        error.status = cargosResponse.status;
+        throw error;
+      }
+
+      const cargoTerm = selectedRole === "administrador" ? "admin" : "funcion";
+      const cargo = cargosResult.dados?.find((item) =>
+        normalizedRole(item.nome_cargo).includes(cargoTerm),
+      );
+      if (!cargo) throw new Error("O cargo selecionado não está cadastrado no sistema.");
+
+      const response = await fetch("/api/funcionarios", {
+        method: "POST",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome,
+          cpf: cpfInput.value.replace(/\D/g, ""),
+          email: get("input-email").value.trim(),
+          senha: password,
+          id_cargos: Number(cargo.id_cargos),
+          pode_cadastrar_funcionarios:
+            selectedRole === "administrador" && Boolean(adminPermission?.checked),
+          foto: await preparePhoto(inputFoto?.files?.[0]),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        const error = new Error(result.mensagem || "Não foi possível cadastrar o funcionário.");
+        error.status = response.status;
+        throw error;
+      }
+
+      if (typeof options.onSuccess === "function") {
+        await options.onSuccess({ nome: name, resultado: result });
+        return;
+      }
+      localStorage.setItem(
+        "docegestao_aviso_funcionario",
+        `Funcionário ${name} criado com sucesso.`,
+      );
+      if (typeof window.navegarDemo === "function") {
+        window.navegarDemo("funcionarios");
+      } else {
+        window.location.href = "./painel.html?pagina=funcionarios";
+      }
+    } catch (error) {
+      if (error.status === 401) {
+        localStorage.removeItem("docegestao_token");
+        localStorage.removeItem("docegestao_funcionario");
+      }
+      showNotice(error.message || "Não foi possível conectar ao servidor.");
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = originalButtonText;
     }
+  });
 
-    function limparAviso() {
-        if (alertBox) alertBox.classList.add("hidden");
-        if (alertText) alertText.textContent = "";
-        document.getElementById("cadastro-alert-link")?.classList.add("hidden");
+  cancelButton?.addEventListener("click", () => {
+    if (typeof options.onCancel === "function") {
+      options.onCancel();
+      return;
     }
-
-    async function prepararFoto(file) {
-        if (!file) return null;
-        if (!file.type.startsWith("image/")) {
-            throw new Error("Escolha um arquivo de imagem.");
-        }
-        if (file.size > 2 * 1024 * 1024) {
-            throw new Error("A imagem deve ter no máximo 2 MB.");
-        }
-
-        const imagem = await createImageBitmap(file);
-        try {
-            const escala = Math.min(1, 512 / Math.max(imagem.width, imagem.height));
-            const canvas = document.createElement("canvas");
-            canvas.width = Math.max(1, Math.round(imagem.width * escala));
-            canvas.height = Math.max(1, Math.round(imagem.height * escala));
-            canvas.getContext("2d").drawImage(imagem, 0, 0, canvas.width, canvas.height);
-            return canvas.toDataURL("image/jpeg", 0.82);
-        } finally {
-            imagem.close();
-        }
+    if (typeof window.navegarDemo === "function") {
+      window.navegarDemo("funcionarios");
+    } else {
+      window.location.href = "./painel.html?pagina=funcionarios";
     }
+  });
 
-    const cadastroPublicoLink = document.getElementById("cadastro-alert-link");
-    cadastroPublicoLink?.classList.add("hidden");
-    void validarAcessoAdministrador();
-
-    // Máscara CPF
-    const inputCPF = document.getElementById("input-cpf");
-    if (inputCPF) {
-        inputCPF.addEventListener("input", (e) => {
-            let v = e.target.value.replace(/\D/g, "");
-            if (v.length > 11) v = v.slice(0, 11);
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d)/, "$1.$2");
-            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-            e.target.value = v;
-        });
-    }
-
-    // Máscara Telefone
-    const inputTel = document.getElementById("input-telefone");
-    if (inputTel) {
-        inputTel.addEventListener("input", (e) => {
-            let v = e.target.value.replace(/\D/g, "");
-            if (v.length > 11) v = v.slice(0, 11);
-            v = v.replace(/^(\d{2})(\d)/g, "($1) $2");
-            v = v.replace(/(\d{5})(\d)/, "$1-$2");
-            e.target.value = v;
-        });
-    }
-
-    // Upload de foto
-    inputFoto?.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (file && photoPreview && uploadPlaceholder) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                photoPreview.src = event.target.result;
-                photoPreview.classList.remove("hidden");
-                uploadPlaceholder.classList.add("hidden");
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Cartões de nível de acesso
-    function atualizarCartoesNivel(nivelSelecionado) {
-        if (!cardAdmin || !cardFunc) return;
-
-        const cardSelecionado =
-            "relative flex items-start p-4 rounded-xl border-2 border-[#875C46] bg-[#FDFBF7] cursor-pointer transition-all";
-        const cardDesmarcado =
-            "relative flex items-start p-4 rounded-xl border border-gray-200 bg-white hover:border-[#875C46]/50 cursor-pointer transition-all";
-
-        cardAdmin.className =
-            nivelSelecionado === "administrador" ? cardSelecionado : cardDesmarcado;
-        cardFunc.className =
-            nivelSelecionado === "funcionario" ? cardSelecionado : cardDesmarcado;
-    }
-
-    radioNivel.forEach((radio) => {
-        radio.addEventListener("change", (e) => {
-            atualizarCartoesNivel(e.target.value);
-        });
-    });
-    atualizarCartoesNivel(
-        form.querySelector('input[name="nivel_acesso"]:checked')?.value,
-    );
-
-    // Validação e Gravação
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        limparAviso();
-        if (!form.checkValidity()) {
-            const primeiroCampoInvalido = form.querySelector(":invalid");
-            mostrarAviso("Confira os campos obrigatórios e corrija os dados destacados.");
-            primeiroCampoInvalido?.focus();
-            return;
-        }
-
-        const senha = document.getElementById("input-senha").value;
-        const confirmaSenha = document.getElementById(
-            "input-confirma-senha",
-        ).value;
-
-        if (senha !== confirmaSenha) {
-            mostrarAviso("As senhas digitadas não coincidem. Verifique e tente novamente.");
-            return;
-        }
-
-        if (!cadastroPublico && !administradorAutorizado) {
-            pedirLoginAdministrador(
-                "Entre com uma conta de administrador antes de criar o funcionário.",
-            );
-            return;
-        }
-
-        const nome = document.getElementById("input-nome").value.trim();
-        const textoOriginalBotao = botaoEnviar.textContent;
-        botaoEnviar.disabled = true;
-        botaoEnviar.textContent = "Salvando...";
-
-        if (cadastroPublico) {
-            try {
-                const response = await fetch("/api/login/cadastro-funcionario", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        nome,
-                        cpf: document
-                            .getElementById("input-cpf")
-                            .value.replace(/\D/g, ""),
-                        email: document.getElementById("input-email").value.trim(),
-                        senha,
-                        foto: await prepararFoto(inputFoto?.files?.[0]),
-                    }),
-                });
-                const resultado = await response.json();
-                if (!response.ok) {
-                    throw new Error(
-                        resultado.mensagem || "Não foi possível criar a conta.",
-                    );
-                }
-
-                sessionStorage.setItem(
-                    "docegestao_aviso_login",
-                    "Conta criada com sucesso. Entre com seu e-mail e senha.",
-                );
-                voltarAoLogin();
-            } catch (erro) {
-                mostrarAviso(
-                    erro.message || "Não foi possível conectar ao servidor.",
-                );
-            } finally {
-                botaoEnviar.disabled = false;
-                botaoEnviar.textContent = textoOriginalBotao;
-            }
-            return;
-        }
-
-        try {
-            const token = localStorage.getItem("docegestao_token");
-            if (!token) {
-                throw new Error("Não há uma sessão de administrador. Faça login ou use o cadastro de conta de funcionário.");
-            }
-
-            const headers = { Authorization: `Bearer ${token}` };
-            const respostaCargos = await fetch("/api/cargos", { headers });
-            const resultadoCargos = await respostaCargos.json();
-            if (!respostaCargos.ok) {
-                throw new Error(
-                    resultadoCargos.mensagem || "Não foi possível consultar os cargos.",
-                );
-            }
-
-            const nivelSelecionado = form.querySelector(
-                'input[name="nivel_acesso"]:checked',
-            )?.value;
-            const termoCargo = nivelSelecionado === "administrador" ? "admin" : "funcion";
-            const cargo = resultadoCargos.dados?.find((item) =>
-                item.nome_cargo
-                    .normalize("NFD")
-                    .replace(/[\u0300-\u036f]/g, "")
-                    .toLowerCase()
-                    .includes(termoCargo),
-            );
-            if (!cargo) {
-                throw new Error("O cargo selecionado não está cadastrado no sistema.");
-            }
-
-            const response = await fetch("/api/funcionarios", {
-                method: "POST",
-                headers: {
-                    ...headers,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    nome,
-                    cpf: document.getElementById("input-cpf").value.replace(/\D/g, ""),
-                    email: document.getElementById("input-email").value.trim(),
-                    senha,
-                    id_cargos: Number(cargo.id_cargos),
-                    foto: await prepararFoto(inputFoto?.files?.[0]),
-                }),
-            });
-            const resultado = await response.json();
-            if (!response.ok) {
-                throw new Error(
-                    resultado.mensagem || "Não foi possível cadastrar o funcionário.",
-                );
-            }
-
-            localStorage.setItem(
-                "docegestao_aviso_funcionario",
-                `Funcionário ${nome} criado com sucesso.`,
-            );
-            if (typeof window.navegarDemo === "function") {
-                window.navegarDemo("funcionarios");
-            } else {
-                window.location.href = "./painel.html?pagina=funcionarios";
-            }
-        } catch (erro) {
-            mostrarAviso(
-                erro.message || "Não foi possível conectar ao servidor.",
-            );
-        } finally {
-            botaoEnviar.disabled = false;
-            botaoEnviar.textContent = textoOriginalBotao;
-        }
-    });
-
-    form.addEventListener("input", limparAviso);
-
-    // Limpar
-    btnCancelar?.addEventListener("click", () => {
-        if (cadastroPublico) {
-            voltarAoLogin();
-            return;
-        }
-        form.reset();
-        if (photoPreview) {
-            photoPreview.src = "";
-            photoPreview.classList.add("hidden");
-        }
-        uploadPlaceholder?.classList.remove("hidden");
-    });
+  void validateAdminAccess();
 }
 
-document.addEventListener("demo:page-loaded", inicializarCadastroFuncionario);
+window.inicializarCadastroFuncionario = inicializarCadastroFuncionario;
+document.addEventListener("demo:page-loaded", (event) => {
+  if (event.detail?.pagina === "cadastro") inicializarCadastroFuncionario();
+});
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", inicializarCadastroFuncionario, { once: true });
+  document.addEventListener("DOMContentLoaded", () => inicializarCadastroFuncionario(), { once: true });
 } else {
-    inicializarCadastroFuncionario();
+  inicializarCadastroFuncionario();
 }

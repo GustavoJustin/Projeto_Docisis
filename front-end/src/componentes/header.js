@@ -33,7 +33,7 @@ const HEADER_HTML = `
             class="flex items-center justify-center rounded-full p-1 transition hover:bg-white/10"
             aria-label="Abrir menu da conta" aria-haspopup="menu" aria-expanded="false">
             <img data-header-avatar
-              src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80&w=120"
+              src="../src/img/avatar-padrao.svg"
               alt="Avatar da conta" class="h-9 w-9 rounded-full border border-[#D4A373] object-cover">
           </button>
 
@@ -42,7 +42,7 @@ const HEADER_HTML = `
             style="max-width:min(20rem, calc(100vw - 2rem))">
             <div class="flex items-center gap-4 border-b border-gray-200 bg-[#F8F6F2] p-4">
               <img data-header-menu-avatar
-                src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80&w=120"
+                src="../src/img/avatar-padrao.svg"
                 alt="" class="h-14 w-14 shrink-0 rounded-full border border-[#D4A373] object-cover">
               <div class="min-w-0">
                 <p data-header-menu-name class="truncate text-sm font-bold text-[#3A2A1A]">Nenhuma conta conectada</p>
@@ -129,6 +129,48 @@ const HEADER_HTML = `
       </section>
     </div>
 
+    <div id="header-call-details-dialog" class="fixed inset-0 z-[90] hidden items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+      role="presentation">
+      <section role="dialog" aria-modal="true" aria-labelledby="header-call-details-title"
+        class="w-full max-w-lg rounded-2xl border border-[#E7DED5] bg-white p-6 text-[#4A3F39] shadow-2xl">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p id="header-call-details-status" class="text-[11px] font-bold uppercase tracking-wide text-[#875C46]"></p>
+            <h2 id="header-call-details-title" class="mt-1 text-lg font-bold text-[#3A2A1A]">Detalhes do chamado</h2>
+          </div>
+          <button type="button" id="header-call-details-close" class="rounded-full p-2 text-gray-500 transition hover:bg-gray-100"
+            aria-label="Fechar detalhes do chamado">
+            <i data-lucide="x" class="h-4 w-4"></i>
+          </button>
+        </div>
+        <p id="header-call-details-description" class="mt-4 whitespace-pre-wrap break-words rounded-xl bg-[#F8F6F2] p-4 text-sm leading-6"></p>
+        <p id="header-call-details-metadata" class="mt-3 text-xs text-gray-500"></p>
+        <p id="header-call-details-error" class="mt-3 hidden rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800" role="alert"></p>
+        <div class="mt-6 flex justify-end gap-3">
+          <button type="button" id="header-call-details-cancel"
+            class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-50">
+            Cancelar
+          </button>
+          <button type="button" id="header-call-details-action"
+            class="rounded-lg bg-[#784E38] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#633e2c] disabled:cursor-not-allowed disabled:opacity-50">
+            Resolver chamado
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <aside id="header-active-call-banner" class="fixed bottom-4 left-1/2 z-[80] hidden w-[min(42rem,calc(100vw-2rem))] -translate-x-1/2 items-center justify-between gap-4 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-[#4A3F39] shadow-2xl"
+      aria-live="polite">
+      <div id="header-active-call-drag-handle" class="min-w-0 flex-1 cursor-move select-none" style="touch-action:none">
+        <p class="text-xs font-bold uppercase tracking-wide text-[#784E38]">Chamado em resolução</p>
+        <p id="header-active-call-text" class="mt-1 truncate text-sm font-medium"></p>
+      </div>
+      <button type="button" id="header-active-call-close"
+        class="shrink-0 rounded-lg bg-[#784E38] px-4 py-2 text-xs font-bold text-white shadow-md transition hover:bg-[#633e2c]">
+        Fechar chamado
+      </button>
+    </aside>
+
     <div id="header-settings-dialog" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
       role="presentation">
       <section role="dialog" aria-modal="true" aria-labelledby="header-settings-title"
@@ -214,7 +256,7 @@ const HEADER_HTML = `
               <p class="mt-1 text-sm text-gray-500">Atualize as informações exibidas neste navegador.</p>
               <div class="mt-6 flex flex-wrap items-center gap-4">
                 <img data-settings-avatar
-                  src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80&w=120"
+                  src="../src/img/avatar-padrao.svg"
                   alt="Foto de perfil" class="h-16 w-16 rounded-full border border-[#D4A373] object-cover">
                 <div>
                   <label for="settings-profile-photo" class="inline-flex cursor-pointer items-center rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50">
@@ -466,6 +508,16 @@ function carregarHeader() {
   const confirmLogoutButton = container.querySelector("#header-confirm-logout");
   const accountActionLabel = container.querySelector("[data-header-account-action-label]");
   const closeSelectedNotification = container.querySelector("#header-close-selected-notification");
+  const callDetailsDialog = container.querySelector("#header-call-details-dialog");
+  const callDetailsStatus = container.querySelector("#header-call-details-status");
+  const callDetailsDescription = container.querySelector("#header-call-details-description");
+  const callDetailsMetadata = container.querySelector("#header-call-details-metadata");
+  const callDetailsError = container.querySelector("#header-call-details-error");
+  const callDetailsAction = container.querySelector("#header-call-details-action");
+  const activeCallBanner = container.querySelector("#header-active-call-banner");
+  const activeCallDragHandle = container.querySelector("#header-active-call-drag-handle");
+  const activeCallText = container.querySelector("#header-active-call-text");
+  const activeCallClose = container.querySelector("#header-active-call-close");
   const fotoPerfil = container.querySelector("[data-header-avatar]");
   const fotoMenu = container.querySelector("[data-header-menu-avatar]");
   const avatarPadraoPerfil = fotoPerfil.getAttribute("src");
@@ -479,6 +531,7 @@ function carregarHeader() {
   let activeDialogTrigger = null;
   let usuarioAtual = null;
   let sincronizacaoChamadosAtual = null;
+  let chamadoEmDetalhe = null;
 
   function lerJsonLocalStorage(key, fallback) {
     try {
@@ -520,6 +573,142 @@ function carregarHeader() {
   function limparErroNotificacoes() {
     notificationsError.textContent = "";
     notificationsError.classList.add("hidden");
+  }
+
+  function idFuncionarioAtual() {
+    const funcionario = usuarioAtual ||
+      lerJsonLocalStorage("docegestao_funcionario", {});
+    return String(funcionario?.id_funcionario || "");
+  }
+
+  function usuarioResponsavelPeloChamado(chamado) {
+    return Boolean(
+      chamado?.id_responsavel &&
+      String(chamado.id_responsavel) === idFuncionarioAtual(),
+    );
+  }
+
+  function atualizarBannerChamado(chamados) {
+    const chamadoAtivo = chamados.find(
+      (chamado) =>
+        chamado.tipo === "chamado" &&
+        chamado.status === "em_resolucao" &&
+        usuarioResponsavelPeloChamado(chamado),
+    );
+    activeCallBanner.classList.toggle("hidden", !chamadoAtivo);
+    activeCallBanner.classList.toggle("flex", Boolean(chamadoAtivo));
+    if (chamadoAtivo) {
+      activeCallText.textContent = `#${chamadoAtivo.callId}: ${chamadoAtivo.mensagem}`;
+      activeCallClose.dataset.callId = chamadoAtivo.callId;
+    } else {
+      delete activeCallClose.dataset.callId;
+    }
+  }
+
+  function atualizarCacheChamado(chamado, concluido = false) {
+    const chamados = lerJsonLocalStorage("docegestao_chamados", []);
+    const atuais = Array.isArray(chamados) ? chamados : [];
+    const atualizados = concluido
+      ? atuais.filter((item) => String(item.id) !== String(chamado.id))
+      : [
+          ...atuais.filter((item) => String(item.id) !== String(chamado.id)),
+          chamado,
+        ];
+    try {
+      localStorage.setItem("docegestao_chamados", JSON.stringify(atualizados));
+    } catch (error) {
+      console.error("Não foi possível atualizar o cache dos chamados:", error);
+    }
+    atualizarNotificacoes();
+  }
+
+  function fecharDetalhesChamado() {
+    callDetailsDialog.classList.add("hidden");
+    callDetailsDialog.classList.remove("flex");
+    chamadoEmDetalhe = null;
+  }
+
+  function abrirDetalhesChamado(chamado) {
+    fecharDialogo(notificationsDialog, notificationsTrigger);
+    chamadoEmDetalhe = chamado;
+    callDetailsStatus.textContent = chamado.status === "em_resolucao"
+      ? `Em resolução${chamado.responsavelNome ? ` por ${chamado.responsavelNome}` : ""}`
+      : "Chamado aberto";
+    callDetailsDescription.textContent = chamado.mensagem;
+    const criadoEm = chamado.criadaEm
+      ? new Date(chamado.criadaEm).toLocaleString("pt-BR")
+      : "Data não informada";
+    callDetailsMetadata.textContent =
+      `Aberto por ${chamado.solicitanteNome || "Funcionário"} em ${criadoEm}.`;
+    callDetailsError.textContent = "";
+    callDetailsError.classList.add("hidden");
+
+    const responsavel = usuarioResponsavelPeloChamado(chamado);
+    const emResolucao = chamado.status === "em_resolucao";
+    callDetailsAction.textContent = responsavel
+      ? "Fechar chamado"
+      : emResolucao
+        ? "Em resolução"
+        : "Resolver chamado";
+    callDetailsAction.disabled = emResolucao && !responsavel;
+    callDetailsAction.dataset.action = responsavel ? "concluir" : "assumir";
+    callDetailsDialog.classList.remove("hidden");
+    callDetailsDialog.classList.add("flex");
+    window.lucide?.createIcons();
+  }
+
+  async function executarAcaoChamado(chamado, acao) {
+    const callId = String(chamado.callId || chamado.id || "").replace(/^chamado:/, "");
+    if (!/^\d+$/.test(callId)) {
+      throw new Error("Não foi possível identificar o chamado. Atualize as notificações e tente novamente.");
+    }
+    const token = localStorage.getItem("docegestao_token");
+    if (!token) throw new Error("Sua sessão expirou. Entre novamente para continuar.");
+
+    const response = await fetch(`/api/chamados/${encodeURIComponent(callId)}/${acao}`, {
+      method: "PATCH",
+      headers: { Authorization: "Bearer " + token },
+    });
+    const result = await lerRespostaChamados(
+      response,
+      acao === "assumir"
+        ? "Não foi possível assumir o chamado."
+        : "Não foi possível concluir o chamado.",
+    );
+    const atualizado = {
+      ...result.dados,
+      id: String(result.dados.id),
+      callId: String(result.dados.id),
+    };
+
+    if (acao === "concluir") {
+      const state = carregarNotificacoes();
+      state.items = state.items.filter(
+        (item) => item.id !== `chamado:${callId}`,
+      );
+      if (state.selectedId === `chamado:${callId}`) state.selectedId = null;
+      salvarNotificacoes(state);
+      atualizarCacheChamado(atualizado, true);
+      fecharDetalhesChamado();
+      limparErroNotificacoes();
+    } else {
+      atualizarCacheChamado(atualizado);
+      const state = carregarNotificacoes();
+      const item = state.items.find((entry) => entry.id === `chamado:${callId}`);
+      if (item) {
+        Object.assign(item, {
+          status: atualizado.status,
+          id_responsavel: atualizado.id_responsavel,
+          responsavelNome: atualizado.responsavelNome,
+        });
+        salvarNotificacoes(state);
+        chamadoEmDetalhe = item;
+        atualizarBannerChamado(state.items);
+        renderizarNotificacoes(state);
+      }
+    }
+    document.dispatchEvent(new Event("docegestao:chamados-atualizados"));
+    return atualizado;
   }
 
   async function lerRespostaChamados(response, mensagemPadrao) {
@@ -568,6 +757,24 @@ function carregarHeader() {
       settingsProfileFeedback.className = "min-h-5 text-xs text-red-600";
       return false;
     }
+  }
+
+  function exibirAvisoPerfil(mensagem, tipo = "success") {
+    const aviso = document.createElement("div");
+    aviso.className = tipo === "error"
+      ? "fixed left-1/2 top-20 z-[120] -translate-x-1/2 rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-800 shadow-xl"
+      : "fixed left-1/2 top-20 z-[120] -translate-x-1/2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-sm font-semibold text-emerald-800 shadow-xl";
+    aviso.setAttribute("role", tipo === "error" ? "alert" : "status");
+    aviso.setAttribute("aria-live", tipo === "error" ? "assertive" : "polite");
+    aviso.textContent = mensagem;
+    document.body.appendChild(aviso);
+    window.setTimeout(() => aviso.remove(), 4500);
+  }
+
+  function notificarPerfilAtualizado() {
+    window.dispatchEvent(new CustomEvent("docegestao:perfil-atualizado", {
+      detail: { funcionario: usuarioAtual },
+    }));
   }
 
   function aplicarPreferenciasNotificacao() {
@@ -715,6 +922,7 @@ function carregarHeader() {
       if (["esgotado", "critico", "prox-estoque", "vencido", "prox-vencimento", "medio"].includes(item.tipo) && preferences.products) return false;
       return true;
     });
+    atualizarBannerChamado(state.items);
     notificationCount.textContent = String(visibleItems.length);
     notificationCount.classList.toggle("hidden", visibleItems.length === 0);
     const selectedItem = visibleItems.find((item) =>
@@ -724,9 +932,13 @@ function carregarHeader() {
       state.selectedId = null;
       salvarNotificacoes(state);
     }
-    closeSelectedNotification.disabled = !selectedItem;
-    closeSelectedNotification.classList.toggle("shadow-md", Boolean(selectedItem));
-    closeSelectedNotification.classList.toggle("brightness-110", Boolean(selectedItem));
+    const selectedCallCanClose =
+      selectedItem?.status === "em_resolucao" &&
+      usuarioResponsavelPeloChamado(selectedItem);
+    closeSelectedNotification.textContent = "Fechar chamado";
+    closeSelectedNotification.disabled = !selectedCallCanClose;
+    closeSelectedNotification.classList.toggle("shadow-md", selectedCallCanClose);
+    closeSelectedNotification.classList.toggle("brightness-110", selectedCallCanClose);
     notificationsList.replaceChildren();
 
     const stockNotificationCount = state.items.filter((item) =>
@@ -766,20 +978,19 @@ function carregarHeader() {
       const card = document.createElement("article");
       const selectable = item.tipo === "chamado";
       const selected = selectable && item.id === state.selectedId;
-      card.tabIndex = 0;
-      card.setAttribute("role", "button");
+      card.tabIndex = selectable ? 0 : -1;
+      card.setAttribute("role", selectable ? "group" : "button");
       card.setAttribute(
         "aria-label",
-        `${selectable ? (selected ? "Recolher chamado" : "Expandir chamado") : "Localizar alerta"}: ${item.titulo}`,
+        `${selectable ? "Ver detalhes do chamado" : "Localizar alerta"}: ${item.titulo}`,
       );
-      if (selectable) card.setAttribute("aria-pressed", String(selected));
       const alertaEstoque = window.estoqueClassificacao.obterAlerta(item.tipo);
       card.className = `cursor-pointer rounded-xl border-0 bg-white p-4 transition-all duration-200 ease-out hover:shadow-md focus:outline-none ${selected ? "shadow-md" : ""} ${item.lida ? "opacity-80" : ""}`;
       card.style.backgroundColor = "#ffffff";
       if (alertaEstoque) {
         card.style.borderLeft = `4px solid ${alertaEstoque.cor}`;
       } else if (item.tipo === "chamado") {
-        card.style.borderLeft = "4px solid #0ea5e9";
+        card.style.borderLeft = `4px solid ${item.status === "em_resolucao" ? "#d97706" : "#0ea5e9"}`;
       }
       if (selected) {
         card.style.transform = "translateY(-5px)";
@@ -790,11 +1001,11 @@ function carregarHeader() {
           const currentState = carregarNotificacoes();
           const notification = currentState.items.find((entry) => entry.id === item.id);
           if (!notification) return;
-          const isSelected = currentState.selectedId === item.id;
-          currentState.selectedId = isSelected ? null : item.id;
+          currentState.selectedId = item.id;
           notification.lida = true;
           salvarNotificacoes(currentState);
           renderizarNotificacoes(currentState);
+          abrirDetalhesChamado(notification);
           return;
         }
 
@@ -817,13 +1028,16 @@ function carregarHeader() {
       card.addEventListener("click", ativarNotificacao);
       card.addEventListener("keydown", (event) => {
         if (!["Enter", " "].includes(event.key)) return;
+        if (event.target !== card) return;
         event.preventDefault();
         ativarNotificacao();
       });
 
       const title = document.createElement("h3");
       title.className = "text-sm font-semibold text-gray-800";
-      title.textContent = item.titulo;
+      title.textContent = item.tipo === "chamado" && item.status === "em_resolucao"
+        ? "Chamado em resolução"
+        : item.titulo;
       const message = document.createElement("p");
       message.className = "mt-1 text-xs leading-5 text-gray-600";
       const previewLimit = 70;
@@ -843,6 +1057,34 @@ function carregarHeader() {
       date.className = "mt-2 text-[11px] text-gray-400";
       date.textContent = new Date(item.criadaEm).toLocaleString("pt-BR");
       card.append(title, message, date);
+      if (item.tipo === "chamado" && item.status === "em_resolucao") {
+        const owner = document.createElement("p");
+        owner.className = "mt-2 text-[11px] font-medium text-amber-700";
+        owner.textContent = `Em resolução por ${item.responsavelNome || "um funcionário"}`;
+        card.appendChild(owner);
+      }
+      if (
+        item.tipo === "chamado" &&
+        item.status === "em_resolucao" &&
+        usuarioResponsavelPeloChamado(item)
+      ) {
+        const closeCallButton = document.createElement("button");
+        closeCallButton.type = "button";
+        closeCallButton.className = "mt-3 rounded-lg bg-[#784E38] px-3 py-2 text-xs font-bold text-white transition hover:bg-[#633e2c]";
+        closeCallButton.textContent = "Fechar chamado";
+        closeCallButton.addEventListener("click", async (event) => {
+          event.stopPropagation();
+          closeCallButton.disabled = true;
+          try {
+            await executarAcaoChamado(item, "concluir");
+          } catch (error) {
+            console.error("Não foi possível concluir o chamado:", error);
+            exibirErroNotificacoes(error.message || "Não foi possível concluir o chamado.");
+            closeCallButton.disabled = false;
+          }
+        });
+        card.appendChild(closeCallButton);
+      }
 
       notificationsList.appendChild(card);
     });
@@ -926,6 +1168,7 @@ function carregarHeader() {
     if (Array.isArray(calls)) {
       calls.forEach((call, index) => {
         if (!call || typeof call !== "object") return;
+        if (call.status === "concluido") return;
         const callId = String(
           call.id || `${call.criadoEm || "chamado"}:${index}:${call.descricao || ""}`,
         );
@@ -954,6 +1197,13 @@ function carregarHeader() {
       notification.callId = callId;
       notification.mensagem = String(call.descricao || "Um novo chamado foi registrado na administração.");
       notification.criadaEm = call.criadoEm || notification.criadaEm;
+      notification.status = call.status || "aberto";
+      notification.id_responsavel = call.id_responsavel || null;
+      notification.responsavelNome = call.responsavelNome || null;
+      notification.solicitanteNome = call.solicitanteNome || null;
+      notification.titulo = notification.status === "em_resolucao"
+        ? "Chamado em resolução"
+        : "Novo chamado aberto";
     });
 
     salvarNotificacoes(state);
@@ -1061,6 +1311,7 @@ function carregarHeader() {
         localStorage.setItem("docegestao_chamados", JSON.stringify(chamadosAtualizados));
         atualizarNotificacoes();
         limparErroNotificacoes();
+        document.dispatchEvent(new Event("docegestao:chamados-sincronizados"));
       } catch (error) {
         console.error("Não foi possível sincronizar os chamados:", error);
         exibirErroNotificacoes(error.message || "Não foi possível carregar os chamados.");
@@ -1255,38 +1506,91 @@ function carregarHeader() {
       fotoPerfil.src = foto;
       fotoMenu.src = foto;
       settingsProfileAvatar.src = foto;
-      settingsProfileFeedback.textContent = "Foto atualizada para sua conta.";
-      settingsProfileFeedback.className = "min-h-5 text-xs text-emerald-700";
+      notificarPerfilAtualizado();
+      settingsProfileFeedback.textContent = "Foto de perfil atualizada e salva na sua conta.";
+      settingsProfileFeedback.className = "inline-flex rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800";
+      exibirAvisoPerfil("Foto de perfil atualizada com sucesso.");
     } catch (error) {
       console.error("Não foi possível atualizar a foto do perfil:", error);
       settingsProfileFeedback.textContent = error.message || "Não foi possível carregar essa imagem.";
-      settingsProfileFeedback.className = "min-h-5 text-xs text-red-600";
+      settingsProfileFeedback.className = "inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800";
+      exibirAvisoPerfil(settingsProfileFeedback.textContent, "error");
     } finally {
       settingsProfilePhoto.value = "";
     }
   });
 
-  settingsProfileForm.addEventListener("submit", (event) => {
+  settingsProfileForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const formData = new FormData(settingsProfileForm);
     const ageText = String(formData.get("idade") || "").trim();
     const age = ageText ? Number(ageText) : null;
     if (ageText && (!Number.isInteger(age) || age < 1 || age > 120)) {
       settingsProfileFeedback.textContent = "Informe uma idade entre 1 e 120 anos.";
-      settingsProfileFeedback.className = "min-h-5 text-xs text-red-600";
+      settingsProfileFeedback.className = "inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800";
+      return;
+    }
+
+    const nome = String(formData.get("nome") || "").trim();
+    const email = String(formData.get("email") || "").trim().toLowerCase();
+    if (!nome || !email) {
+      settingsProfileFeedback.textContent = "Informe seu nome e e-mail.";
+      settingsProfileFeedback.className = "inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800";
       return;
     }
 
     const profile = {
       ...obterPerfilSalvo(),
-      nome: String(formData.get("nome") || "").trim(),
+      nome,
       idade: age,
-      email: String(formData.get("email") || "").trim(),
+      email,
     };
-    if (!salvarPerfilSalvo(profile)) return;
-    atualizarConta();
-    settingsProfileFeedback.textContent = "Perfil atualizado neste navegador.";
-    settingsProfileFeedback.className = "min-h-5 text-xs text-emerald-700";
+    const token = localStorage.getItem("docegestao_token");
+    const submitButton = settingsProfileForm.querySelector('button[type="submit"]');
+    if (!token || !usuarioAtual?.id_funcionario) {
+      settingsProfileFeedback.textContent = "Entre na sua conta para salvar as alterações.";
+      settingsProfileFeedback.className = "inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800";
+      return;
+    }
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Salvando...";
+    }
+    settingsProfileFeedback.textContent = "Salvando alterações...";
+    settingsProfileFeedback.className = "inline-flex rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-600";
+    try {
+      const response = await fetch("/api/funcionarios/perfil", {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ nome, email }),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.mensagem || "Não foi possível salvar as alterações do perfil.");
+      }
+
+      usuarioAtual = { ...usuarioAtual, ...result.dados };
+      localStorage.setItem("docegestao_funcionario", JSON.stringify(usuarioAtual));
+      if (!salvarPerfilSalvo(profile)) return;
+      atualizarConta();
+      notificarPerfilAtualizado();
+      settingsProfileFeedback.textContent = "Perfil atualizado e salvo na sua conta.";
+      settingsProfileFeedback.className = "inline-flex rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800";
+      exibirAvisoPerfil("Perfil atualizado com sucesso.");
+    } catch (error) {
+      console.error("Não foi possível atualizar o perfil:", error);
+      settingsProfileFeedback.textContent = error.message || "Não foi possível salvar as alterações.";
+      settingsProfileFeedback.className = "inline-flex rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800";
+      exibirAvisoPerfil(settingsProfileFeedback.textContent, "error");
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = "Salvar alterações";
+      }
+    }
   });
 
   [notificationsDialog, settingsDialog].forEach((dialog) => {
@@ -1305,7 +1609,9 @@ function carregarHeader() {
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
-    if (!notificationsDialog.classList.contains("hidden")) {
+    if (!callDetailsDialog.classList.contains("hidden")) {
+      fecharDetalhesChamado();
+    } else if (!notificationsDialog.classList.contains("hidden")) {
       fecharDialogo(notificationsDialog, notificationsTrigger);
     } else if (!settingsDialog.classList.contains("hidden")) {
       fecharDialogo(settingsDialog, settingsTrigger);
@@ -1314,59 +1620,105 @@ function carregarHeader() {
     }
   });
 
+  callDetailsDialog.addEventListener("click", (event) => {
+    if (event.target === callDetailsDialog) fecharDetalhesChamado();
+  });
+  container.querySelector("#header-call-details-close").addEventListener(
+    "click",
+    fecharDetalhesChamado,
+  );
+  container.querySelector("#header-call-details-cancel").addEventListener(
+    "click",
+    fecharDetalhesChamado,
+  );
+  callDetailsAction.addEventListener("click", async () => {
+    if (!chamadoEmDetalhe || callDetailsAction.disabled) return;
+    const acao = callDetailsAction.dataset.action;
+    callDetailsAction.disabled = true;
+    callDetailsError.textContent = "";
+    callDetailsError.classList.add("hidden");
+    try {
+      await executarAcaoChamado(chamadoEmDetalhe, acao);
+      fecharDetalhesChamado();
+    } catch (error) {
+      console.error(`Não foi possível ${acao === "assumir" ? "assumir" : "concluir"} o chamado:`, error);
+      callDetailsError.textContent = error.message || "Não foi possível atualizar o chamado.";
+      callDetailsError.classList.remove("hidden");
+    } finally {
+      if (callDetailsDialog.isConnected && chamadoEmDetalhe) {
+        callDetailsAction.disabled =
+          chamadoEmDetalhe.status === "em_resolucao" &&
+          !usuarioResponsavelPeloChamado(chamadoEmDetalhe);
+      }
+    }
+  });
+
+  let arrasteChamado = null;
+  activeCallDragHandle.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || !activeCallBanner.classList.contains("flex")) return;
+    const bounds = activeCallBanner.getBoundingClientRect();
+    arrasteChamado = {
+      pointerId: event.pointerId,
+      offsetX: event.clientX - bounds.left,
+      offsetY: event.clientY - bounds.top,
+    };
+    activeCallDragHandle.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+  activeCallDragHandle.addEventListener("pointermove", (event) => {
+    if (!arrasteChamado || event.pointerId !== arrasteChamado.pointerId) return;
+    const bounds = activeCallBanner.getBoundingClientRect();
+    const left = Math.max(
+      0,
+      Math.min(window.innerWidth - bounds.width, event.clientX - arrasteChamado.offsetX),
+    );
+    const top = Math.max(
+      0,
+      Math.min(window.innerHeight - bounds.height, event.clientY - arrasteChamado.offsetY),
+    );
+    activeCallBanner.style.left = `${left}px`;
+    activeCallBanner.style.top = `${top}px`;
+    activeCallBanner.style.right = "auto";
+    activeCallBanner.style.bottom = "auto";
+    activeCallBanner.style.transform = "none";
+  });
+  const terminarArrasteChamado = (event) => {
+    if (arrasteChamado?.pointerId !== event.pointerId) return;
+    arrasteChamado = null;
+  };
+  activeCallDragHandle.addEventListener("pointerup", terminarArrasteChamado);
+  activeCallDragHandle.addEventListener("pointercancel", terminarArrasteChamado);
+
   closeSelectedNotification.addEventListener("click", async () => {
-    let state = carregarNotificacoes();
-    let selectedItem = state.items.find((item) =>
+    const state = carregarNotificacoes();
+    const selectedItem = state.items.find((item) =>
       item.id === state.selectedId && item.tipo === "chamado",
     );
     if (!selectedItem || closeSelectedNotification.disabled) return;
-
-    const token = localStorage.getItem("docegestao_token");
-    if (!token) {
-      exibirErroNotificacoes("Sua sessão expirou. Entre novamente para remover o chamado.");
-      return;
-    }
-
     closeSelectedNotification.disabled = true;
     limparErroNotificacoes();
     try {
-      let callId = String(selectedItem.callId || selectedItem.id.replace(/^chamado:/, ""));
-      if (!/^\d+$/.test(callId)) {
-        await sincronizarChamadosNotificacoes();
-        const idMigrado = lerJsonLocalStorage(MIGRATED_CALLS_KEY, {})[callId];
-        if (!/^\d+$/.test(String(idMigrado || ""))) {
-          throw new Error("Não foi possível migrar este chamado antigo para o banco de dados.");
-        }
-        state = carregarNotificacoes();
-        selectedItem = state.items.find(
-          (item) => item.tipo === "chamado" && item.callId === String(idMigrado),
-        );
-        if (!selectedItem) {
-          throw new Error("O chamado foi atualizado. Selecione-o novamente para fechar.");
-        }
-        callId = String(idMigrado);
-      }
-
-      const response = await fetch(`/api/chamados/${encodeURIComponent(callId)}`, {
-        method: "DELETE",
-        headers: { Authorization: "Bearer " + token },
-      });
-      await lerRespostaChamados(response, "Não foi possível remover o chamado.");
-
-      const calls = lerJsonLocalStorage("docegestao_chamados", []);
-      localStorage.setItem(
-        "docegestao_chamados",
-        JSON.stringify(calls.filter((call) => String(call.id) !== callId)),
-      );
-      state.items = state.items.filter((item) => item.id !== selectedItem.id);
-      state.selectedId = null;
-      salvarNotificacoes(state);
-      renderizarNotificacoes(state);
-      limparErroNotificacoes();
+      await executarAcaoChamado(selectedItem, "concluir");
     } catch (error) {
-      console.error("Não foi possível remover o chamado:", error);
-      exibirErroNotificacoes(error.message || "Não foi possível remover o chamado.");
+      console.error("Não foi possível concluir o chamado:", error);
+      exibirErroNotificacoes(error.message || "Não foi possível concluir o chamado.");
       closeSelectedNotification.disabled = false;
+    }
+  });
+  activeCallClose.addEventListener("click", async () => {
+    const callId = activeCallClose.dataset.callId;
+    const chamado = carregarNotificacoes().items.find(
+      (item) => item.tipo === "chamado" && item.callId === callId,
+    );
+    if (!chamado) return;
+    activeCallClose.disabled = true;
+    try {
+      await executarAcaoChamado(chamado, "concluir");
+    } catch (error) {
+      console.error("Não foi possível concluir o chamado:", error);
+      exibirErroNotificacoes(error.message || "Não foi possível concluir o chamado.");
+    } finally {
+      activeCallClose.disabled = false;
     }
   });
 
@@ -1405,6 +1757,13 @@ function carregarHeader() {
     settingsProfileAvatar.src = foto || avatarPadraoConfiguracoes;
   }
 
+  window.prepararPerfilDaConta = async () => {
+    await sincronizarContaDaSessao();
+    atualizarFoto();
+    preencherPerfil();
+    return usuarioAtual;
+  };
+
   aplicarTema(localStorage.getItem(THEME_KEY) === "dark");
   atualizarConta();
   void sincronizarContaDaSessao();
@@ -1436,6 +1795,12 @@ function carregarHeader() {
   document.addEventListener("docegestao:atualizar-notificacoes", atualizarNotificacoes);
   document.addEventListener("docegestao:chamados-atualizados", () => {
     void sincronizarChamadosNotificacoes();
+  });
+  window.setInterval(() => {
+    if (!document.hidden) void sincronizarChamadosNotificacoes();
+  }, 15000);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) void sincronizarChamadosNotificacoes();
   });
   document.addEventListener("docegestao:produto-removido", registrarProdutoRemovido);
   void sincronizarEstoqueNotificacoes();

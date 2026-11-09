@@ -1,20 +1,16 @@
 function initializeSplashScreen() {
-  if (!document.getElementById('splash-content')) return;
+  const content = document.getElementById("splash-content");
+  if (!content || window.__splashScreen?.content === content) return;
 
   const elements = {
-    body: document.body,
-    decorationTop: document.getElementById('splash-decoration-top'),
-    decorationBottom: document.getElementById('splash-decoration-bottom'),
-    content: document.getElementById('splash-content'),
-    iconCircle: document.getElementById('splash-icon-circle'),
-    iconSquare: document.getElementById('splash-icon-square'),
-    iconDiamond: document.getElementById('splash-icon-diamond'),
-    title: document.getElementById('splash-title'),
-    subtitle: document.getElementById('splash-subtitle'),
-    loading: document.getElementById('splash-loading'),
-    loadingText: document.getElementById('splash-loading-text'),
-    progressTrack: document.getElementById('splash-progress-track'),
-    progressBar: document.getElementById('splash-progress-bar'),
+    content,
+    loadingText: document.getElementById("splash-loading-text"),
+    progressTrack: document.getElementById("splash-progress-track"),
+    progressBar: document.getElementById("splash-progress-bar"),
+    progressValue: document.getElementById("splash-progress-value"),
+    errorActions: document.getElementById("splash-error-actions"),
+    retry: document.getElementById("splash-retry"),
+    continue: document.getElementById("splash-continue"),
   };
 
   for (const [name, element] of Object.entries(elements)) {
@@ -23,54 +19,161 @@ function initializeSplashScreen() {
     }
   }
 
-  const styles = {
-    body: 'relative bg-cream min-h-screen flex items-center justify-center overflow-hidden font-sans',
-    decorationTop: 'pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full bg-rose-100/60 blur-3xl',
-    decorationBottom: 'pointer-events-none absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-cocoa-200/50 blur-3xl',
-    content: 'relative z-10 flex flex-col items-center text-center px-6',
-    iconCircle: 'w-20 h-20 rounded-full border border-dashed border-cocoa-200 flex items-center justify-center mb-6',
-    iconSquare: 'w-11 h-11 rounded-xl bg-linear-to-br from-cocoa-400 to-cocoa-600 flex items-center justify-center shadow-sm',
-    iconDiamond: 'w-3 h-3 bg-cream rotate-45 rounded-sm',
-    title: 'font-display text-3xl font-bold text-cocoa-700',
-    subtitle: 'mt-1 text-[11px] tracking-widest text-cocoa-400 font-medium',
-    loading: 'mt-16 flex flex-col items-center gap-2',
-    loadingText: 'text-xs text-cocoa-400',
-    progressTrack: 'w-32 h-1 rounded-full bg-cocoa-200/60 overflow-hidden',
-    progressBar: 'h-full rounded-full bg-cocoa-500',
-  };
+  const overlay = document.createElement("div");
+  overlay.setAttribute("role", "region");
+  overlay.setAttribute("aria-label", "Carregamento do Docisis");
+  overlay.style.cssText =
+    "position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;overflow:auto;background:#FAFAFA";
+  content.style.cssText =
+    "position:relative;inset:auto;z-index:auto;display:flex;min-height:100vh;width:100%;align-items:center;justify-content:center;overflow:auto;background:transparent;color:#4A3F39;font-family:Inter,Arial,sans-serif";
+  overlay.append(content);
+  document.body.append(overlay);
 
-  for (const [name, classNames] of Object.entries(styles)) {
-    elements[name].classList.add(...classNames.split(' '));
+  let active = true;
+  let attempt = 0;
+  let progress = 0;
+  let timer = null;
+
+  function limparTimer() {
+    if (timer !== null) {
+      window.clearTimeout(timer);
+      timer = null;
+    }
   }
 
-  const animationDuration = 1800;
-  const startedAt = performance.now();
-  let animationFrame;
-  const timer = window.setTimeout(() => {
-    window.navegarDemo('estoque');
-  }, 2500);
-
-  function animateProgress(now) {
-    const cycleProgress = ((now - startedAt) % animationDuration) / animationDuration;
-    const progress = Math.min(cycleProgress / 0.7, 1);
-    elements.progressBar.style.width = `${progress * 100}%`;
-    elements.progressTrack.setAttribute('aria-valuenow', String(Math.round(progress * 100)));
-    animationFrame = window.requestAnimationFrame(animateProgress);
+  function mostrarAcoes(mensagem, permitirContinuar) {
+    if (!active) return;
+    limparTimer();
+    elements.loadingText.textContent = mensagem;
+    elements.progressValue.textContent = "Carregamento pausado";
+    elements.errorActions.hidden = false;
+    elements.errorActions.style.display = "flex";
+    elements.continue.hidden = !permitirContinuar;
+    elements.continue.style.display = permitirContinuar ? "inline-flex" : "none";
+    elements.content.setAttribute("aria-busy", "false");
   }
 
-  animationFrame = window.requestAnimationFrame(animateProgress);
+  function concluir() {
+    if (!active) return;
+    atualizarProgresso(100, "Tudo pronto!");
+    active = false;
+    limparTimer();
+    elements.content.setAttribute("aria-busy", "false");
+    overlay.remove();
+    delete window.__splashLoader;
+    delete window.__splashScreen;
+  }
 
-  window.__splashCleanup = () => {
-    window.cancelAnimationFrame(animationFrame);
-    window.clearTimeout(timer);
-    delete window.__splashCleanup;
+  function cancelar() {
+    if (!active) return;
+    active = false;
+    attempt += 1;
+    limparTimer();
+    overlay.remove();
+    delete window.__splashLoader;
+    delete window.__splashScreen;
+  }
+
+  function atualizarProgresso(valor, mensagem) {
+    if (!active) return;
+    progress = Math.max(progress, Math.min(100, Math.max(0, valor)));
+    const restante = 100 - Math.round(progress);
+    elements.progressBar.style.width = `${progress}%`;
+    elements.progressTrack.setAttribute("aria-valuenow", String(Math.round(progress)));
+    elements.progressTrack.setAttribute("aria-valuetext", `Faltam ${restante}%`);
+    elements.progressValue.textContent = `Faltam ${restante}%`;
+    if (mensagem) elements.loadingText.textContent = mensagem;
+  }
+
+  const loader = {
+    setProgress: atualizarProgresso,
+    finish: concluir,
+    cancel: cancelar,
   };
+
+  window.__splashLoader = loader;
+  window.__splashScreen = { content };
+
+  async function prepararTela() {
+    const tentativaAtual = ++attempt;
+    limparTimer();
+    progress = 0;
+    elements.progressBar.style.width = "0%";
+    elements.progressTrack.setAttribute("aria-valuenow", "0");
+    elements.progressTrack.setAttribute("aria-valuetext", "Faltam 100%");
+    elements.progressValue.textContent = "Faltam 100%";
+    elements.loadingText.textContent = "Preparando seu perfil…";
+    elements.errorActions.hidden = true;
+    elements.errorActions.style.display = "none";
+    elements.continue.hidden = true;
+    elements.continue.style.display = "none";
+    elements.content.setAttribute("aria-busy", "true");
+
+    try {
+      const prepararPerfil =
+        typeof window.prepararPerfilDaConta === "function"
+          ? window.prepararPerfilDaConta()
+          : typeof window.obterFuncionarioAutenticado === "function"
+            ? window.obterFuncionarioAutenticado()
+            : Promise.resolve();
+
+      await Promise.race([
+        prepararPerfil,
+        new Promise((_, reject) => {
+          timer = window.setTimeout(
+            () => reject(new Error("O perfil está demorando para responder. Verifique a conexão e tente novamente.")),
+            20000,
+          );
+        }),
+      ]);
+      limparTimer();
+      if (!active || tentativaAtual !== attempt) return;
+
+      atualizarProgresso(33, "Perfil preparado. Montando sua tela…");
+      if (typeof window.navegarDemo === "function") {
+        window.navegarDemo("estoque");
+      } else {
+        window.location.assign("./painel.html?pagina=splash");
+        return;
+      }
+
+      timer = window.setTimeout(() => {
+        if (active && tentativaAtual === attempt) {
+          mostrarAcoes(
+            "A tela ainda está carregando. Você pode tentar novamente ou mostrar o painel.",
+            progress >= 66,
+          );
+        }
+      }, 25000);
+    } catch (error) {
+      limparTimer();
+      if (!active || tentativaAtual !== attempt) return;
+      console.error("Não foi possível preparar os dados do perfil:", error);
+      mostrarAcoes(
+        error.message || "Não foi possível carregar os dados do perfil.",
+        progress >= 66,
+      );
+    }
+  }
+
+  elements.retry.addEventListener("click", () => {
+    void prepararTela();
+  });
+  elements.continue.addEventListener("click", cancelar);
+
+  void prepararTela();
 }
 
-document.addEventListener('demo:before-page-change', () => {
-  window.__splashCleanup?.();
+document.addEventListener("demo:before-page-change", (event) => {
+  if (event.detail?.pagina !== "estoque") {
+    window.__splashLoader?.cancel();
+  }
 });
 
-document.addEventListener('demo:page-loaded', (event) => {
-  if (event.detail?.pagina === 'splash') initializeSplashScreen();
+document.addEventListener("demo:page-loaded", (event) => {
+  if (event.detail?.pagina === "splash") initializeSplashScreen();
 });
+
+if (document.getElementById("splash-content")) {
+  initializeSplashScreen();
+}
