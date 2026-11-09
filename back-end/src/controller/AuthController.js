@@ -13,23 +13,6 @@ class AuthController {
     }
   }
 
-  async cadastrarFuncionarioPublico(req, res) {
-    try {
-      const resultado = await AuthService.cadastrarFuncionarioPublico(req.body);
-      res.status(201).json(resultado);
-    } catch (erro) {
-      const status = erro.code === "ER_DUP_ENTRY" ? 409 : erro.status || 500;
-      res.status(status).json({
-        sucesso: false,
-        mensagem:
-          erro.code === "ER_DUP_ENTRY"
-            ? "Já existe uma conta com este CPF ou e-mail."
-            : erro.mensagem ||
-              "Cadastro temporariamente indisponível. Verifique a configuração do banco de dados.",
-      });
-    }
-  }
-
   async login(req, res) {
     try {
       const resultado = await AuthService.login(req.body);

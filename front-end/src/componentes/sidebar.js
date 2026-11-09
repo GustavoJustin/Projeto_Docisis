@@ -87,7 +87,12 @@ async function obterFuncionarioAutenticado() {
         String(usuarioLocal.id_funcionario) ===
           String(sessaoUsuarioAtual?.id_funcionario)
       ) {
-        sessaoUsuarioAtual = { ...sessaoUsuarioAtual, foto: usuarioLocal.foto || null };
+        sessaoUsuarioAtual = {
+          ...sessaoUsuarioAtual,
+          nome: usuarioLocal.nome || sessaoUsuarioAtual.nome,
+          email: usuarioLocal.email || sessaoUsuarioAtual.email,
+          foto: usuarioLocal.foto || null,
+        };
       }
     } catch (error) {
       console.error("Não foi possível sincronizar a foto local da conta:", error);
@@ -164,6 +169,14 @@ function carregarSidebar() {
 }
 
 window.obterFuncionarioAutenticado = obterFuncionarioAutenticado;
+window.addEventListener("docegestao:perfil-atualizado", (event) => {
+  const funcionario = event.detail?.funcionario;
+  if (
+    !funcionario ||
+    String(funcionario.id_funcionario) !== String(sessaoUsuarioAtual?.id_funcionario)
+  ) return;
+  sessaoUsuarioAtual = { ...sessaoUsuarioAtual, ...funcionario };
+});
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", carregarSidebar, { once: true });
 } else {

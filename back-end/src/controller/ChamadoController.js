@@ -13,6 +13,18 @@ class ChamadoController {
     }
   }
 
+  async listarHistoricoChamados(req, res) {
+    try {
+      res.json(await ChamadoService.listarHistoricoChamados());
+    } catch (erro) {
+      console.error("Não foi possível carregar o histórico de chamados:", erro);
+      res.status(erro.status || 500).json({
+        sucesso: false,
+        mensagem: erro.mensagem || "Não foi possível carregar o histórico de chamados.",
+      });
+    }
+  }
+
   async cadastrarChamado(req, res) {
     try {
       const resultado = await ChamadoService.cadastrarChamado(
@@ -29,14 +41,36 @@ class ChamadoController {
     }
   }
 
-  async deletarChamado(req, res) {
+  async assumirChamado(req, res) {
     try {
-      res.json(await ChamadoService.deletarChamado(req.params.id));
+      res.json(
+        await ChamadoService.assumirChamado(
+          req.params.id,
+          req.funcionario?.id_funcionario,
+        ),
+      );
     } catch (erro) {
-      console.error("Não foi possível remover o chamado:", erro);
+      console.error("Não foi possível assumir o chamado:", erro);
       res.status(erro.status || 500).json({
         sucesso: false,
-        mensagem: erro.mensagem || "Não foi possível remover o chamado.",
+        mensagem: erro.mensagem || "Não foi possível assumir o chamado.",
+      });
+    }
+  }
+
+  async concluirChamado(req, res) {
+    try {
+      res.json(
+        await ChamadoService.concluirChamado(
+          req.params.id,
+          req.funcionario?.id_funcionario,
+        ),
+      );
+    } catch (erro) {
+      console.error("Não foi possível concluir o chamado:", erro);
+      res.status(erro.status || 500).json({
+        sucesso: false,
+        mensagem: erro.mensagem || "Não foi possível concluir o chamado.",
       });
     }
   }

@@ -43,14 +43,20 @@
               Controle de acessos, permissões e atividades da equipe.
             </p>
           </div>
-          <a id="btn-novo-funcionario" href="cadastro-funcionario.html"
-            class="bg-[#875C46] hover:bg-[#6D4936] text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-            </svg>
-            Novo Funcionário
-          </a>
+          <div class="flex items-center gap-2">
+            <button id="btn-editar-funcionario" type="button"
+              class="bg-white hover:bg-gray-50 text-[#875C46] border border-[#875C46]/30 px-4 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-colors">
+              Editar
+            </button>
+            <button id="btn-novo-funcionario" type="button"
+              class="bg-[#875C46] hover:bg-[#6D4936] text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+              </svg>
+              Novo Funcionário
+            </button>
+          </div>
         </div>
 
         <!-- Indicadores e Métricas Rápidas -->
@@ -222,6 +228,37 @@
       </div>
     </main>
 
+    <div id="create-employee-modal"
+      class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      role="dialog" aria-modal="true" aria-labelledby="create-employee-title">
+      <section class="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+          <h2 id="create-employee-title" class="text-lg font-bold text-[#6D4936]">Novo funcionário</h2>
+          <button id="create-employee-close" type="button" class="rounded-lg px-3 py-1 text-xl text-gray-500 hover:bg-gray-100" aria-label="Fechar">
+            &times;
+          </button>
+        </div>
+        <div id="create-employee-content" class="overflow-y-auto p-4 sm:p-6"></div>
+      </section>
+    </div>
+
+    <div id="edit-employee-modal"
+      class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      role="dialog" aria-modal="true" aria-labelledby="edit-employee-title">
+      <section class="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+          <div>
+            <h2 id="edit-employee-title" class="text-lg font-bold text-[#6D4936]">Editar acessos</h2>
+            <p class="mt-1 text-xs text-gray-500">As senhas atuais são protegidas e não podem ser consultadas. Você pode definir uma nova senha.</p>
+          </div>
+          <button id="edit-employee-close" type="button" class="rounded-lg px-3 py-1 text-xl text-gray-500 hover:bg-gray-100" aria-label="Fechar">
+            &times;
+          </button>
+        </div>
+        <div id="edit-employee-list" class="overflow-y-auto p-5"></div>
+      </section>
+    </div>
+
     <!-- Modal de confirmação de exclusão, no mesmo padrão visual do estoque -->
     <div id="confirm-removal-modal"
       class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4"
@@ -264,6 +301,7 @@
   <script src="../src/script/estoque-classificacao.js" defer></script>
   <script src="../src/componentes/header.js" defer></script>
   <script src="../src/script/gestao-equipes.js" defer></script>
+  <script src="../src/script/cadastroFuncionario.js" defer></script>
 </body>
 
 </html>

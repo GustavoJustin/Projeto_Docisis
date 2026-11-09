@@ -4,15 +4,26 @@ jest.mock("../repositories/FuncionariosRepository", () => ({
   listarFuncionario: jest.fn(),
   deletarFuncionario: jest.fn(),
   atualizarFotoPerfil: jest.fn(),
+  atualizarFuncionario: jest.fn(),
+}));
+jest.mock("../repositories/CargosRepository", () => ({
+  buscarCargoId: jest.fn(),
+}));
+jest.mock("../repositories/HistoricoContaRepository", () => ({
+  registrarAcaoConta: jest.fn(),
 }));
 
 const FuncionariosRepository = require("../repositories/FuncionariosRepository");
+const CargosRepository = require("../repositories/CargosRepository");
+const HistoricoContaRepository = require("../repositories/HistoricoContaRepository");
 const FuncionarioService = require("./FuncionarioService");
 
 describe("FuncionarioService.cadastrarFuncionario", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     FuncionariosRepository.cadastrarFuncionario.mockResolvedValue(1);
+    CargosRepository.buscarCargoId.mockResolvedValue({ nome_cargo: "Funcionário" });
+    HistoricoContaRepository.registrarAcaoConta.mockResolvedValue();
   });
 
   test("normalizes a formatted CPF and stores it as 11 digits", async () => {
@@ -26,6 +37,9 @@ describe("FuncionarioService.cadastrarFuncionario", () => {
 
     expect(FuncionariosRepository.cadastrarFuncionario).toHaveBeenCalledWith(
       expect.objectContaining({ cpf: "12345678999" }),
+    );
+    expect(HistoricoContaRepository.registrarAcaoConta).toHaveBeenCalledWith(
+      expect.objectContaining({ acao: "criacao", email_funcionario: "admin@gmail.com" }),
     );
   });
 
@@ -55,9 +69,39 @@ describe("FuncionarioService.cadastrarFuncionario", () => {
       senha: "123456",
       foto,
     });
-
     expect(FuncionariosRepository.cadastrarFuncionario).toHaveBeenCalledWith(
       expect.objectContaining({ foto }),
+    );
+  });
+
+  test("stores the create permission only for an explicitly authorized admin", async () => {
+    CargosRepository.buscarCargoId.mockResolvedValue({ nome_cargo: "Administrador" });
+    await FuncionarioService.cadastrarFuncionario({
+      cpf: "12345678999",
+      id_cargos: 1,
+      nome: "Admin",
+      email: "admin@example.com",
+      senha: "123456",
+      pode_cadastrar_funcionarios: true,
+    });
+
+    expect(FuncionariosRepository.cadastrarFuncionario).toHaveBeenCalledWith(
+      expect.objectContaining({ pode_cadastrar_funcionarios: 1 }),
+    );
+  });
+
+  test("does not grant employee accounts the permission to create employees", async () => {
+    await FuncionarioService.cadastrarFuncionario({
+      cpf: "12345678999",
+      id_cargos: 1,
+      nome: "Funcionário",
+      email: "funcionario@example.com",
+      senha: "123456",
+      pode_cadastrar_funcionarios: true,
+    });
+
+    expect(FuncionariosRepository.cadastrarFuncionario).toHaveBeenCalledWith(
+      expect.objectContaining({ pode_cadastrar_funcionarios: 0 }),
     );
   });
 });
@@ -65,11 +109,13 @@ describe("FuncionarioService.cadastrarFuncionario", () => {
 describe("FuncionarioService.deletarFuncionario", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    HistoricoContaRepository.registrarAcaoConta.mockResolvedValue();
   });
 
   test("blocks deletion of the last administrator", async () => {
     FuncionariosRepository.buscarFuncionarioId.mockResolvedValue({
       id_funcionario: 1,
+      email: "admin@example.com",
       nome_cargo: "Administrador",
     });
     FuncionariosRepository.listarFuncionario.mockResolvedValue([
@@ -86,6 +132,8 @@ describe("FuncionarioService.deletarFuncionario", () => {
   test("allows deletion of an administrator when another administrator remains", async () => {
     FuncionariosRepository.buscarFuncionarioId.mockResolvedValue({
       id_funcionario: 1,
+      nome: "Admin",
+      email: "admin@example.com",
       nome_cargo: "Administrador",
     });
     FuncionariosRepository.listarFuncionario.mockResolvedValue([
@@ -98,12 +146,86 @@ describe("FuncionarioService.deletarFuncionario", () => {
       mensagem: "Funcionario apagado",
     });
     expect(FuncionariosRepository.deletarFuncionario).toHaveBeenCalledWith(1);
+    expect(HistoricoContaRepository.registrarAcaoConta).toHaveBeenCalledWith(
+      expect.objectContaining({ acao: "remocao" }),
+    );
   });
 });
 
 describe("FuncionarioService.atualizarFotoPerfil", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe("FuncionarioService.redefinirSenha", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    test("stores only a new password hash", async () => {
+      FuncionariosRepository.buscarFuncionarioId.mockResolvedValue({ id_funcionario: 5 });
+
+      await expect(FuncionarioService.redefinirSenha(5, "novaSenha123")).resolves.toEqual({
+        sucesso: true,
+        mensagem: "Senha redefinida com sucesso.",
+      });
+      const [, dadosAtualizados] = FuncionariosRepository.atualizarFuncionario.mock.calls[0];
+      expect(dadosAtualizados.senha).not.toBe("novaSenha123");
+      expect(dadosAtualizados.senha).toMatch(/^\$2[aby]\$/);
+    });
+
+    test("rejects passwords shorter than six characters", async () => {
+      await expect(FuncionarioService.redefinirSenha(5, "123")).rejects.toMatchObject({
+        status: 400,
+      });
+      expect(FuncionariosRepository.atualizarFuncionario).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("FuncionarioService.atualizarPerfil", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    test("persists the authenticated user's name and email and returns refreshed data", async () => {
+      FuncionariosRepository.buscarFuncionarioId
+        .mockResolvedValueOnce({ id_funcionario: 5 })
+        .mockResolvedValueOnce({
+          id_funcionario: 5,
+          nome: "Nome Atualizado",
+          email: "atualizado@example.com",
+        });
+
+      await expect(FuncionarioService.atualizarPerfil(5, {
+        nome: " Nome Atualizado ",
+        email: " ATUALIZADO@EXAMPLE.COM ",
+      })).resolves.toMatchObject({
+        sucesso: true,
+        dados: { nome: "Nome Atualizado", email: "atualizado@example.com" },
+      });
+      expect(FuncionariosRepository.atualizarFuncionario).toHaveBeenCalledWith(5, {
+        nome: "Nome Atualizado",
+        email: "atualizado@example.com",
+      });
+    });
+
+    test("rejects invalid names and emails without writing", async () => {
+      await expect(FuncionarioService.atualizarPerfil(5, {
+        nome: " ",
+        email: "invalid",
+      })).rejects.toMatchObject({ status: 400 });
+      expect(FuncionariosRepository.atualizarFuncionario).not.toHaveBeenCalled();
+    });
+
+    test("reports duplicate email conflicts", async () => {
+      FuncionariosRepository.buscarFuncionarioId.mockResolvedValue({ id_funcionario: 5 });
+      FuncionariosRepository.atualizarFuncionario.mockRejectedValue({ code: "ER_DUP_ENTRY" });
+
+      await expect(FuncionarioService.atualizarPerfil(5, {
+        nome: "Nome",
+        email: "duplicado@example.com",
+      })).rejects.toMatchObject({ status: 409 });
+    });
   });
 
   test("updates the authenticated user's profile photo", async () => {

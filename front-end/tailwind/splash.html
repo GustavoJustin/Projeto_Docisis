@@ -1,23 +1,59 @@
-<body class="min-h-screen bg-[#FAFAFA] text-[#4A3F39] flex">
-  <div id="splash-decoration-top" aria-hidden="true"></div>
-  <div id="splash-decoration-bottom" aria-hidden="true"></div>
-  <main id="splash-content" aria-busy="true">
-    <div id="splash-icon-circle" aria-hidden="true">
-      <div id="splash-icon-square">
-        <div id="splash-icon-diamond"></div>
-      </div>
+<body class="min-h-screen bg-[#FAFAFA] text-[#4A3F39]">
+  <main id="splash-content" aria-busy="true"
+    style="position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;overflow:auto;background:#FAFAFA;color:#4A3F39;font-family:Inter,Arial,sans-serif">
+    <div aria-hidden="true"
+      style="position:absolute;top:-6rem;left:-6rem;width:18rem;height:18rem;border-radius:9999px;background:rgba(251,207,232,.35);filter:blur(48px)">
+    </div>
+    <div aria-hidden="true"
+      style="position:absolute;right:-6rem;bottom:-6rem;width:18rem;height:18rem;border-radius:9999px;background:rgba(217,198,180,.45);filter:blur(48px)">
     </div>
 
-    <h1 id="splash-title">Docisis</h1>
-    <p id="splash-subtitle">GESTÃO DE ESTOQUE</p>
-
-    <div id="splash-loading">
-      <p id="splash-loading-text">Carregando seus dados…</p>
-      <div id="splash-progress-track" role="progressbar" aria-label="Carregamento" aria-valuemin="0" aria-valuemax="100"
-        aria-valuenow="0">
-        <div id="splash-progress-bar"></div>
+    <section style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;padding:2rem 1.5rem;text-align:center">
+      <div aria-hidden="true"
+        style="display:flex;width:6.25rem;height:6.25rem;align-items:center;justify-content:center;margin-bottom:1.75rem;border:1px dashed #D9C6B4;border-radius:9999px">
+        <div style="display:flex;width:3.5rem;height:3.5rem;align-items:center;justify-content:center;border-radius:1rem;background:linear-gradient(135deg,#A68A72,#784E38);box-shadow:0 2px 6px rgba(58,42,26,.18)">
+          <div style="width:.75rem;height:.75rem;transform:rotate(45deg);border-radius:.2rem;background:#FAFAFA"></div>
+        </div>
       </div>
-    </div>
+
+      <h1 id="splash-title" style="margin:0;color:#6D4936;font-family:Georgia,serif;font-size:2.25rem;font-weight:700">
+        Docisis
+      </h1>
+      <p style="margin:.25rem 0 0;color:#9B816D;font-size:.75rem;font-weight:500;letter-spacing:.18em">
+        GESTÃO DE ESTOQUE
+      </p>
+
+      <div id="splash-loading" style="display:flex;flex-direction:column;align-items:center;gap:.6rem;margin-top:5rem">
+        <p id="splash-loading-text" role="status" aria-live="polite" style="margin:0;color:#9B816D;font-size:.9rem">
+          Preparando seu perfil…
+        </p>
+        <div id="splash-progress-track" role="progressbar" aria-label="Carregamento"
+          aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="Faltam 100%"
+          style="width:10rem;height:.3rem;overflow:hidden;border-radius:9999px;background:rgba(217,198,180,.6)">
+          <div id="splash-progress-bar"
+            style="width:0;height:100%;border-radius:9999px;background:#875C46;transition:width .3s ease">
+          </div>
+        </div>
+        <p id="splash-progress-value" aria-live="polite" style="margin:0;color:#9B816D;font-size:.75rem">
+          Faltam 100%
+        </p>
+
+        <div id="splash-error-actions" hidden
+          style="display:none;flex-wrap:wrap;justify-content:center;gap:.5rem;padding-top:.75rem">
+          <button id="splash-retry" type="button"
+            style="border:0;border-radius:.5rem;background:#784E38;padding:.6rem 1rem;color:#fff;font-weight:600;cursor:pointer">
+            Tentar novamente
+          </button>
+          <button id="splash-continue" type="button" hidden
+            style="border:1px solid #D9C6B4;border-radius:.5rem;background:#fff;padding:.6rem 1rem;color:#6D4936;font-weight:600;cursor:pointer">
+            Mostrar tela
+          </button>
+        </div>
+        <a id="splash-return-login" href="./pagina-login.html"
+          style="margin-top:.75rem;color:#784E38;font-size:.8rem;text-decoration:underline">
+          Voltar ao login
+        </a>
+      </div>
+    </section>
   </main>
-
 </body>

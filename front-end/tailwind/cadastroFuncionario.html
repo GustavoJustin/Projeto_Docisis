@@ -11,13 +11,6 @@
             aria-live="polite"
           >
             <span id="cadastro-alert-text"></span>
-            <a
-              id="cadastro-alert-link"
-              href="pagina-login.html"
-              class="ml-1 font-semibold underline"
-            >
-              Voltar ao login
-            </a>
           </div>
 
           <!-- Banner Superior -->
@@ -162,6 +155,15 @@
                 <input type="radio" name="nivel_acesso" value="funcionario" checked class="mt-1 w-4 h-4 accent-[#875C46]" />
               </label>
             </div>
+            <label id="admin-create-permission-container"
+              class="hidden mt-4 flex items-start gap-3 rounded-xl border border-[#875C46]/20 bg-[#FDFBF7] p-4 text-sm">
+              <input id="admin-create-permission" type="checkbox"
+                class="mt-0.5 h-4 w-4 accent-[#875C46]" />
+              <span>
+                <span class="block font-semibold text-[#4A3F39]">Este administrador pode criar funcionários</span>
+                <span class="mt-1 block text-xs text-gray-500">A permissão também será verificada pelo servidor.</span>
+              </span>
+            </label>
           </div>
 
           <!-- Seção 3: Contato e Segurança -->

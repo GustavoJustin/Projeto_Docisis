@@ -22,6 +22,7 @@ describe("FuncionariosRepository.prepararSchemaAutenticacao", () => {
       pool.query
         .mockResolvedValueOnce([[], []])
         .mockResolvedValueOnce([{}, []])
+        .mockResolvedValueOnce([{}, []])
         .mockResolvedValueOnce([employees, []]);
 
       await expect(FuncionariosRepository.listarFuncionario()).resolves.toEqual(employees);
@@ -29,13 +30,19 @@ describe("FuncionariosRepository.prepararSchemaAutenticacao", () => {
       expect(pool.query.mock.calls[1][0]).toContain(
         "ADD COLUMN foto LONGTEXT NULL",
       );
-      expect(pool.query.mock.calls[2][0]).toContain("f.foto");
+      expect(pool.query.mock.calls[2][0]).toContain(
+        "ADD COLUMN pode_cadastrar_funcionarios",
+      );
+      expect(pool.query.mock.calls[3][0]).toContain("f.foto");
     });
 
     test("updates an employee profile photo", async () => {
       const foto = "data:image/jpeg;base64,aGVsbG8=";
       pool.query
-        .mockResolvedValueOnce([[{ Field: "foto" }], []])
+        .mockResolvedValueOnce([[
+          { Field: "foto" },
+          { Field: "pode_cadastrar_funcionarios" },
+        ], []])
         .mockResolvedValueOnce([{ affectedRows: 1 }, []]);
 
       await expect(FuncionariosRepository.atualizarFotoPerfil(5, foto)).resolves.toBe(1);

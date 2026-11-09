@@ -46,21 +46,10 @@ Documentação automática gerada a partir das rotas e controladores do backend.
       "id_funcionario": 1,
       "nome": "Maria",
       "email": "maria@docesis.com",
-      "id_cargos": 2
+      "id_cargos": 2,
+      "foto": null,
+      "pode_cadastrar_funcionarios": 0
     }
-  }
-  ```
-
-### POST /api/login/cadastro-funcionario
-
-- Descrição: cria uma conta de funcionário. Se o cargo "Funcionário" ainda não existir, ele é criado automaticamente.
-- Body:
-  ```json
-  {
-    "nome": "Maria Oliveira",
-    "cpf": "12345678901",
-    "email": "maria@email.com",
-    "senha": "123456"
   }
   ```
 
@@ -69,7 +58,7 @@ Documentação automática gerada a partir das rotas e controladores do backend.
 - Em uma instalação sem administrador, crie a primeira conta no terminal com `npm --prefix back-end run criar-admin-inicial`.
 - O comando prepara as colunas de autenticação ausentes, permite vários funcionários no mesmo cargo e converte CPF para texto de 11 dígitos nas colunas relacionadas, preservando as chaves estrangeiras existentes.
 - Informe o CPF com ou sem pontuação; o comando remove a formatação. A senha é solicitada sem exibição e o comando só funciona enquanto ainda não existir um administrador.
-- Depois, entre pela página de login e cadastre funcionários pela área de gestão da equipe.
+- Depois, entre pela página de login e crie funcionários pela área de gestão da equipe. O cadastro público não está disponível.
 
 ### GET /api/sessao
 
@@ -83,7 +72,9 @@ Documentação automática gerada a partir das rotas e controladores do backend.
       "id_funcionario": 1,
       "nome": "Maria",
       "email": "maria@docesis.com",
-      "nome_cargo": "Funcionário"
+      "nome_cargo": "Funcionário",
+      "foto": null,
+      "pode_cadastrar_funcionarios": 0
     }
   }
   ```
@@ -130,9 +121,14 @@ Documentação automática gerada a partir das rotas e controladores do backend.
 
 - Busca um funcionário por id sem retornar o hash da senha. Requer perfil de administrador.
 
+### PATCH /api/funcionarios/perfil
+
+- Atualiza nome e e-mail da conta autenticada e retorna os dados atualizados. Requer autenticação JWT.
+- Body: `{ "nome": "Maria Oliveira", "email": "maria@email.com" }`
+
 ### POST /api/funcionarios
 
-- Cria um funcionário com senha definida pelo administrador. Requer perfil de administrador.
+- Cria um funcionário com senha definida pelo administrador. Requer perfil de administrador com permissão `pode_cadastrar_funcionarios`.
 - Body exemplo:
   ```json
   {
@@ -140,9 +136,16 @@ Documentação automática gerada a partir das rotas e controladores do backend.
     "id_cargos": 2,
     "nome": "Maria Oliveira",
     "email": "maria@email.com",
-    "senha": "123456"
+    "senha": "123456",
+    "foto": null,
+    "pode_cadastrar_funcionarios": false
   }
   ```
+
+### PATCH /api/funcionarios/:id/senha
+
+- Redefine a senha de um funcionário sem revelar a senha anterior ou seu hash. Requer perfil de administrador.
+- Body: `{ "senha": "novaSenha123" }` (mínimo de 6 caracteres).
 
 ### PUT /api/funcionarios/:id
 
@@ -283,6 +286,35 @@ Documentação automática gerada a partir das rotas e controladores do backend.
 ### DELETE /api/relatorios/:id
 
 - Remove relatório.
+
+## Chamados
+
+Todas as rotas exigem autenticação JWT.
+
+### GET /api/chamados
+
+- Lista chamados abertos e em resolução para as notificações.
+- Cada item inclui o status, quem abriu e, quando assumido, o funcionário responsável.
+
+### POST /api/chamados
+
+- Registra um chamado para o funcionário autenticado.
+- Body: `{ "descricao": "Descrição do chamado" }`.
+
+### PATCH /api/chamados/:id/assumir
+
+- Vincula o chamado aberto ao funcionário autenticado e altera o status para `em_resolucao`.
+- Um chamado assumido por outra pessoa não pode ser atribuído novamente.
+
+### PATCH /api/chamados/:id/concluir
+
+- Conclui o chamado somente se a conta autenticada for a responsável atual.
+- Mantém o registro e a data de conclusão para consulta no histórico administrativo.
+
+### GET /api/chamados/historico
+
+- Lista chamados e ações de criação/remoção de contas feitas por administradores, ordenados por data. Requer perfil de administrador.
+- Requer autenticação JWT e cargo de administrador.
 
 ## Observações
 
