@@ -126,20 +126,20 @@
       const tipoOriginal = String(movimentacao.tipo || "").toUpperCase();
       const descricao = String(movimentacao.descricao || "Ajuste de estoque");
       const descricaoNormalizada = normalized(descricao);
-      const tipo = descricaoNormalizada.includes("dados do produto atualizados")
-        ? "AJUSTE"
-        : tipoOriginal === "SAIDA"
-          ? "SAÍDA"
-          : tipoOriginal;
-      const entrada = tipo === "ENTRADA";
-      const saida = tipo === "SAIDA" || tipo === "SAÍDA";
-      const eventoProduto = descricaoNormalizada.includes("removido do estoque")
-        ? "Remoção de produto"
-        : descricaoNormalizada.includes("adicionado ao estoque")
-          ? "Cadastro de produto"
-          : descricaoNormalizada.includes("dados do produto atualizados")
-            ? "Atualização do produto"
-            : "";
+      const cadastro = descricaoNormalizada.includes("adicionado ao estoque");
+      const remocao = descricaoNormalizada.includes("removido do estoque");
+      const direcaoOriginal = normalized(tipoOriginal);
+      const ajuste = !cadastro && !remocao &&
+        (tipoOriginal === "AJUSTE" || direcaoOriginal === "entrada" || direcaoOriginal === "saida");
+      let tipo = tipoOriginal;
+      if (cadastro) tipo = "ENTRADA";
+      else if (remocao) tipo = "SAÍDA";
+      else if (ajuste) tipo = "AJUSTE";
+      else if (tipoOriginal === "SAIDA") tipo = "SAÍDA";
+      const entrada = cadastro;
+      const saida = remocao;
+      const quantidadeAjustePositiva =
+        Number(movimentacao.quantidade_nova) >= Number(movimentacao.quantidade_anterior);
       const classeQuantidade = entrada
         ? "text-emerald-600"
         : saida
@@ -165,7 +165,9 @@
             ? `+ ${quantidade} ${movimentacao.unidade || "un"}`
             : saida
               ? `- ${quantidade} ${movimentacao.unidade || "un"}`
-              : "—",
+              : ajuste
+                ? `${quantidadeAjustePositiva ? "+" : "-"} ${quantidade} ${movimentacao.unidade || "un"}`
+                : "—",
           classe: `py-3 font-medium ${classeQuantidade}`,
         },
         { texto: descricao, classe: "py-3 text-stone-500" },
@@ -187,17 +189,10 @@
           celula.appendChild(usuarioContainer);
         } else if (indice === 2) {
           const grupo = document.createElement("div");
-          grupo.className = "flex flex-col items-start gap-1";
           const etiqueta = document.createElement("span");
           etiqueta.className = `inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${entrada ? "bg-emerald-50 text-emerald-700" : saida ? "bg-rose-50 text-rose-600" : "bg-amber-50 text-amber-700"}`;
           etiqueta.textContent = tipo;
           grupo.appendChild(etiqueta);
-          if (eventoProduto) {
-            const evento = document.createElement("span");
-            evento.className = "text-[10px] font-semibold uppercase tracking-wide text-stone-500";
-            evento.textContent = eventoProduto;
-            grupo.appendChild(evento);
-          }
           celula.appendChild(grupo);
         } else {
           celula.textContent = campo.texto;
@@ -359,7 +354,7 @@
         }
         const wrapper = document.createElement("div");
         wrapper.style.cssText =
-          "padding:24px;background:#fff;color:#292524;font-family:Arial,sans-serif";
+          "padding:24px;background:#fff;color:#292524;font-family:Inter,sans-serif";
         const [year, month, day] = selectedDate.split("-");
         wrapper.innerHTML = `<h1 style="font-size:20px;margin:0 0 6px">Histórico de Movimentações</h1><p style="font-size:12px;color:#78716c;margin:0 0 18px">Movimentações de ${day}/${month}/${year} · ${recordsForDay.length} registro(s)</p>`;
 

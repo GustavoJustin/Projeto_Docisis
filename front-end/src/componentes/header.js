@@ -6,7 +6,7 @@ const HEADER_HTML = `
         <p class="text-xs text-[#D9C6B4] font-medium">
           Gestão <span class="mx-1">/</span> <span data-header-page-name>Estoque</span>
         </p>
-        <h1 data-header-page-name class="font-serif text-lg sm:text-xl font-bold tracking-tight text-[#F5EFE9]">
+        <h1 data-header-page-name class="font-display text-lg sm:text-xl font-bold tracking-tight text-[#F5EFE9]">
           Estoque de Matérias-Primas
         </h1>
       </div>

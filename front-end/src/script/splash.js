@@ -25,7 +25,7 @@ function initializeSplashScreen() {
   overlay.style.cssText =
     "position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;overflow:auto;background:#FAFAFA";
   content.style.cssText =
-    "position:relative;inset:auto;z-index:auto;display:flex;min-height:100vh;width:100%;align-items:center;justify-content:center;overflow:auto;background:transparent;color:#4A3F39;font-family:Inter,Arial,sans-serif";
+    "position:relative;inset:auto;z-index:auto;display:flex;min-height:100vh;width:100%;align-items:center;justify-content:center;overflow:auto;background:transparent;color:#4A3F39;font-family:Inter,sans-serif";
   overlay.append(content);
   document.body.append(overlay);
 

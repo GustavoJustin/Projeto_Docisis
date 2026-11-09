@@ -6,7 +6,9 @@
   "scripts": {
     "test": "jest --runInBand --detectOpenHandles",
     "start": "node src/server.js",
-    "criar-admin-inicial": "node src/scripts/criar-admin-inicial.js"
+    "criar-admin-inicial": "node src/scripts/criar-admin-inicial.js",
+    "seed:demo": "node src/scripts/seed-demo.js",
+    "demo:alertas": "node src/scripts/atualizar-alertas-demo.js"
   },
   "keywords": [],
   "author": "",
