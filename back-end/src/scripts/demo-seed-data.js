@@ -1,0 +1,142 @@
+const suppliers = [
+    'Harald Alimentos Ltda',
+    'Barry Callebaut Brasil',
+    'Nestlé Brasil Ltda',
+    'Bunge Alimentos S/A',
+    'Embalagens & Confeitos Express',
+]
+
+const employees = [
+    {
+        role: 'Administrador',
+        cpf: '11122233344',
+        name: 'Ana Clara Silva',
+        email: 'ana.silva@docisis.com.br',
+        photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150',
+        canCreateEmployees: 1,
+        canDeleteEmployees: 1,
+    },
+    {
+        role: 'Administrador',
+        cpf: '22233344455',
+        name: 'Carlos Eduardo Oliveira',
+        email: 'carlos.oliveira@docisis.com.br',
+        photo: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150',
+        canCreateEmployees: 1,
+        canDeleteEmployees: 1,
+    },
+    {
+        role: 'Funcionário',
+        cpf: '33344455566',
+        name: 'Mariana Santos',
+        email: 'mariana.santos@docisis.com.br',
+        photo: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150',
+        canCreateEmployees: 0,
+        canDeleteEmployees: 0,
+    },
+    {
+        role: 'Funcionário',
+        cpf: '44455566677',
+        name: 'Lucas Ribeiro',
+        email: 'lucas.ribeiro@docisis.com.br',
+        photo: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150',
+        canCreateEmployees: 0,
+        canDeleteEmployees: 0,
+    },
+    {
+        role: 'Funcionário',
+        cpf: '55566677788',
+        name: 'Beatriz Lima',
+        email: 'beatriz.lima@docisis.com.br',
+        photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+        canCreateEmployees: 0,
+        canDeleteEmployees: 0,
+    },
+]
+
+// Supplier IDs in the source data refer to the supplier list above, not database IDs.
+const products = [
+    [1, 'Harald', 'L2024-01', 'Matéria-Prima', '2025-12-31', 'Chocolate em Pó 50% Cacau 1kg', 'Chocolate em pó solúvel para brigadeiros e massas de bolo', 'Chocolates', '32.90', 25, 50, 'kg', 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=300', '2024-10-01', 1],
+    [2, 'Sicao', 'L2024-02', 'Matéria-Prima', '2025-10-15', 'Chocolate Ao Leite em Gotas 1.01kg', 'Gotas de chocolate ao leite nobre para temperagem e recheios', 'Chocolates', '48.50', 40, 80, 'kg', 'https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=300', '2024-10-05', 1],
+    [2, 'Callebaut', 'L2024-03', 'Matéria-Prima', '2026-01-20', 'Chocolate Amargo 70.5% Callebaut 2.5kg', 'Chocolate belga amargo em gotas de alta qualidade', 'Chocolates', '189.00', 15, 30, 'kg', 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=300', '2024-09-12', 1],
+    [3, 'Nestlé', 'L2024-04', 'Matéria-Prima', '2025-08-30', 'Leite Condensado Moça 395g', 'Lata de leite condensado tradicional para doces e recheios', 'Laticínios', '7.89', 120, 300, 'un', 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=300', '2024-10-10', 1],
+    [3, 'Itambé', 'L2024-05', 'Matéria-Prima', '2025-06-15', 'Creme de Leite UHT 1kg', 'Creme de leite culinário 20% gordura para ganaches e cremes', 'Laticínios', '18.50', 60, 150, 'kg', 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=300', '2024-10-12', 1],
+    [3, 'Piracanjuba', 'L2024-06', 'Matéria-Prima', '2025-05-10', 'Leite em Pó Integral 400g', 'Leite em pó para receitas de brigadeiro de ninho e recheios', 'Laticínios', '16.90', 50, 100, 'un', 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300', '2024-10-15', 1],
+    [4, 'Dona Benta', 'L2024-07', 'Matéria-Prima', '2025-09-01', 'Farinha de Trigo Especial 5kg', 'Farinha de trigo tipo 1 para massas finas de bolos e tortas', 'Farinhas', '22.00', 30, 60, 'un', 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300', '2024-09-25', 1],
+    [4, 'União', 'L2024-08', 'Matéria-Prima', '2026-03-15', 'Açúcar Refinado 1kg', 'Açúcar refinado para caldas, caramelos e massas', 'Açúcares', '4.50', 100, 250, 'kg', 'https://images.unsplash.com/photo-1581441363689-1f3c3c414635?w=300', '2024-10-02', 1],
+    [4, 'União', 'L2024-09', 'Matéria-Prima', '2026-02-28', 'Açúcar de Confeiteiro 500g', 'Açúcar impalpável ideal para coberturas e glacês', 'Açúcares', '6.20', 40, 80, 'un', 'https://images.unsplash.com/photo-1610970878459-a0e464d7592b?w=300', '2024-10-02', 1],
+    [3, 'Qualy', 'L2024-10', 'Matéria-Prima', '2025-04-10', 'Manteiga Sem Sal 500g', 'Manteiga de primeira qualidade para buttercream e folhados', 'Laticínios', '21.90', 25, 50, 'un', 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=300', '2024-10-08', 1],
+    [4, 'Fleischmann', 'L2024-11', 'Matéria-Prima', '2025-11-20', 'Fermento Químico em Pó 250g', 'Fermento em pó para bolos e tortas de fermentação rápida', 'Fermentos', '8.90', 35, 70, 'un', 'https://images.unsplash.com/photo-1517433670267-08bbd4be890f?w=300', '2024-09-18', 1],
+    [5, 'Mix', 'L2024-12', 'Insumo', '2026-05-15', 'Corante Gel Vermelho Morango 60g', 'Corante alimentício concentrado para tingir chantilly e pastas', 'Corantes e Aromas', '9.50', 15, 30, 'un', 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=300', '2024-10-05', 1],
+    [5, 'Mix', 'L2024-13', 'Insumo', '2026-05-15', 'Essência de Baunilha Branca 500ml', 'Aroma concentrado de baunilha para aromatizar massas e cremes', 'Corantes e Aromas', '14.80', 20, 40, 'un', 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=300', '2024-09-30', 1],
+    [1, 'Mavalerio', 'L2024-14', 'Insumo', '2025-10-01', 'Granulado Crocante Macio 1kg', 'Granulado sabor chocolate para decoração de brigadeiros', 'Confeitos', '19.90', 45, 90, 'kg', 'https://images.unsplash.com/photo-1582293041079-7814c2f12063?w=300', '2024-10-11', 1],
+    [1, 'Mavalerio', 'L2024-15', 'Insumo', '2025-10-01', 'Miçangas Coloridas 500g', 'Confeitos coloridos de açúcar para bolos e cupcakes', 'Confeitos', '12.40', 30, 60, 'un', 'https://images.unsplash.com/photo-1514517220017-8ce97a34a7b6?w=300', '2024-10-11', 1],
+    [null, 'Ninho', 'L2024-16', 'Produto Acabado', '2024-11-20', 'Bolo Vulcão de Ninho com Nutella', 'Bolo caseiro de leite ninho com recheio cremoso e cobertura de Nutella', 'Bolos Prontos', '65.00', 8, 20, 'un', 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300', '2024-11-05', 1],
+    [null, 'Docisis', 'L2024-17', 'Produto Acabado', '2024-11-15', 'Copo da Felicidade de Morango', 'Camadas de creme de ninho, morangos frescos e ganache amarga', 'Sobremesas', '22.00', 15, 40, 'un', 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=300', '2024-11-06', 1],
+    [null, 'Docisis', 'L2024-18', 'Produto Acabado', '2024-11-18', 'Brigadeiro Gourmet ao Leite 20g', 'Brigadeiro feito com chocolate nobre e confeito belga', 'Doces Finos', '3.50', 100, 300, 'un', 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=300', '2024-11-07', 1],
+    [null, 'Docisis', 'L2024-19', 'Produto Acabado', '2024-11-18', 'Beijinho de Coco Cremoso 20g', 'Doce tradicional de coco ralado fresco e leite condensado', 'Doces Finos', '3.50', 80, 250, 'un', 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=300', '2024-11-07', 1],
+    [null, 'Docisis', 'L2024-20', 'Produto Acabado', '2024-11-14', 'Torta Holandesa Fatia 150g', 'Fatia de torta holandesa com creme de baunilha e cobertura de chocolate', 'Tortas', '16.50', 12, 30, 'un', 'https://images.unsplash.com/photo-1535141192574-5d4897c13136?w=300', '2024-11-06', 1],
+    [null, 'Docisis', 'L2024-21', 'Produto Acabado', '2024-11-16', 'Cheesecake de Frutas Vermelhas Fatia', 'Massa crocante, creme de queijo suave e calda artesanal de frutas vermelhas', 'Tortas', '18.90', 10, 25, 'un', 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=300', '2024-11-06', 1],
+    [null, 'Docisis', 'L2024-22', 'Produto Acabado', '2024-11-17', 'Brownie Tradicional com Nozes', 'Brownie denso e fofinho de chocolate meio amargo com pedaços de nozes', 'Doces Assados', '10.00', 25, 60, 'un', 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=300', '2024-11-05', 1],
+    [null, 'Docisis', 'L2024-23', 'Produto Acabado', '2024-11-15', 'Coxinha de Morango com Brigadeiro', 'Morango inteiro envolto em brigadeiro gourmet e confeito crocante', 'Doces Finos', '12.00', 20, 50, 'un', 'https://images.unsplash.com/photo-1587314168485-3236d6710814?w=300', '2024-11-07', 1],
+    [null, 'Docisis', 'L2024-24', 'Produto Acabado', '2024-11-12', 'Macaron de Pistache', 'Biscoito merengado francês recheado com ganache de pistache', 'Doces Finos', '6.50', 40, 100, 'un', 'https://images.unsplash.com/photo-1569864358642-9d1684040f43?w=300', '2024-11-04', 1],
+    [null, 'Docisis', 'L2024-25', 'Produto Acabado', '2024-11-12', 'Macaron de Frutas Vermelhas', 'Biscoito francês recheado com geleia de framboesa e amoras', 'Doces Finos', '6.50', 40, 100, 'un', 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=300', '2024-11-04', 1],
+    [5, 'Galvanotek', 'L2024-26', 'Embalagem', '2028-12-31', 'Embalagem para Bolo Fatia G-630 (100 un)', 'Embalagem articulada transparente para fatias de bolo e torta', 'Embalagens', '45.00', 10, 25, 'cx', 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=300', '2024-09-01', 1],
+    [5, 'Galvanotek', 'L2024-27', 'Embalagem', '2028-12-31', 'Caixa para 6 Brigadeiros com Berço (50 un)', 'Caixa de papelão com tampa transparente para transporte de doces', 'Embalagens', '62.00', 8, 20, 'cx', 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=300', '2024-09-01', 1],
+    [5, 'Cromus', 'L2024-28', 'Embalagem', '2028-12-31', 'Forminha N4 Rosa Bebê (1000 un)', 'Forminha de papel para brigadeiros e doces de festa tamanho padrão', 'Embalagens', '18.00', 15, 40, 'cx', 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=300', '2024-08-20', 1],
+    [5, 'Cromus', 'L2024-29', 'Embalagem', '2028-12-31', 'Fita de Cetim Rosa 15mm x 50m', 'Fita decorativa para acabamento de caixas de presente e laços', 'Embalagens', '14.50', 12, 30, 'un', 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=300', '2024-08-20', 1],
+    [null, 'Docisis', 'L2024-30', 'Matéria-Prima', '2025-06-30', 'Geleia Artesanal de Morango 1kg', 'Geleia concentrada com pedaços de morango para recheios', 'Recheios', '38.00', 12, 30, 'kg', 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=300', '2024-10-20', 1],
+    [2, 'Nutella', 'L2024-31', 'Matéria-Prima', '2025-11-10', 'Creme de Avelã Nutella 3kg', 'Balde de creme de avelã com cacau para recheios premium', 'Recheios', '175.00', 6, 15, 'un', 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=300', '2024-10-18', 1],
+    [3, 'Chantilly Amélia', 'L2024-32', 'Matéria-Prima', '2025-07-22', 'Creme de Chantilly Chanty Pak 1L', 'Creme vegetal pronto para bater e confeitar bolos', 'Laticínios', '19.90', 30, 80, 'un', 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=300', '2024-10-04', 1],
+    [5, 'Selecta', 'L2024-33', 'Insumo', '2026-04-12', 'Pasta Saborizante de Pistache 200g', 'Pasta concentrada de pistache puro para sorvetes e recheios', 'Corantes e Aromas', '58.00', 5, 12, 'un', 'https://images.unsplash.com/photo-1569864358642-9d1684040f43?w=300', '2024-09-15', 1],
+    [4, 'Bunge', 'L2024-34', 'Matéria-Prima', '2025-12-05', 'Gordura Vegetal Hidrogenada 5kg', 'Gordura para massas folhadas e glacês', 'Matéria-Prima', '72.00', 4, 10, 'un', 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=300', '2024-10-01', 1],
+    [3, 'Sococo', 'L2024-35', 'Matéria-Prima', '2025-10-28', 'Coco Ralado Desidratado Médio 1kg', 'Coco ralado sem açúcar para beijinhos e decorações', 'Matéria-Prima', '34.50', 18, 40, 'kg', 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=300', '2024-10-09', 1],
+]
+
+const alertScenarios = {
+    'L2024-01': { validity: '2026-11-01', quantity: 40, max: 50 },
+    'L2024-02': { validity: '2026-11-12', quantity: 70, max: 80 },
+    'L2024-03': { validity: '2027-06-01', quantity: 5, max: 30 },
+    'L2024-04': { validity: '2026-11-08', quantity: 240, max: 300 },
+    'L2024-05': { validity: '2026-11-15', quantity: 125, max: 150 },
+    'L2024-06': { validity: '2027-05-01', quantity: 20, max: 100 },
+    'L2024-07': { validity: '2027-04-01', quantity: 0, max: 60 },
+    'L2024-08': { validity: '2027-03-15', quantity: 220, max: 250 },
+    'L2024-09': { validity: '2027-02-28', quantity: 32, max: 80 },
+    'L2024-10': { validity: '2027-04-10', quantity: 20, max: 50 },
+    'L2024-11': { validity: '2027-05-20', quantity: 42, max: 70 },
+    'L2024-12': { validity: '2027-05-15', quantity: 20, max: 30 },
+    'L2024-13': { validity: '2027-09-30', quantity: 36, max: 40 },
+    'L2024-14': { validity: '2027-10-01', quantity: 20, max: 90 },
+    'L2024-15': { validity: '2027-10-11', quantity: 55, max: 60 },
+    'L2024-16': { validity: '2026-10-25', quantity: 17, max: 20 },
+    'L2024-17': { validity: '2026-11-16', quantity: 34, max: 40 },
+    'L2024-18': { validity: '2027-11-07', quantity: 280, max: 300 },
+    'L2024-19': { validity: '2027-11-07', quantity: 180, max: 250 },
+    'L2024-20': { validity: '2027-11-06', quantity: 12, max: 30 },
+    'L2024-21': { validity: '2027-11-06', quantity: 22, max: 25 },
+    'L2024-22': { validity: '2027-11-05', quantity: 0, max: 60 },
+    'L2024-23': { validity: '2027-11-07', quantity: 45, max: 50 },
+    'L2024-24': { validity: '2027-11-04', quantity: 90, max: 100 },
+    'L2024-25': { validity: '2027-11-04', quantity: 95, max: 100 },
+    'L2024-26': { validity: '2027-09-01', quantity: 22, max: 25 },
+    'L2024-27': { validity: '2027-09-01', quantity: 8, max: 20 },
+    'L2024-28': { validity: '2027-08-20', quantity: 35, max: 40 },
+    'L2024-29': { validity: '2027-08-20', quantity: 27, max: 30 },
+    'L2024-30': { validity: '2027-10-20', quantity: 6, max: 30 },
+    'L2024-31': { validity: '2027-10-18', quantity: 11, max: 15 },
+    'L2024-32': { validity: '2027-10-04', quantity: 65, max: 80 },
+    'L2024-33': { validity: '2027-09-15', quantity: 8, max: 12 },
+    'L2024-34': { validity: '2027-10-01', quantity: 9, max: 10 },
+    'L2024-35': { validity: '2027-10-09', quantity: 18, max: 40 },
+}
+
+for (const product of products) {
+    const scenario = alertScenarios[product[2]]
+    if (!scenario) throw new Error(`Falta cenário de alerta para o lote ${product[2]}.`)
+    product[4] = scenario.validity
+    product[9] = scenario.quantity
+    product[10] = scenario.max
+}
+
+module.exports = { suppliers, employees, products, alertScenarios }

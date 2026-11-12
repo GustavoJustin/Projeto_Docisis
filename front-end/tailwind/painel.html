@@ -15,6 +15,7 @@
     href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="../src/css/output.css" />
+  <link rel="stylesheet" href="../src/css/responsive.css" />
   <link id="login-css" rel="stylesheet" href="../src/css%20paginas/index.css" disabled />
   <link id="relatorios-css" rel="stylesheet" href="../src/css%20paginas/relatorio_analises.css" disabled />
   <link id="splash-css" rel="stylesheet" href="../src/css%20paginas/splash.css" disabled />
@@ -24,12 +25,13 @@
 
   <style>
     body {
-      font-family: "Plus Jakarta Sans", sans-serif;
+      visibility: hidden;
+      font-family: "Inter", sans-serif;
     }
   </style>
 </head>
 
-<body class="h-screen overflow-hidden bg-[#FAFAFA] text-[#4A3F39] flex" style="visibility: hidden">
+<body class="h-screen overflow-hidden bg-[#FAFAFA] text-[#4A3F39] flex">
   <div id="sidebar-container" data-active="" class="w-64 shrink-0"></div>
 
   <div id="coluna-conteudo" class="flex h-screen min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
@@ -44,6 +46,7 @@
 
   <script src="../src/componentes/footer.js" defer></script>
   <script src="../src/componentes/sidebar.js" defer></script>
+  <script src="../src/script/estoque-classificacao.js" defer></script>
   <script src="../src/componentes/header.js" defer></script>
   
   <script src="../src/script/estoqueinsumos.js" defer></script>

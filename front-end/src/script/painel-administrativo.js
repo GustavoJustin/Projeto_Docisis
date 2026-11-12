@@ -1,4 +1,7 @@
 document.addEventListener("demo:page-loaded", () => {
+    const historicoChamados = document.getElementById("historico-chamados-tbody");
+    if (historicoChamados) void carregarHistoricoChamados(historicoChamados);
+
     const capacidadeValor = document.getElementById("estoque-capacidade-percentual");
     const capacidadeBarra = document.getElementById("estoque-capacidade-barra");
     const capacidadeDetalhe = document.getElementById("estoque-capacidade-detalhe");
@@ -58,6 +61,7 @@ document.addEventListener("demo:page-loaded", () => {
                     capacidadeDetalhe.textContent = error.message;
                     console.error("Não foi possível carregar os parâmetros de estoque:", error);
                 });
+
         }
     }
 
@@ -110,43 +114,6 @@ document.addEventListener("demo:page-loaded", () => {
                 "text-gray-400 font-medium hover:text-[#875C46] h-full border-b-2 border-transparent transition-all";
         });
     }
-
-    // --- 2. Correção do Botão BACKUP ---
-    const btnBackup = document.getElementById("btn-backup");
-    btnBackup?.addEventListener("click", () => {
-        showToast(
-            "Backup indisponível",
-            "O servidor ainda não oferece uma operação de backup do banco de dados.",
-        );
-    });
-
-    // --- 3. Correção do Botão EXPORTAR ---
-    const btnExportar = document.getElementById("btn-exportar");
-    btnExportar?.addEventListener("click", () => {
-        const rows = [...document.querySelectorAll("#logs-tbody tr")];
-        const csv = [
-            ["Data/Hora", "Usuário", "Ação", "Status"],
-            ...rows.map((row) =>
-                [...row.cells].map((cell) => cell.innerText.trim()),
-            ),
-        ]
-            .map((row) =>
-                row.map((value) => `"${value.replace(/"/g, '""')}"`).join(","),
-            )
-            .join("\r\n");
-        const url = URL.createObjectURL(
-            new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" }),
-        );
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "logs-auditoria.csv";
-        link.click();
-        URL.revokeObjectURL(url);
-        showToast(
-            "Relatório Exportado",
-            "O arquivo CSV dos registros exibidos foi baixado.",
-        );
-    });
 
     // --- 4. Correção do Botão ABRIR CHAMADO e Modal ---
     const btnChamado = document.getElementById("btn-chamado");
@@ -241,10 +208,101 @@ document.addEventListener("demo:page-loaded", () => {
         .getElementById("search-input")
         ?.addEventListener("input", (e) => {
             const query = e.target.value.toLowerCase();
-            document.querySelectorAll("#logs-tbody tr").forEach((row) => {
+            document.querySelectorAll("#historico-chamados-tbody tr").forEach((row) => {
                 row.style.display = row.innerText.toLowerCase().includes(query)
                     ? ""
                     : "none";
             });
         });
 });
+
+async function carregarHistoricoChamados(tbody) {
+    const token = localStorage.getItem("docegestao_token");
+    if (!token) {
+        mostrarEstadoHistoricoChamados(tbody, "Entre na sua conta para consultar o histórico.");
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/chamados/historico", {
+            headers: { Authorization: "Bearer " + token },
+        });
+        const contentType = response.headers.get("content-type") || "";
+        if (!contentType.includes("application/json")) {
+            throw new Error("A API não retornou o histórico de chamadas.");
+        }
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.mensagem || "Não foi possível carregar o histórico de chamadas.");
+        }
+
+        const registros = Array.isArray(result.dados) ? result.dados : [];
+        if (registros.length === 0) {
+            mostrarEstadoHistoricoChamados(tbody, "Ainda não há chamados ou movimentações de contas registrados.");
+            return;
+        }
+
+        tbody.replaceChildren();
+        registros.forEach((registro) => {
+            const row = document.createElement("tr");
+            const valores = [
+                new Date(registro.data).toLocaleString("pt-BR"),
+                registro.usuario || "Usuário não identificado",
+                registro.acao || "Atividade registrada",
+            ];
+            valores.forEach((valor, index) => {
+                const cell = document.createElement("td");
+                cell.className = index === 1
+                    ? "py-3.5 px-3 font-semibold text-gray-800"
+                    : index === 2
+                        ? "py-3.5 px-3 text-gray-600"
+                        : "py-3.5 px-3 text-gray-400";
+                cell.textContent = valor;
+                row.appendChild(cell);
+            });
+            const statusCell = document.createElement("td");
+            statusCell.className = "py-3.5 px-3 text-center";
+            const badge = document.createElement("span");
+            const status = registro.status || "REGISTRADO";
+            const classes = status === "CONCLUÍDO"
+                ? "bg-emerald-50 text-emerald-600"
+                : status === "EM RESOLUÇÃO"
+                    ? "bg-amber-50 text-amber-700"
+                    : status === "CRIAÇÃO"
+                        ? "bg-blue-50 text-blue-700"
+                        : status === "REMOÇÃO"
+                            ? "bg-rose-50 text-rose-700"
+                            : "bg-gray-100 text-gray-600";
+            badge.className = `${classes} rounded-full px-2.5 py-1 text-[10px] font-bold`;
+            badge.textContent = status;
+            statusCell.appendChild(badge);
+            row.appendChild(statusCell);
+            tbody.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Não foi possível carregar o histórico de chamadas:", error);
+        mostrarEstadoHistoricoChamados(
+            tbody,
+            error.message || "Não foi possível carregar o histórico de chamadas.",
+        );
+    }
+}
+
+function atualizarHistoricoChamadosEmTela() {
+    const tbody = document.getElementById("historico-chamados-tbody");
+    if (tbody) void carregarHistoricoChamados(tbody);
+}
+
+document.addEventListener("docegestao:chamados-atualizados", atualizarHistoricoChamadosEmTela);
+document.addEventListener("docegestao:chamados-sincronizados", atualizarHistoricoChamadosEmTela);
+
+function mostrarEstadoHistoricoChamados(tbody, message) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 4;
+    cell.className = "py-6 px-3 text-center text-gray-400";
+    cell.setAttribute("role", "status");
+    cell.textContent = message;
+    row.appendChild(cell);
+    tbody.replaceChildren(row);
+}

@@ -4,12 +4,21 @@ class FuncionarioRepository {
     async garantirColunaFoto() {
         if (!this.preparacaoColunaFoto) {
             this.preparacaoColunaFoto = (async () => {
-                const [colunas] = await pool.query(
-                    "SHOW COLUMNS FROM tbl_funcionarios LIKE 'foto'",
-                )
-                if (colunas.length === 0) {
+                const [colunas] = await pool.query('SHOW COLUMNS FROM tbl_funcionarios')
+                const existentes = new Set(colunas.map((coluna) => coluna.Field))
+                if (!existentes.has('foto')) {
                     await pool.query(
                         'ALTER TABLE tbl_funcionarios ADD COLUMN foto LONGTEXT NULL',
+                    )
+                }
+                if (!existentes.has('pode_cadastrar_funcionarios')) {
+                    await pool.query(
+                        'ALTER TABLE tbl_funcionarios ADD COLUMN pode_cadastrar_funcionarios TINYINT(1) NOT NULL DEFAULT 1',
+                    )
+                }
+                if (!existentes.has('pode_excluir_funcionarios')) {
+                    await pool.query(
+                        'ALTER TABLE tbl_funcionarios ADD COLUMN pode_excluir_funcionarios TINYINT(1) NOT NULL DEFAULT 0',
                     )
                 }
             })().catch((erro) => {
@@ -259,7 +268,8 @@ class FuncionarioRepository {
         await this.garantirColunaFoto()
         const [rows] = await pool.query(`
             SELECT f.id_funcionario, f.id_cargos, f.cpf, f.nome, f.email,
-                   f.foto, c.nome_cargo
+                   f.foto, f.pode_cadastrar_funcionarios,
+                   f.pode_excluir_funcionarios, c.nome_cargo
             FROM tbl_funcionarios f
             JOIN tbl_cargos c ON c.id_cargos = f.id_cargos
             ORDER BY f.id_funcionario
@@ -271,7 +281,8 @@ class FuncionarioRepository {
         await this.garantirColunaFoto()
         const [rows] = await pool.query(`
             SELECT f.id_funcionario, f.id_cargos, f.cpf, f.nome, f.email,
-                   f.foto, c.nome_cargo
+                   f.foto, f.pode_cadastrar_funcionarios,
+                   f.pode_excluir_funcionarios, c.nome_cargo
             FROM tbl_funcionarios f
             JOIN tbl_cargos c ON c.id_cargos = f.id_cargos
             WHERE f.id_funcionario = ?

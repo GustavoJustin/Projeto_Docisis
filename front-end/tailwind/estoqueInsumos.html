@@ -17,6 +17,7 @@
 
   <!-- Estilos e ícones compartilhados -->
   <link rel="stylesheet" href="../src/css/output.css" />
+  <link rel="stylesheet" href="../src/css/responsive.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Dependências específicas: copie e ative apenas as necessárias para a página. -->
@@ -68,9 +69,19 @@
             Essências
           </button>
         </div>
+        <p id="estoque-total-alertas" class="text-xs font-semibold text-gray-600" role="status">
+          Produtos com alerta de estoque: <span>0</span>
+        </p>
+
+        <label class="relative block w-full">
+          <span class="sr-only">Buscar produtos no estoque</span>
+          <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"></i>
+          <input id="input-busca" type="search" autocomplete="off" placeholder="Buscar produto por nome..."
+            class="w-full rounded-xl border border-black/10 bg-white py-3 pl-10 pr-4 text-sm text-gray-700 outline-none transition focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/20" />
+        </label>
 
         <!-- Grid de Insumos -->
-        <div id="grid-produtos" class="grid grid-cols-1 items-stretch md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div id="grid-produtos" class="grid grid-cols-1 items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3">
 
           <!-- Card 7: Adicionar Novo Insumo -->
           <div id="btn-card-adicionar"
@@ -84,6 +95,26 @@
           </div>
 
         </div>
+        <nav class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-black/5 bg-white px-4 py-3"
+          aria-label="Paginação do estoque">
+          <p id="estoque-paginacao-info" class="text-xs font-medium text-gray-600" aria-live="polite">
+            Carregando produtos...
+          </p>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" id="estoque-voltar-inicio"
+              class="rounded-lg border border-black/10 px-3 py-2 text-xs font-semibold text-brand-brown transition hover:bg-brand-cream hover:shadow-sm disabled:opacity-40">
+              Voltar ao início
+            </button>
+            <button type="button" id="estoque-pagina-anterior"
+              class="rounded-lg border border-black/10 px-3 py-2 text-xs font-semibold text-brand-brown transition hover:bg-brand-cream hover:shadow-sm disabled:opacity-40">
+              &larr; Anterior
+            </button>
+            <button type="button" id="estoque-proxima-pagina"
+              class="rounded-lg border border-black/10 px-3 py-2 text-xs font-semibold text-brand-brown transition hover:bg-brand-cream hover:shadow-sm disabled:opacity-40">
+              Próxima &rarr;
+            </button>
+          </div>
+        </nav>
       </div>
     </main>
 
@@ -211,6 +242,42 @@
       </div>
     </div>
 
+    <div id="modal-detalhes-produto"
+      class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      role="dialog" aria-modal="true" aria-labelledby="detalhes-produto-titulo">
+      <section class="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-black/10 bg-white p-6 shadow-2xl">
+        <div class="flex items-center justify-between gap-4 border-b border-black/5 pb-3">
+          <h3 id="detalhes-produto-titulo" class="font-display text-base font-bold text-brand-text-dark">
+            Detalhes do insumo
+          </h3>
+          <button type="button" id="fechar-detalhes-produto" aria-label="Fechar detalhes"
+            class="rounded-lg px-3 py-1 text-xl font-bold text-brand-text-muted transition hover:bg-black/5">&times;</button>
+        </div>
+        <div class="mt-4 grid gap-5 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
+          <div id="detalhes-produto-imagem" class="flex min-h-40 items-center justify-center overflow-hidden rounded-xl bg-gray-50"></div>
+          <div class="space-y-4">
+            <div class="space-y-1.5">
+              <div class="flex justify-between gap-3 text-xs">
+                <span class="font-semibold text-brand-text-muted">Nível de estoque</span>
+                <span id="detalhes-produto-nivel" class="font-semibold text-brand-text-dark"></span>
+              </div>
+              <div class="h-2 w-full overflow-hidden rounded-full bg-gray-100" role="progressbar"
+                aria-label="Nível de estoque do produto">
+                <div id="detalhes-produto-barra" class="h-full w-0 rounded-full transition-all"></div>
+              </div>
+            </div>
+            <dl id="detalhes-produto-conteudo" class="grid content-start gap-3 text-sm"></dl>
+          </div>
+        </div>
+        <div class="mt-5 flex justify-end border-t border-black/5 pt-4">
+          <button type="button" id="detalhes-produto-atualizar"
+            class="rounded-xl bg-brand-brown px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-brown-dark hover:shadow-md">
+            Atualizar estoque
+          </button>
+        </div>
+      </section>
+    </div>
+
     <!-- ==================== MODAL ATUALIZAR ESTOQUE ==================== -->
     <div id="modal-atualizar-estoque"
       class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
@@ -304,6 +371,7 @@
   <script> lucide.createIcons(); </script>
   <script src="../src/componentes/footer.js" defer></script>
   <script src="../src/componentes/sidebar.js" defer></script>
+  <script src="../src/script/estoque-classificacao.js" defer></script>
   <script src="../src/componentes/header.js" defer></script>
   <script src="../src/script/estoqueinsumos.js" defer></script>
 

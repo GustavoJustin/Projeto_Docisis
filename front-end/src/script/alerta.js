@@ -20,15 +20,15 @@ const paginasDemo = {
   },
   historico: {
     arquivo: "historicoCompleto.html",
-    titulo: "Histórico Completo",
+    titulo: "Histórico de Movimentações",
     ativo: "historico",
     modais: ["modal-filtros-historico", "modal-exportar-pdf"],
   },
   funcionarios: {
     arquivo: "gestao-equipes.html",
-    titulo: "Gestão de Equipes",
+    titulo: "Gestão de Funcionários",
     ativo: "funcionarios",
-    modais: ["confirm-removal-modal"],
+    modais: ["confirm-removal-modal", "create-employee-modal", "edit-employee-modal"],
   },
   admin: {
     arquivo: "painel-administrativo.html",
@@ -42,14 +42,10 @@ const paginasDemo = {
     ativo: "estoque",
   },
   cadastro: {
-    arquivo: "cadastroFuncionario.html",
+    arquivo: "gestao-equipes.html",
     titulo: "Cadastro de Funcionário",
     ativo: "funcionarios",
-  },
-  cadastroPublico: {
-    arquivo: "cadastroPublico.html",
-    titulo: "Criar conta",
-    especial: true,
+    modais: ["confirm-removal-modal", "create-employee-modal", "edit-employee-modal"],
   },
   login: {
     arquivo: "pagina-login.html",
@@ -81,7 +77,6 @@ const paginasPorArquivo = {
   "historico-materias_prima.html": "materia",
   "cadastrofuncionario.html": "cadastro",
   "cadastro-funcionario.html": "cadastro",
-  "cadastropublico.html": "cadastroPublico",
   "pagina-login.html": "login",
   "index.html": "login",
   "splash.html": "splash",
@@ -243,9 +238,11 @@ function atualizarEstruturaPagina(pagina, documento, configuracao) {
 
 async function carregarPaginaAtual() {
   const navegacao = ++navegacaoAtual;
-  document.dispatchEvent(new Event("demo:before-page-change"));
   const urlAtual = new URL(window.location.href);
   const pagina = urlAtual.searchParams.get("pagina") || "login";
+  document.dispatchEvent(
+    new CustomEvent("demo:before-page-change", { detail: { pagina } }),
+  );
   const configuracao = paginasDemo[pagina];
 
   if (!configuracao) {
@@ -255,7 +252,7 @@ async function carregarPaginaAtual() {
     return;
   }
 
-  if (pagina === "funcionarios" && !(await usuarioEhAdministrador())) {
+  if (["funcionarios", "cadastro"].includes(pagina) && !(await usuarioEhAdministrador())) {
     urlAtual.searchParams.set("pagina", "estoque");
     window.history.replaceState({}, "", urlAtual);
     await carregarPaginaAtual();
@@ -286,10 +283,10 @@ async function carregarPaginaAtual() {
     const fragmento = prepararConteudo(documento, configuracao);
     if (navegacao !== navegacaoAtual) return;
 
+    window.__splashLoader?.setProgress(66, "Tela montada. Carregando seus dados…");
     atualizarEstruturaPagina(pagina, documento, configuracao);
     conteudoPrincipal.replaceChildren(fragmento);
     document.getElementById("coluna-conteudo").scrollTop = 0;
-    document.body.style.visibility = "visible";
 
     if (pagina === "alertas") {
       categoriaAlertaAtiva = "all";
@@ -297,22 +294,31 @@ async function carregarPaginaAtual() {
       atualizarContadores();
       aplicarFiltrosAlertas();
     }
-    if (pagina === "estoque") window.inicializarEstoque();
+    if (pagina === "estoque") await window.inicializarEstoque();
     if (pagina === "alertas") window.inicializarAlertasEstoque?.();
     if (pagina === "historico") window.inicializarHistorico?.();
     if (pagina === "relatorios") window.inicializarRelatorios();
     if (pagina === "materia") window.inicializarMateriaPrima();
 
     window.lucide?.createIcons();
+    if (pagina !== "splash") {
+      document.body.style.visibility = "visible";
+    }
     document.dispatchEvent(
       new CustomEvent("demo:page-loaded", { detail: { pagina } }),
     );
+    if (pagina === "splash") {
+      document.body.style.visibility = "visible";
+    } else {
+      window.__splashLoader?.finish();
+    }
   } catch (erro) {
     console.error(`Erro ao carregar ${configuracao.arquivo}:`, erro);
     exibirErro(
       "Não foi possível carregar a página. Confira se o projeto está aberto por um servidor local.",
     );
     document.body.style.visibility = "visible";
+    window.__splashLoader?.finish();
   }
 }
 

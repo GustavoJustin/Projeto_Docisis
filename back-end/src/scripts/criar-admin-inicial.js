@@ -100,6 +100,8 @@ async function criarAdministradorInicial() {
             email,
             senha,
             id_cargos: cargo.id_cargos,
+            pode_cadastrar_funcionarios: true,
+            pode_excluir_funcionarios: true,
         });
         console.log(`Administrador criado com sucesso (ID ${resultado.resultado}).`);
         console.log("Agora entre no DoceGestão usando o e-mail e a senha informados.");

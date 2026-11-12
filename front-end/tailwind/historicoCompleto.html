@@ -17,6 +17,7 @@
 
   <!-- Estilos e ícones compartilhados -->
   <link rel="stylesheet" href="../src/css/output.css" />
+  <link rel="stylesheet" href="../src/css/responsive.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
@@ -30,22 +31,14 @@
 
     <!-- CONTEUDO PRINCIPAL -->
     <main class="min-w-0 flex-1 p-10">
-      <div class="relative mb-6 w-full">
-        <i data-lucide="search"
-          class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-300"></i>
-        <input id="busca-historico" type="text" placeholder="Buscar no histórico..."
-          class="w-full rounded-lg border border-stone-200 bg-white py-2 pl-9 pr-3 text-sm text-stone-600 placeholder:text-stone-300 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800" />
-      </div>
-
-      <div class="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 class="text-2xl font-semibold text-stone-800">
-            Histórico de Movimentações
-          </h1>
-          <p class="mt-1 text-sm text-stone-400">
-            Acompanhe todas as entradas e saídas do estoque em tempo real.
-          </p>
-        </div>
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <label class="relative block min-w-0 flex-1">
+          <span class="sr-only">Buscar no histórico</span>
+          <i data-lucide="search"
+            class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-300"></i>
+          <input id="busca-historico" type="text" placeholder="Buscar no histórico..."
+            class="w-full rounded-lg border border-stone-200 bg-white py-2 pl-9 pr-3 text-sm text-stone-600 placeholder:text-stone-300 focus:border-amber-800 focus:outline-none focus:ring-1 focus:ring-amber-800" />
+        </label>
         <div class="flex flex-wrap gap-2">
           <button id="btn-aplicar-filtros" type="button"
             class="flex items-center gap-2 rounded-lg bg-amber-900 px-4 py-2 text-sm font-medium text-white hover:bg-amber-950">
@@ -63,7 +56,7 @@
       </div>
 
       <!-- Tabela -->
-      <div class="mt-6 overflow-x-auto rounded-2xl border border-stone-200 bg-white p-5">
+      <div class="mt-4 overflow-x-auto rounded-2xl border border-stone-200 bg-white p-5">
         <table class="w-full text-left text-sm">
           <thead>
             <tr class="border-b border-stone-100 text-xs uppercase tracking-wide text-stone-400">
@@ -174,9 +167,20 @@
           </tbody>
         </table>
 
-        <div class="mt-4 flex items-center justify-between text-sm text-stone-400">
+        <nav class="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-stone-400"
+          aria-label="Paginação do histórico">
           <p id="resumo-paginacao">Mostrando 5 de 5 registros</p>
-        </div>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" id="historico-pagina-anterior"
+              class="rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs font-semibold text-amber-900 transition hover:bg-amber-50 hover:shadow-sm disabled:opacity-40">
+              &larr; Anterior
+            </button>
+            <button type="button" id="historico-proxima-pagina"
+              class="rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs font-semibold text-amber-900 transition hover:bg-amber-50 hover:shadow-sm disabled:opacity-40">
+              Próxima &rarr;
+            </button>
+          </div>
+        </nav>
       </div>
 
       <!-- Cartões de resumo -->
@@ -227,6 +231,7 @@
             <option value="todos">Todos os tipos</option>
             <option value="ENTRADA">Entrada</option>
             <option value="SAÍDA">Saída</option>
+            <option value="AJUSTE">Ajuste</option>
           </select>
         </div>
         <div>
@@ -283,6 +288,7 @@
   <script> lucide.createIcons(); </script>
   <script src="../src/componentes/footer.js" defer></script>
   <script src="../src/componentes/sidebar.js" defer></script>
+  <script src="../src/script/estoque-classificacao.js" defer></script>
   <script src="../src/componentes/header.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
   <script src="../src/script/historicoCompleto.js"></script>
@@ -479,7 +485,7 @@ if (!window.inicializarHistorico) {
         }
         const wrapper = document.createElement("div");
         wrapper.style.cssText =
-          "padding:24px;background:#fff;color:#292524;font-family:Arial,sans-serif";
+          "padding:24px;background:#fff;color:#292524;font-family:Inter,sans-serif";
         const [year, month, day] = selectedDate.split("-");
         wrapper.innerHTML = `<h1 style="font-size:20px;margin:0 0 6px">Histórico de Movimentações</h1><p style="font-size:12px;color:#78716c;margin:0 0 18px">Movimentações de ${day}/${month}/${year} · ${recordsForDay.length} registro(s)</p>`;
 

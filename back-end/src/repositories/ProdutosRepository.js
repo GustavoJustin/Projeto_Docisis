@@ -90,13 +90,84 @@ class ProdutoRepository {
         return rows[0]
     }
 
-    async cadastrarProduto(dadosDoProduto) {
+    async cadastrarProduto(dadosDoProduto, movimentacao) {
         await this.garantirColunasEstoque()
+        if (movimentacao) {
+            return this.cadastrarProdutoComMovimentacao(dadosDoProduto, movimentacao)
+        }
         if (!this.idAutoIncrement) {
             return this.cadastrarProdutoComIdGerado(dadosDoProduto)
         }
         const [resultado] = await pool.query('INSERT INTO tbl_produtos SET ?', [dadosDoProduto])
         return resultado.insertId
+    }
+
+    async cadastrarProdutoComMovimentacao(dadosDoProduto, movimentacao) {
+        const connection = await pool.getConnection()
+        const nomeLock = 'docegestao_tbl_produtos_id_gen'
+        let lockAdquirido = false
+
+        try {
+            await connection.beginTransaction()
+            let id
+            if (this.idAutoIncrement) {
+                const [resultado] = await connection.query(
+                    'INSERT INTO tbl_produtos SET ?',
+                    [dadosDoProduto],
+                )
+                id = resultado.insertId
+            } else {
+                const [locks] = await connection.query(
+                    'SELECT GET_LOCK(?, 10) AS adquirido',
+                    [nomeLock],
+                )
+                if (Number(locks[0]?.adquirido) !== 1) {
+                    throw new Error('Não foi possível reservar um ID para o novo produto.')
+                }
+                lockAdquirido = true
+                const [rows] = await connection.query(
+                    'SELECT COALESCE(MAX(id_produtos), 0) + 1 AS proximoId FROM tbl_produtos',
+                )
+                id = Number(rows[0]?.proximoId)
+                if (!Number.isSafeInteger(id) || id < 1) {
+                    throw new Error('Não foi possível gerar um ID válido para o novo produto.')
+                }
+                await connection.query('INSERT INTO tbl_produtos SET ?', [
+                    { ...dadosDoProduto, id_produtos: id },
+                ])
+            }
+
+            const quantidade = Number(dadosDoProduto.quantidade) || 0
+            const nome = dadosDoProduto.nome_insumo || dadosDoProduto.marca || dadosDoProduto.tipo
+            await connection.query(
+                `INSERT INTO tbl_mov_ajuste_estoque
+                    (id_produtos, nome_produto, usuario, tipo, quantidade_anterior,
+                     quantidade_nova, quantidade, unidade, descricao)
+                 VALUES (?, ?, ?, 'ENTRADA', 0, ?, ?, ?, ?)`,
+                [
+                    id,
+                    nome,
+                    movimentacao.usuario || 'Sistema',
+                    quantidade,
+                    quantidade,
+                    dadosDoProduto.unidade || 'un',
+                    movimentacao.descricao || 'Produto adicionado ao estoque.',
+                ],
+            )
+            await connection.commit()
+            return id
+        } catch (erro) {
+            await connection.rollback()
+            throw erro
+        } finally {
+            try {
+                if (lockAdquirido) {
+                    await connection.query('SELECT RELEASE_LOCK(?)', [nomeLock])
+                }
+            } finally {
+                connection.release()
+            }
+        }
     }
 
     async cadastrarProdutoComIdGerado(dadosDoProduto) {
@@ -253,7 +324,7 @@ class ProdutoRepository {
         }
     }
 
-    async atualizarProduto(id, dadosDoProduto) {
+    async atualizarProduto(id, dadosDoProduto, movimentacao) {
         await this.garantirColunasEstoque()
         const camposProduto = []
         const dadoProduto = []
@@ -269,18 +340,104 @@ class ProdutoRepository {
 
         const query = `UPDATE tbl_produtos SET ${camposProduto.join(',')} WHERE id_produtos = ?`
 
-        const [resultado] = await pool.query(query, dadoProduto)
+        if (!movimentacao) {
+            const [resultado] = await pool.query(query, dadoProduto)
+            return resultado.affectedRows
+        }
 
-        return resultado.affectedRows
+        const connection = await pool.getConnection()
+        try {
+            await connection.beginTransaction()
+            const [resultado] = await connection.query(query, dadoProduto)
+            await this.inserirEventoEstoque(connection, movimentacao)
+            await connection.commit()
+            return resultado.affectedRows
+        } catch (erro) {
+            await connection.rollback()
+            throw erro
+        } finally {
+            connection.release()
+        }
     }
 
-    async deletarProduto(id) {
-        await this.garantirColunasEstoque()
-        await pool.query(
-            'UPDATE tbl_produtos SET ativo = 0 WHERE id_produtos = ?',
-            [id],
+    async inserirEventoEstoque(executor, dados) {
+        const [resultado] = await executor.query(
+            `INSERT INTO tbl_mov_ajuste_estoque
+                (id_produtos, nome_produto, usuario, tipo, quantidade_anterior,
+                 quantidade_nova, quantidade, unidade, descricao)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                dados.id_produtos,
+                dados.nome_produto,
+                dados.usuario || 'Sistema',
+                dados.tipo,
+                dados.quantidade_anterior,
+                dados.quantidade_nova,
+                dados.quantidade,
+                dados.unidade || 'un',
+                dados.descricao || null,
+            ],
         )
-        return true
+        return resultado.insertId
+    }
+
+    async registrarEventoEstoque(dados) {
+        await this.garantirColunasEstoque()
+        return this.inserirEventoEstoque(pool, dados)
+    }
+
+    async deletarProduto(id, usuario) {
+        await this.garantirColunasEstoque()
+        if (!usuario) {
+            await pool.query(
+                'UPDATE tbl_produtos SET ativo = 0 WHERE id_produtos = ?',
+                [id],
+            )
+            return true
+        }
+
+        const connection = await pool.getConnection()
+        try {
+            await connection.beginTransaction()
+            const [rows] = await connection.query(
+                'SELECT * FROM tbl_produtos WHERE id_produtos = ? AND ativo = 1 FOR UPDATE',
+                [id],
+            )
+            const produto = rows[0]
+            if (!produto) {
+                const erro = new Error('Produto não encontrado.')
+                erro.status = 404
+                throw erro
+            }
+            const quantidade = Number(produto.quantidade) || 0
+            const nome = produto.nome_insumo || produto.marca || produto.tipo || 'Produto'
+            await connection.query(
+                'UPDATE tbl_produtos SET ativo = 0 WHERE id_produtos = ?',
+                [id],
+            )
+            await connection.query(
+                `INSERT INTO tbl_mov_ajuste_estoque
+                    (id_produtos, nome_produto, usuario, tipo, quantidade_anterior,
+                     quantidade_nova, quantidade, unidade, descricao)
+                 VALUES (?, ?, ?, 'SAIDA', ?, 0, ?, ?, ?)`,
+                [
+                    id,
+                    nome,
+                    usuario,
+                    quantidade,
+                    quantidade,
+                    produto.unidade || 'un',
+                    'Produto removido do estoque.',
+                ],
+            )
+            await connection.commit()
+            return true
+        } catch (erro) {
+            await connection.rollback()
+            throw erro
+        } finally {
+            connection.release()
+        }
     }
 }
 

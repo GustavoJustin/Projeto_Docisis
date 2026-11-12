@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#3A2A1A" />
   <meta name="description" content="DoceGestão: gestão prática para sua confeitaria." />
-  <title>DoceGestão | Gestão de Equipe</title>
+  <title>DoceGestão | Gestão de Funcionários</title>
 
   <!-- Fontes usadas pelas páginas do projeto -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,6 +17,7 @@
 
   <!-- Estilos e ícones compartilhados -->
   <link rel="stylesheet" href="../src/css/output.css" />
+  <link rel="stylesheet" href="../src/css/responsive.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Dependências específicas: copie e ative apenas as necessárias para a página. -->
@@ -32,87 +33,67 @@
 
     <!-- CONTEUDO PRINCIPAL -->
     <main class="min-w-0 flex-1 p-10">
-      <div class="max-w-6xl mx-auto space-y-6">
+      <div class="space-y-6">
 
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-2xl font-bold text-[#6D4936]">
-              Gestão de Funcionários
-            </h2>
-            <p class="text-sm text-gray-500 mt-0.5">
-              Controle de acessos, permissões e atividades da equipe.
-            </p>
-          </div>
-          <a id="btn-novo-funcionario" href="cadastro-funcionario.html"
-            class="bg-[#875C46] hover:bg-[#6D4936] text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-            </svg>
-            Novo Funcionário
-          </a>
-        </div>
-
-        <!-- Indicadores e Métricas Rápidas -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div data-team-filter="all" role="button" tabindex="0" aria-label="Mostrar toda a equipe" class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#875C46]">
-            <div>
-              <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Total da Equipe
-              </p>
-              <p id="total-count" class="text-2xl font-bold text-gray-800 mt-1">
-                0
-              </p>
+        <div class="grid grid-cols-1 gap-5 lg:grid-cols-3">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:col-span-2">
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-xs font-semibold text-gray-400 tracking-wider">Total da Equipe</p>
+                <p id="total-count" class="text-2xl font-bold text-gray-800 mt-1">0</p>
+              </div>
+              <div class="p-3 bg-[#F5ECE5] text-[#875C46] rounded-xl">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </div>
             </div>
-            <div class="p-3 bg-[#F5ECE5] text-[#875C46] rounded-xl">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z">
-                </path>
-              </svg>
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-xs font-semibold text-gray-400 tracking-wider">Acessos Ativos</p>
+                <p id="active-count" class="text-2xl font-bold text-emerald-600 mt-1">0</p>
+              </div>
+              <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
             </div>
-          </div>
-
-          <div data-team-filter="active" role="button" tabindex="0" aria-label="Mostrar acessos ativos" class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-            <div>
-              <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Acessos Ativos
-              </p>
-              <p id="active-count" class="text-2xl font-bold text-emerald-600 mt-1">
-                0
-              </p>
-            </div>
-            <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-xs font-semibold text-gray-400 tracking-wider">Administradores</p>
+                <p id="admin-count" class="text-2xl font-bold text-[#875C46] mt-1">0</p>
+              </div>
+              <div class="p-3 bg-[#F5ECE5] text-[#875C46] rounded-xl">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+              </div>
             </div>
           </div>
-
-          <div data-team-filter="admins" role="button" tabindex="0" aria-label="Mostrar administradores" class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between cursor-pointer hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#875C46]">
-            <div>
-              <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Administradores
-              </p>
-              <p id="admin-count" class="text-2xl font-bold text-[#875C46] mt-1">
-                0
-              </p>
-            </div>
-            <div class="p-3 bg-[#F5ECE5] text-[#875C46] rounded-xl">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="flex items-center justify-end gap-2">
+            <button id="btn-editar-funcionario" type="button"
+              class="bg-white hover:bg-gray-50 text-[#875C46] border border-[#875C46]/30 px-4 py-2.5 rounded-lg text-sm font-medium shadow-sm transition-colors">
+              Editar
+            </button>
+            <button id="btn-novo-funcionario" type="button"
+              class="bg-[#875C46] hover:bg-[#6D4936] text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                </path>
+                  d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
               </svg>
-            </div>
+              Novo Funcionário
+            </button>
           </div>
         </div>
 
         <!-- Filtros e Busca -->
         <div
           class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center">
-          <div class="relative w-full md:w-80">
+          <div class="relative w-full md:flex-1">
             <input type="text" id="search-member" placeholder="Buscar por nome ou e-mail..."
               class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-[#875C46]" />
             <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor"
@@ -123,16 +104,16 @@
           </div>
 
           <div class="flex items-center gap-2 text-xs">
-            <button data-filter="all"
+            <button data-filter="all" aria-pressed="true"
               class="filter-role bg-[#875C46] text-white px-3 py-1.5 rounded-lg font-medium transition-colors">
               Todos
             </button>
-            <button data-filter="Administrador"
-              class="filter-role bg-gray-100 text-gray-600 hover:bg-gray-200 px-3 py-1.5 rounded-lg font-medium transition-colors">
+            <button data-filter="Administrador" aria-pressed="false"
+              class="filter-role bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg font-medium transition-colors">
               Admins
             </button>
-            <button data-filter="Funcionário"
-              class="filter-role bg-gray-100 text-gray-600 hover:bg-gray-200 px-3 py-1.5 rounded-lg font-medium transition-colors">
+            <button data-filter="Funcionário" aria-pressed="false"
+              class="filter-role bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg font-medium transition-colors">
               Funcionários
             </button>
           </div>
@@ -222,6 +203,37 @@
       </div>
     </main>
 
+    <div id="create-employee-modal"
+      class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/50 p-4 backdrop-blur-md"
+      role="dialog" aria-modal="true" aria-labelledby="create-employee-title">
+      <section class="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+          <h2 id="create-employee-title" class="text-lg font-bold text-[#6D4936]">Novo funcionário</h2>
+          <button id="create-employee-close" type="button" class="rounded-lg px-3 py-1 text-xl text-gray-500 hover:bg-gray-100" aria-label="Fechar">
+            &times;
+          </button>
+        </div>
+        <div id="create-employee-content" class="overflow-y-auto p-4 sm:p-6"></div>
+      </section>
+    </div>
+
+    <div id="edit-employee-modal"
+      class="fixed inset-0 z-[80] hidden items-center justify-center bg-black/50 p-4 backdrop-blur-md"
+      role="dialog" aria-modal="true" aria-labelledby="edit-employee-title">
+      <section class="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+          <div>
+            <h2 id="edit-employee-title" class="text-lg font-bold text-[#6D4936]">Editar contas</h2>
+            <p class="mt-1 text-xs text-gray-500">Altere o cargo, as permissões e a senha corporativa.</p>
+          </div>
+          <button id="edit-employee-close" type="button" class="rounded-lg px-3 py-1 text-xl text-gray-500 hover:bg-gray-100" aria-label="Fechar">
+            &times;
+          </button>
+        </div>
+        <div id="edit-employee-list" class="overflow-y-auto p-5"></div>
+      </section>
+    </div>
+
     <!-- Modal de confirmação de exclusão, no mesmo padrão visual do estoque -->
     <div id="confirm-removal-modal"
       class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4"
@@ -261,8 +273,10 @@
   <script> lucide.createIcons(); </script>
   <script src="../src/componentes/footer.js" defer></script>
   <script src="../src/componentes/sidebar.js" defer></script>
+  <script src="../src/script/estoque-classificacao.js" defer></script>
   <script src="../src/componentes/header.js" defer></script>
   <script src="../src/script/gestao-equipes.js" defer></script>
+  <script src="../src/script/cadastroFuncionario.js" defer></script>
 </body>
 
 </html>

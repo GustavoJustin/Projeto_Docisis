@@ -37,7 +37,7 @@ const SIDEBAR_HTML = `
           </a>
 
           <!-- Alertas -->
-          <a href="./alerta.html" data-page="alertas"
+          <a href="./alertas.html" data-page="alertas"
             class="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-black/5 transition-all">
             <i data-lucide="bell" class="w-5 h-5"></i>
             <span>Alertas</span>
@@ -67,27 +67,40 @@ const SIDEBAR_HTML = `
       </div>
     </div>
 
-    <!-- Rodapé: Botão Novo Item -->
-    <div class="p-5">
-      <a href="./materia-prima.html" id="btn-novo-sidebar"
-        class="w-full bg-cocoa-700 hover:bg-cocoa-800 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer text-sm">
-        <span class="text-base font-normal">+</span>
-        <span>Nova Movimentação</span>
-      </a>
-    </div>
   </aside>
 `
 let sessaoUsuarioAtual = null;
 let tokenSessaoUsuarioAtual = null;
 
-async function obterFuncionarioAutenticado() {
+async function obterFuncionarioAutenticado(forcarAtualizacao = false) {
   const token = localStorage.getItem("docegestao_token");
   if (!token) {
     sessaoUsuarioAtual = null;
     tokenSessaoUsuarioAtual = null;
     return null;
   }
-  if (token === tokenSessaoUsuarioAtual) return sessaoUsuarioAtual;
+  if (!forcarAtualizacao && token === tokenSessaoUsuarioAtual) {
+    try {
+      const usuarioLocal = JSON.parse(
+        localStorage.getItem("docegestao_funcionario") || "null",
+      );
+      if (
+        usuarioLocal &&
+        String(usuarioLocal.id_funcionario) ===
+          String(sessaoUsuarioAtual?.id_funcionario)
+      ) {
+        sessaoUsuarioAtual = {
+          ...sessaoUsuarioAtual,
+          nome: usuarioLocal.nome || sessaoUsuarioAtual.nome,
+          email: usuarioLocal.email || sessaoUsuarioAtual.email,
+          foto: usuarioLocal.foto || null,
+        };
+      }
+    } catch (error) {
+      console.error("Não foi possível sincronizar a foto local da conta:", error);
+    }
+    return sessaoUsuarioAtual;
+  }
 
   try {
     const response = await fetch("/api/sessao", {
@@ -193,6 +206,14 @@ function carregarSidebar() {
 }
 
 window.obterFuncionarioAutenticado = obterFuncionarioAutenticado;
+window.addEventListener("docegestao:perfil-atualizado", (event) => {
+  const funcionario = event.detail?.funcionario;
+  if (
+    !funcionario ||
+    String(funcionario.id_funcionario) !== String(sessaoUsuarioAtual?.id_funcionario)
+  ) return;
+  sessaoUsuarioAtual = { ...sessaoUsuarioAtual, ...funcionario };
+});
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", carregarSidebar, { once: true });
 } else {

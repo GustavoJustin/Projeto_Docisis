@@ -6,7 +6,7 @@ const HEADER_HTML = `
         <p class="text-xs text-[#D9C6B4] font-medium">
           Gestão <span class="mx-1">/</span> <span data-header-page-name>Estoque</span>
         </p>
-        <h1 data-header-page-name class="font-serif text-lg sm:text-xl font-bold tracking-tight text-[#F5EFE9]">
+        <h1 data-header-page-name class="font-display text-lg sm:text-xl font-bold tracking-tight text-[#F5EFE9]">
           Estoque de Matérias-Primas
         </h1>
       </div>
@@ -33,7 +33,7 @@ const HEADER_HTML = `
             class="flex items-center justify-center rounded-full p-1 transition hover:bg-white/10"
             aria-label="Abrir menu da conta" aria-haspopup="menu" aria-expanded="false">
             <img data-header-avatar
-              src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80&w=120"
+              src="../src/img/avatar-padrao.svg"
               alt="Avatar da conta" class="h-9 w-9 rounded-full border border-[#D4A373] object-cover">
           </button>
 
@@ -42,7 +42,7 @@ const HEADER_HTML = `
             style="max-width:min(20rem, calc(100vw - 2rem))">
             <div class="flex items-center gap-4 border-b border-gray-200 bg-[#F8F6F2] p-4">
               <img data-header-menu-avatar
-                src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80&w=120"
+                src="../src/img/avatar-padrao.svg"
                 alt="" class="h-14 w-14 shrink-0 rounded-full border border-[#D4A373] object-cover">
               <div class="min-w-0">
                 <p data-header-menu-name class="truncate text-sm font-bold text-[#3A2A1A]">Nenhuma conta conectada</p>
@@ -90,8 +90,8 @@ const HEADER_HTML = `
       role="presentation">
       <section role="dialog" aria-modal="true" aria-labelledby="header-notifications-title"
         class="absolute inset-y-0 right-0 flex w-full max-w-sm flex-col overflow-hidden border-l border-[#E7DED5] text-[#4A3F39] shadow-2xl"
-        style="background-color:#FAFAFA">
-        <div class="flex items-center justify-between border-b border-gray-100 bg-[#F8F6F2] px-5 py-4">
+        style="background-color:#F8F8F8">
+        <div class="flex items-center justify-between px-5 py-4" style="background-color:#EDEAE5">
           <div class="flex items-center gap-3">
             <div>
               <h2 id="header-notifications-title" class="text-lg font-bold text-[#3A2A1A]">Notificações</h2>
@@ -110,7 +110,7 @@ const HEADER_HTML = `
           </div>
         </div>
         <p id="header-notifications-error" class="hidden mx-5 mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800" role="alert"></p>
-        <div id="header-notifications-list" class="flex-1 space-y-3 overflow-y-auto p-5" style="background-color:#FAFAFA">
+        <div id="header-notifications-list" class="flex-1 space-y-3 overflow-y-auto p-5" style="background-color:#F8F8F8">
           <div data-notifications-empty class="flex h-full min-h-64 flex-col items-center justify-center text-center">
             <span class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F5ECE5] text-[#875C46]">
               <i data-lucide="bell-ring" class="h-7 w-7"></i>
@@ -119,17 +119,52 @@ const HEADER_HTML = `
             <p class="mt-1 text-xs text-gray-500">Você não tem novas notificações</p>
           </div>
         </div>
-        <div class="flex justify-end border-t border-gray-100 px-5 py-3">
-          <button type="button" id="header-close-selected-notification"
-            class="rounded-lg bg-[#784E38] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#633e2c] disabled:cursor-not-allowed disabled:opacity-50"
-            disabled>
-            Fechar notificação
+      </section>
+    </div>
+
+    <div id="header-call-details-dialog" class="fixed inset-0 z-[90] hidden items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+      role="presentation">
+      <section role="dialog" aria-modal="true" aria-labelledby="header-call-details-title"
+        class="w-full max-w-lg rounded-2xl border border-[#E7DED5] bg-white p-6 text-[#4A3F39] shadow-2xl">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p id="header-call-details-status" class="text-[11px] font-bold uppercase tracking-wide text-[#875C46]"></p>
+            <h2 id="header-call-details-title" class="mt-1 text-lg font-bold text-[#3A2A1A]">Detalhes do chamado</h2>
+          </div>
+          <button type="button" id="header-call-details-close" class="rounded-full p-2 text-gray-500 transition hover:bg-gray-100"
+            aria-label="Fechar detalhes do chamado">
+            <i data-lucide="x" class="h-4 w-4"></i>
+          </button>
+        </div>
+        <p id="header-call-details-description" class="mt-4 whitespace-pre-wrap break-words rounded-xl bg-[#F8F6F2] p-4 text-sm leading-6"></p>
+        <p id="header-call-details-metadata" class="mt-3 text-xs text-gray-500"></p>
+        <p id="header-call-details-error" class="mt-3 hidden rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800" role="alert"></p>
+        <div class="mt-6 flex justify-end gap-3">
+          <button type="button" id="header-call-details-cancel"
+            class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-50">
+            Cancelar
+          </button>
+          <button type="button" id="header-call-details-close-call"
+            class="rounded-lg border border-[#784E38] px-4 py-2 text-sm font-semibold text-[#784E38] transition hover:bg-[#F8F6F2] disabled:cursor-not-allowed disabled:opacity-50">
+            Fechar chamado
+          </button>
+          <button type="button" id="header-call-details-action"
+            class="rounded-lg bg-[#784E38] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#633e2c] disabled:cursor-not-allowed disabled:opacity-50">
+            Resolver chamado
           </button>
         </div>
       </section>
     </div>
 
-    <div id="header-settings-dialog" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+    <aside id="header-active-call-banner" class="fixed bottom-4 right-4 z-[80] hidden w-[min(32rem,calc(100vw-2rem))] items-center justify-between gap-4 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-[#4A3F39] shadow-2xl"
+      aria-live="polite">
+      <div id="header-active-call-drag-handle" class="min-w-0 flex-1 cursor-move select-none" style="touch-action:none">
+        <p class="text-xs font-bold uppercase tracking-wide text-[#784E38]">Chamado em resolução</p>
+        <p id="header-active-call-text" class="mt-1 truncate text-sm font-medium"></p>
+      </div>
+    </aside>
+
+    <div id="header-settings-dialog" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/40 p-4 backdrop-blur-md"
       role="presentation">
       <section role="dialog" aria-modal="true" aria-labelledby="header-settings-title"
         class="flex h-[min(90vh,42rem)] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-white/50 bg-white shadow-2xl">
@@ -214,10 +249,10 @@ const HEADER_HTML = `
 
             <section data-settings-panel="profile" aria-labelledby="settings-profile-title" class="hidden">
               <h3 id="settings-profile-title" class="text-base font-bold text-gray-800">Perfil</h3>
-              <p class="mt-1 text-sm text-gray-500">Atualize as informações exibidas neste navegador.</p>
+              <p class="mt-1 text-sm text-gray-500">Atualize as informações salvas na sua conta.</p>
               <div class="mt-6 flex flex-wrap items-center gap-4">
                 <img data-settings-avatar
-                  src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80&w=120"
+                  src="../src/img/avatar-padrao.svg"
                   alt="Foto de perfil" class="h-16 w-16 rounded-full border border-[#D4A373] object-cover">
                 <div>
                   <label for="settings-profile-photo" class="inline-flex cursor-pointer items-center rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50">
@@ -243,7 +278,9 @@ const HEADER_HTML = `
                   <input type="email" name="email" required maxlength="254"
                     class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-800 outline-none focus:border-[#875C46]">
                 </label>
-                <p id="settings-profile-feedback" class="min-h-5 text-xs text-gray-500" role="status"></p>
+                <div class="flex h-12 items-center overflow-hidden">
+                  <p id="settings-profile-feedback" class="w-full truncate text-xs text-gray-500" role="status"></p>
+                </div>
                 <button type="submit"
                   class="rounded-lg bg-[#784E38] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#633e2c]">
                   Salvar alterações
@@ -550,9 +587,21 @@ function carregarHeader() {
   const cancelLogoutButton = container.querySelector("#header-cancel-logout");
   const confirmLogoutButton = container.querySelector("#header-confirm-logout");
   const accountActionLabel = container.querySelector("[data-header-account-action-label]");
-  const closeSelectedNotification = container.querySelector("#header-close-selected-notification");
+  const callDetailsDialog = container.querySelector("#header-call-details-dialog");
+  const callDetailsStatus = container.querySelector("#header-call-details-status");
+  const callDetailsDescription = container.querySelector("#header-call-details-description");
+  const callDetailsMetadata = container.querySelector("#header-call-details-metadata");
+  const callDetailsError = container.querySelector("#header-call-details-error");
+  const callDetailsAction = container.querySelector("#header-call-details-action");
+  const callDetailsCloseCall = container.querySelector("#header-call-details-close-call");
+  const activeCallBanner = container.querySelector("#header-active-call-banner");
+  const activeCallDragHandle = container.querySelector("#header-active-call-drag-handle");
+  const activeCallText = container.querySelector("#header-active-call-text");
   const fotoPerfil = container.querySelector("[data-header-avatar]");
   const fotoMenu = container.querySelector("[data-header-menu-avatar]");
+  const avatarPadraoPerfil = fotoPerfil.getAttribute("src");
+  const avatarPadraoMenu = fotoMenu.getAttribute("src");
+  const avatarPadraoConfiguracoes = settingsProfileAvatar.getAttribute("src");
   const NOTIFICATIONS_KEY = "docegestao_notificacoes_v1";
   const PREFERENCES_KEY = "docegestao_preferencias_v1";
   const PROFILE_KEY = "docegestao_perfil_v1";
@@ -560,8 +609,11 @@ function carregarHeader() {
   const MIGRATED_CALLS_KEY = "docegestao_chamados_migrados_v1";
   let activeDialogTrigger = null;
   let usuarioAtual = null;
-  let selectedProfilePhoto = null;
   let sincronizacaoChamadosAtual = null;
+  let chamadoEmDetalhe = null;
+  let profileFeedbackTimeout = null;
+  let settingsProfilePhotoFile = null;
+  let settingsProfilePhotoPreviewUrl = null;
 
   function lerJsonLocalStorage(key, fallback) {
     try {
@@ -603,6 +655,136 @@ function carregarHeader() {
   function limparErroNotificacoes() {
     notificationsError.textContent = "";
     notificationsError.classList.add("hidden");
+  }
+
+  function idFuncionarioAtual() {
+    const funcionario = usuarioAtual ||
+      lerJsonLocalStorage("docegestao_funcionario", {});
+    return String(funcionario?.id_funcionario || "");
+  }
+
+  function usuarioResponsavelPeloChamado(chamado) {
+    return Boolean(
+      chamado?.id_responsavel &&
+      String(chamado.id_responsavel) === idFuncionarioAtual(),
+    );
+  }
+
+  function atualizarBannerChamado(chamados) {
+    const chamadoAtivo = chamados.find(
+      (chamado) =>
+        chamado.tipo === "chamado" &&
+        chamado.status === "em_resolucao" &&
+        usuarioResponsavelPeloChamado(chamado),
+    );
+    activeCallBanner.classList.toggle("hidden", !chamadoAtivo);
+    activeCallBanner.classList.toggle("flex", Boolean(chamadoAtivo));
+    if (chamadoAtivo) {
+      activeCallText.textContent = `#${chamadoAtivo.callId}: ${chamadoAtivo.mensagem}`;
+    }
+  }
+
+  function atualizarCacheChamado(chamado, concluido = false) {
+    const chamados = lerJsonLocalStorage("docegestao_chamados", []);
+    const atuais = Array.isArray(chamados) ? chamados : [];
+    const atualizados = concluido
+      ? atuais.filter((item) => String(item.id) !== String(chamado.id))
+      : [
+          ...atuais.filter((item) => String(item.id) !== String(chamado.id)),
+          chamado,
+        ];
+    try {
+      localStorage.setItem("docegestao_chamados", JSON.stringify(atualizados));
+    } catch (error) {
+      console.error("Não foi possível atualizar o cache dos chamados:", error);
+    }
+    atualizarNotificacoes();
+  }
+
+  function fecharDetalhesChamado() {
+    callDetailsDialog.classList.add("hidden");
+    callDetailsDialog.classList.remove("flex");
+    chamadoEmDetalhe = null;
+  }
+
+  function abrirDetalhesChamado(chamado) {
+    fecharDialogo(notificationsDialog, notificationsTrigger);
+    chamadoEmDetalhe = chamado;
+    callDetailsStatus.textContent = chamado.status === "em_resolucao"
+      ? `Em resolução${chamado.responsavelNome ? ` por ${chamado.responsavelNome}` : ""}`
+      : "Chamado aberto";
+    callDetailsDescription.textContent = chamado.mensagem;
+    const criadoEm = chamado.criadaEm
+      ? new Date(chamado.criadaEm).toLocaleString("pt-BR")
+      : "Data não informada";
+    callDetailsMetadata.textContent =
+      `Aberto por ${chamado.solicitanteNome || "Funcionário"} em ${criadoEm}.`;
+    callDetailsError.textContent = "";
+    callDetailsError.classList.add("hidden");
+
+    const responsavel = usuarioResponsavelPeloChamado(chamado);
+    const emResolucao = chamado.status === "em_resolucao";
+    callDetailsAction.textContent = emResolucao ? "Em resolução" : "Resolver chamado";
+    callDetailsAction.disabled = emResolucao;
+    callDetailsAction.dataset.action = "assumir";
+    callDetailsCloseCall.disabled = emResolucao && !responsavel;
+    callDetailsDialog.classList.remove("hidden");
+    callDetailsDialog.classList.add("flex");
+    window.lucide?.createIcons();
+  }
+
+  async function executarAcaoChamado(chamado, acao) {
+    const callId = String(chamado.callId || chamado.id || "").replace(/^chamado:/, "");
+    if (!/^\d+$/.test(callId)) {
+      throw new Error("Não foi possível identificar o chamado. Atualize as notificações e tente novamente.");
+    }
+    const token = localStorage.getItem("docegestao_token");
+    if (!token) throw new Error("Sua sessão expirou. Entre novamente para continuar.");
+
+    const response = await fetch(`/api/chamados/${encodeURIComponent(callId)}/${acao}`, {
+      method: "PATCH",
+      headers: { Authorization: "Bearer " + token },
+    });
+    const result = await lerRespostaChamados(
+      response,
+      acao === "assumir"
+        ? "Não foi possível assumir o chamado."
+        : "Não foi possível concluir o chamado.",
+    );
+    const atualizado = {
+      ...result.dados,
+      id: String(result.dados.id),
+      callId: String(result.dados.id),
+    };
+
+    if (acao === "concluir") {
+      const state = carregarNotificacoes();
+      state.items = state.items.filter(
+        (item) => item.id !== `chamado:${callId}`,
+      );
+      if (state.selectedId === `chamado:${callId}`) state.selectedId = null;
+      salvarNotificacoes(state);
+      atualizarCacheChamado(atualizado, true);
+      fecharDetalhesChamado();
+      limparErroNotificacoes();
+    } else {
+      atualizarCacheChamado(atualizado);
+      const state = carregarNotificacoes();
+      const item = state.items.find((entry) => entry.id === `chamado:${callId}`);
+      if (item) {
+        Object.assign(item, {
+          status: atualizado.status,
+          id_responsavel: atualizado.id_responsavel,
+          responsavelNome: atualizado.responsavelNome,
+        });
+        salvarNotificacoes(state);
+        chamadoEmDetalhe = item;
+        atualizarBannerChamado(state.items);
+        renderizarNotificacoes(state);
+      }
+    }
+    document.dispatchEvent(new Event("docegestao:chamados-atualizados"));
+    return atualizado;
   }
 
   async function lerRespostaChamados(response, mensagemPadrao) {
@@ -647,10 +829,31 @@ function carregarHeader() {
       return true;
     } catch (error) {
       console.error("Não foi possível salvar as informações do perfil:", error);
-      settingsProfileFeedback.textContent = "Não foi possível salvar. A foto pode ser muito grande.";
-      settingsProfileFeedback.className = "min-h-5 text-xs text-red-600";
+      exibirFeedbackPerfil("Não foi possível salvar. A foto pode ser muito grande.", "error");
       return false;
     }
+  }
+
+  function exibirFeedbackPerfil(mensagem, tipo = "info", temporario = true) {
+    window.clearTimeout(profileFeedbackTimeout);
+    settingsProfileFeedback.textContent = mensagem;
+    settingsProfileFeedback.className = tipo === "error"
+      ? "w-full truncate rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800"
+      : tipo === "success"
+        ? "w-full truncate rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-800"
+        : "w-full truncate rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-medium text-gray-600";
+    if (temporario && mensagem) {
+      profileFeedbackTimeout = window.setTimeout(() => {
+        settingsProfileFeedback.textContent = "";
+        settingsProfileFeedback.className = "w-full truncate text-xs text-gray-500";
+      }, 4500);
+    }
+  }
+
+  function notificarPerfilAtualizado() {
+    window.dispatchEvent(new CustomEvent("docegestao:perfil-atualizado", {
+      detail: { funcionario: usuarioAtual },
+    }));
   }
 
   function aplicarPreferenciasNotificacao() {
@@ -686,11 +889,12 @@ function carregarHeader() {
   function preencherPerfil() {
     const user = usuarioAtual || {};
     const profile = obterPerfilSalvo();
-    settingsProfileForm.elements.namedItem("nome").value = profile.nome || user.nome || "";
+    settingsProfileForm.elements.namedItem("nome").value = user.nome || profile.nome || "";
     settingsProfileForm.elements.namedItem("idade").value = profile.idade || "";
-    settingsProfileForm.elements.namedItem("email").value = profile.email || user.email || "";
-    const avatar = profile.foto || localStorage.getItem("docegestao_foto_perfil");
-    if (avatar) settingsProfileAvatar.src = avatar;
+    settingsProfileForm.elements.namedItem("email").value = user.email || profile.email || "";
+    const avatar = user.foto || profile.foto;
+    settingsProfileAvatar.src =
+      settingsProfilePhotoPreviewUrl || avatar || avatarPadraoConfiguracoes;
   }
 
   function abrirAbaConfiguracao(tabName) {
@@ -795,9 +999,10 @@ function carregarHeader() {
     const visibleItems = state.items.filter((item) => {
       if (preferences.all) return false;
       if (item.tipo === "chamado" && preferences.calls) return false;
-      if (["esgotado", "critico", "vencido", "prox-vencimento", "medio"].includes(item.tipo) && preferences.products) return false;
+      if (["esgotado", "critico", "prox-estoque", "vencido", "prox-vencimento", "medio"].includes(item.tipo) && preferences.products) return false;
       return true;
     });
+    atualizarBannerChamado(state.items);
     notificationCount.textContent = String(visibleItems.length);
     notificationCount.classList.toggle("hidden", visibleItems.length === 0);
     const selectedItem = visibleItems.find((item) =>
@@ -807,14 +1012,21 @@ function carregarHeader() {
       state.selectedId = null;
       salvarNotificacoes(state);
     }
-    closeSelectedNotification.disabled = !selectedItem;
-    closeSelectedNotification.classList.toggle("shadow-md", Boolean(selectedItem));
-    closeSelectedNotification.classList.toggle("brightness-110", Boolean(selectedItem));
     notificationsList.replaceChildren();
+
+    const stockNotificationCount = state.items.filter((item) =>
+      item.tipo !== "chamado",
+    ).length;
+    const stockNotificationSummary = document.createElement("p");
+    stockNotificationSummary.className = "text-xs font-semibold text-gray-600";
+    stockNotificationSummary.setAttribute("role", "status");
+    stockNotificationSummary.textContent =
+      `Alertas de estoque ativos: ${stockNotificationCount}`;
+    notificationsList.appendChild(stockNotificationSummary);
 
     if (visibleItems.length === 0) {
       const emptyState = document.createElement("div");
-      emptyState.className = "flex h-full min-h-64 flex-col items-center justify-center text-center";
+      emptyState.className = "flex min-h-64 flex-col items-center justify-center text-center";
       emptyState.innerHTML = `
         <span class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F5ECE5] text-[#875C46]">
           <i data-lucide="bell-ring" class="h-7 w-7"></i>
@@ -830,59 +1042,43 @@ function carregarHeader() {
     [...visibleItems].sort((first, second) => {
       if (first.tipo === "chamado" && second.tipo !== "chamado") return -1;
       if (first.tipo !== "chamado" && second.tipo === "chamado") return 1;
-      const urgencia = { esgotado: 5, critico: 5, vencido: 4, "prox-vencimento": 3, medio: 2 };
-      const diferencaUrgencia = (urgencia[second.tipo] || 0) - (urgencia[first.tipo] || 0);
+      const urgencia = (item) =>
+        window.estoqueClassificacao.obterAlerta(item.tipo)?.prioridade || 0;
+      const diferencaUrgencia = urgencia(second) - urgencia(first);
       if (diferencaUrgencia !== 0) return diferencaUrgencia;
       return new Date(second.criadaEm) - new Date(first.criadaEm);
     }).forEach((item) => {
       const card = document.createElement("article");
       const selectable = item.tipo === "chamado";
       const selected = selectable && item.id === state.selectedId;
-      card.tabIndex = 0;
-      card.setAttribute("role", "button");
+      card.tabIndex = selectable ? 0 : -1;
+      card.setAttribute("role", selectable ? "group" : "button");
       card.setAttribute(
         "aria-label",
-        `${selectable ? (selected ? "Recolher chamado" : "Expandir chamado") : "Localizar alerta"}: ${item.titulo}`,
+        `${selectable ? "Ver detalhes do chamado" : "Localizar alerta"}: ${item.titulo}`,
       );
-      if (selectable) card.setAttribute("aria-pressed", String(selected));
-      const severityClass = item.tipo === "vencido"
-        ? "border-red-300 bg-red-50"
-        : item.tipo === "prox-vencimento"
-          ? "border-orange-300 bg-orange-50"
-        : item.tipo === "medio"
-          ? "border-yellow-300 bg-yellow-50"
-        : item.tipo === "critico" || item.tipo === "esgotado"
-          ? "border-amber-300 bg-amber-50"
-          : item.tipo === "chamado"
-            ? "border-sky-200 bg-sky-50"
-            : "border-[#E9D9CC] bg-[#F8F6F2]";
-      const accentColor = item.tipo === "vencido"
-        ? "#ef4444"
-        : item.tipo === "prox-vencimento"
-          ? "#ea580c"
-          : item.tipo === "medio"
-            ? "#facc15"
-          : item.tipo === "critico" || item.tipo === "esgotado"
-            ? "#f59e0b"
-            : item.tipo === "chamado"
-              ? "#0ea5e9"
-              : "";
-      card.className = `cursor-pointer rounded-xl border-0 p-4 transition-all duration-200 ease-out hover:shadow-md focus:outline-none ${selected ? "shadow-md" : ""} ${severityClass} ${item.lida ? "opacity-80" : ""}`;
+      const alertaEstoque = window.estoqueClassificacao.obterAlerta(item.tipo);
+      card.className = `cursor-pointer rounded-xl border-0 bg-white p-4 transition-all duration-200 ease-out hover:shadow-md focus:outline-none ${selected ? "shadow-md" : ""} ${item.lida ? "opacity-80" : ""}`;
+      card.style.backgroundColor = "#ffffff";
+      if (alertaEstoque) {
+        card.style.borderLeft = `4px solid ${alertaEstoque.cor}`;
+      } else if (item.tipo === "chamado") {
+        card.style.borderLeft = `4px solid ${item.status === "em_resolucao" ? "#d97706" : "#0ea5e9"}`;
+      }
       if (selected) {
         card.style.transform = "translateY(-5px)";
         card.style.boxShadow = "0 8px 18px rgba(58, 42, 26, 0.22)";
       }
-      if (accentColor) card.style.borderLeft = `4px solid ${accentColor}`;
       const ativarNotificacao = () => {
         if (selectable) {
           const currentState = carregarNotificacoes();
           const notification = currentState.items.find((entry) => entry.id === item.id);
           if (!notification) return;
-          const isSelected = currentState.selectedId === item.id;
-          currentState.selectedId = isSelected ? null : item.id;
+          currentState.selectedId = item.id;
           notification.lida = true;
           salvarNotificacoes(currentState);
           renderizarNotificacoes(currentState);
+          abrirDetalhesChamado(notification);
           return;
         }
 
@@ -891,6 +1087,7 @@ function carregarHeader() {
         if (separatorIndex < 1) return;
         const produtoId = productStateId.slice(0, separatorIndex);
         const status = productStateId.slice(separatorIndex + 1);
+        fecharDialogo(notificationsDialog, notificationsTrigger);
         if (typeof window.navegarDemo === "function") {
           window.navegarDemo("alertas", { localizar: produtoId, status });
         } else {
@@ -904,13 +1101,16 @@ function carregarHeader() {
       card.addEventListener("click", ativarNotificacao);
       card.addEventListener("keydown", (event) => {
         if (!["Enter", " "].includes(event.key)) return;
+        if (event.target !== card) return;
         event.preventDefault();
         ativarNotificacao();
       });
 
       const title = document.createElement("h3");
       title.className = "text-sm font-semibold text-gray-800";
-      title.textContent = item.titulo;
+      title.textContent = item.tipo === "chamado" && item.status === "em_resolucao"
+        ? "Chamado em resolução"
+        : item.titulo;
       const message = document.createElement("p");
       message.className = "mt-1 text-xs leading-5 text-gray-600";
       const previewLimit = 70;
@@ -930,7 +1130,12 @@ function carregarHeader() {
       date.className = "mt-2 text-[11px] text-gray-400";
       date.textContent = new Date(item.criadaEm).toLocaleString("pt-BR");
       card.append(title, message, date);
-
+      if (item.tipo === "chamado" && item.status === "em_resolucao") {
+        const owner = document.createElement("p");
+        owner.className = "mt-2 text-[11px] font-medium text-amber-700";
+        owner.textContent = `Em resolução por ${item.responsavelNome || "um funcionário"}`;
+        card.appendChild(owner);
+      }
       notificationsList.appendChild(card);
     });
     window.lucide?.createIcons();
@@ -940,94 +1145,68 @@ function carregarHeader() {
     const state = carregarNotificacoes();
     let inventory = lerJsonLocalStorage("docegestao_estoque_v1", {});
     const activeProducts = {};
-    const today = new Date();
-    const todayString = [
-      today.getFullYear(),
-      String(today.getMonth() + 1).padStart(2, "0"),
-      String(today.getDate()).padStart(2, "0"),
-    ].join("-");
+    const chamadas = state.items.filter((item) => item.tipo === "chamado");
+    const notificacoesExistentes = new Map();
+    state.items
+      .filter((item) => item.tipo !== "chamado")
+      .forEach((item) => {
+        const estadoAnterior = String(item.produtoStateId || "");
+        const separador = estadoAnterior.lastIndexOf(":");
+        const id = String(
+          item.produtoId ||
+            (separador > 0
+              ? estadoAnterior.slice(0, separador)
+              : String(item.id || "").replace(/^produto:/, "").split(":")[0]),
+        );
+        if (id && !notificacoesExistentes.has(id)) {
+          notificacoesExistentes.set(id, item);
+        }
+      });
 
+    const notificacoesProdutos = [];
     Object.entries(inventory).forEach(([key, product]) => {
       if (!product || typeof product !== "object") return;
       const id = String(product.id || key);
-      const name = String(product.nome || "Produto");
-      const quantity = Number(product.quantidade);
-      const maximo = Number(product.maximo);
-      const validExpiry = /^\d{4}-\d{2}-\d{2}$/.test(product.validade || "");
-      const daysUntilExpiry = validExpiry
-        ? Math.floor(
-          (new Date(`${product.validade}T00:00:00`) - new Date(`${todayString}T00:00:00`)) / 86400000,
-        )
-        : null;
-      const statuses = [];
-      if (
-        product.quantidade !== "" &&
-        product.quantidade !== null &&
-        product.quantidade !== undefined &&
-        Number.isFinite(quantity) &&
-        quantity <= 0
-      ) {
-        statuses.push("esgotado");
-      } else if (
-        Number.isFinite(quantity) &&
-        Number.isFinite(maximo) &&
-        maximo > 0 &&
-        quantity / maximo <= 0.25
-      ) {
-        statuses.push("critico");
-      } else if (
-        Number.isFinite(quantity) &&
-        Number.isFinite(maximo) &&
-        maximo > 0 &&
-        quantity / maximo > 0.5 &&
-        quantity / maximo <= 0.75
-      ) {
-        statuses.push("medio");
-      }
-      if (validExpiry && daysUntilExpiry < 0) {
-        statuses.push("vencido");
-      } else if (validExpiry) {
-        if (daysUntilExpiry <= 7) statuses.push("prox-vencimento");
-      }
+      const classificacao = window.estoqueClassificacao.classificar(product);
+      const status = classificacao.status;
+      if (!status) return;
 
-      statuses.forEach((status) => {
-        const stateId = `${id}:${status}`;
-        activeProducts[stateId] = true;
-        const notificationId = `produto:${stateId}`;
-        if (state.items.some((item) => item.id === notificationId)) return;
-        criarNotificacao(
-          state,
-          notificationId,
-          status,
-          status === "vencido"
-            ? "Produto vencido"
-            : status === "prox-vencimento"
-              ? "Produto próximo ao vencimento"
-            : status === "critico"
-              ? "Estoque crítico"
-              : status === "medio"
-                ? "Estoque em nível médio"
-              : "Produto esgotado",
-          status === "esgotado"
-            ? `${name} está sem estoque.`
-            : status === "critico"
-              ? `${name} está com ${quantity} de ${maximo} ${product.unidade || "un"} em estoque.`
-              : status === "medio"
-                ? `${name} está com ${quantity} de ${maximo} ${product.unidade || "un"} em estoque.`
-              : status === "prox-vencimento"
-                  ? `${name} vence em ${product.validade.split("-").reverse().join("/")} (${daysUntilExpiry === 0 ? "hoje" : `em ${daysUntilExpiry} ${daysUntilExpiry === 1 ? "dia" : "dias"}`}).`
-                : `${name} venceu em ${product.validade.split("-").reverse().join("/")}.`,
-          "alertas",
-        );
-        const created = state.items[state.items.length - 1];
-        created.produtoStateId = stateId;
+      const estadoId = `${id}:${status}`;
+      const estadosAtivos = classificacao.estados;
+      const alerta = window.estoqueClassificacao.obterAlerta(status);
+      const mensagem = estadosAtivos
+        .map((estado) =>
+          window.estoqueClassificacao.obterMensagem(
+            product,
+            estado,
+            classificacao.diasValidade,
+          ),
+        )
+        .filter(Boolean)
+        .join(" ");
+      activeProducts[estadoId] = true;
+
+      const anterior = notificacoesExistentes.get(id);
+      const notification = anterior || {
+        id: `produto:${id}`,
+        criadaEm: new Date().toISOString(),
+        lida: false,
+      };
+      if (anterior && anterior.tipo !== status) notification.lida = false;
+      Object.assign(notification, {
+        id: `produto:${id}`,
+        tipo: status,
+        titulo: alerta.titulo,
+        mensagem,
+        pagina: "alertas",
+        produtoId: id,
+        produtoStateId: estadoId,
       });
+      notificacoesProdutos.push(notification);
     });
+
     state.activeProducts = activeProducts;
-    state.items = state.items.filter((item) =>
-      item.tipo === "chamado" || activeProducts[item.produtoStateId],
-    );
-    if (!state.items.some((item) => item.id === state.selectedId)) state.selectedId = null;
+    state.items = [...notificacoesProdutos, ...chamadas];
     try {
       localStorage.setItem("docegestao_estoque_v1", JSON.stringify(inventory));
     } catch (error) {
@@ -1039,6 +1218,7 @@ function carregarHeader() {
     if (Array.isArray(calls)) {
       calls.forEach((call, index) => {
         if (!call || typeof call !== "object") return;
+        if (call.status === "concluido") return;
         const callId = String(
           call.id || `${call.criadoEm || "chamado"}:${index}:${call.descricao || ""}`,
         );
@@ -1067,9 +1247,15 @@ function carregarHeader() {
       notification.callId = callId;
       notification.mensagem = String(call.descricao || "Um novo chamado foi registrado na administração.");
       notification.criadaEm = call.criadoEm || notification.criadaEm;
+      notification.status = call.status || "aberto";
+      notification.id_responsavel = call.id_responsavel || null;
+      notification.responsavelNome = call.responsavelNome || null;
+      notification.solicitanteNome = call.solicitanteNome || null;
+      notification.titulo = notification.status === "em_resolucao"
+        ? "Chamado em resolução"
+        : "Novo chamado aberto";
     });
 
-    state.items = state.items.slice(-100);
     salvarNotificacoes(state);
     renderizarNotificacoes(state);
   }
@@ -1175,6 +1361,7 @@ function carregarHeader() {
         localStorage.setItem("docegestao_chamados", JSON.stringify(chamadosAtualizados));
         atualizarNotificacoes();
         limparErroNotificacoes();
+        document.dispatchEvent(new Event("docegestao:chamados-sincronizados"));
       } catch (error) {
         console.error("Não foi possível sincronizar os chamados:", error);
         exibirErroNotificacoes(error.message || "Não foi possível carregar os chamados.");
@@ -1194,7 +1381,7 @@ function carregarHeader() {
       const userName = profile.nome || user?.nome || "Nenhuma conta conectada";
       const userEmail = profile.email || user?.email || "Entre para acessar sua conta";
       const userRole = user?.nome_cargo || (user ? "Conta conectada" : "");
-      const avatar = profile.foto || localStorage.getItem("docegestao_foto_perfil");
+      const avatar = user?.foto || profile.foto;
 
       container.querySelectorAll("[data-header-user-name], [data-header-menu-name]")
         .forEach((element) => {
@@ -1211,14 +1398,24 @@ function carregarHeader() {
       if (accountActionLabel) {
         accountActionLabel.textContent = "Sair";
       }
-      if (avatar) {
-        fotoPerfil.src = avatar;
-        fotoMenu.src = avatar;
-        settingsProfileAvatar.src = avatar;
-      }
+      fotoPerfil.src = avatar || avatarPadraoPerfil;
+      fotoMenu.src = avatar || avatarPadraoMenu;
+      settingsProfileAvatar.src = avatar || avatarPadraoConfiguracoes;
     } catch (error) {
       console.error("Não foi possível carregar os dados da conta:", error);
     }
+  }
+
+  async function sincronizarContaDaSessao(forcarAtualizacao = false) {
+    const token = localStorage.getItem("docegestao_token");
+    if (!token || typeof window.obterFuncionarioAutenticado !== "function") return;
+
+    const user = await window.obterFuncionarioAutenticado(forcarAtualizacao);
+    if (token !== localStorage.getItem("docegestao_token") || !user) return;
+
+    usuarioAtual = user;
+    atualizarConta();
+    preencherPerfil();
   }
 
   async function atualizarVisibilidadePreferenciaChamados() {
@@ -1267,9 +1464,11 @@ function carregarHeader() {
     }
   }
 
-  function abrirDialogo(dialog, trigger) {
+  function abrirDialogo(dialog, trigger, { preservarNotificacoes = false } = {}) {
     fecharPerfil();
-    fecharDialogo(notificationsDialog, notificationsTrigger);
+    if (!preservarNotificacoes) {
+      fecharDialogo(notificationsDialog, notificationsTrigger);
+    }
     fecharDialogo(settingsDialog, settingsTrigger);
     activeDialogTrigger = trigger;
     dialog.classList.remove("hidden");
@@ -1310,7 +1509,7 @@ function carregarHeader() {
   container.querySelectorAll("[data-open-header-settings]").forEach((button) => {
     button.addEventListener("click", () => {
       preencherPerfil();
-      abrirDialogo(settingsDialog, settingsTrigger);
+      abrirDialogo(settingsDialog, settingsTrigger, { preservarNotificacoes: true });
       abrirAbaConfiguracao("notifications");
     });
   });
@@ -1325,69 +1524,116 @@ function carregarHeader() {
     aplicarTema(document.documentElement.dataset.theme !== "dark");
   });
 
-  settingsProfilePhoto.addEventListener("change", async () => {
+  settingsProfilePhoto.addEventListener("change", () => {
     const file = settingsProfilePhoto.files?.[0];
     if (!file) return;
-    settingsProfileFeedback.textContent = "Atualizando foto...";
-    settingsProfileFeedback.className = "min-h-5 text-xs text-gray-500";
-    try {
-      selectedProfilePhoto = await prepararFotoPerfil(file);
-      const profile = { ...obterPerfilSalvo(), foto: selectedProfilePhoto };
-      if (salvarPerfilSalvo(profile)) {
-        settingsProfileAvatar.src = selectedProfilePhoto;
-        fotoPerfil.src = selectedProfilePhoto;
-        fotoMenu.src = selectedProfilePhoto;
-        const token = localStorage.getItem("docegestao_token");
-        if (token && usuarioAtual?.id_funcionario) {
-          const response = await fetch("/api/funcionarios/perfil/foto", {
-            method: "PUT",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ foto: selectedProfilePhoto }),
-          });
-          const result = await response.json();
-          if (!response.ok) {
-            throw new Error(result.mensagem || "Não foi possível salvar a foto no sistema.");
-          }
-          settingsProfileFeedback.textContent = "Foto atualizada para sua conta.";
-        } else {
-          settingsProfileFeedback.textContent =
-            "Foto salva neste navegador. Entre na conta para sincronizá-la.";
-        }
-        settingsProfileFeedback.className = "min-h-5 text-xs text-emerald-700";
-      }
-    } catch (error) {
-      console.error("Não foi possível atualizar a foto do perfil:", error);
-      settingsProfileFeedback.textContent = error.message || "Não foi possível carregar essa imagem.";
-      settingsProfileFeedback.className = "min-h-5 text-xs text-red-600";
-    } finally {
-      settingsProfilePhoto.value = "";
-    }
+    if (settingsProfilePhotoPreviewUrl) URL.revokeObjectURL(settingsProfilePhotoPreviewUrl);
+    settingsProfilePhotoFile = file;
+    settingsProfilePhotoPreviewUrl = URL.createObjectURL(file);
+    settingsProfileAvatar.src = settingsProfilePhotoPreviewUrl;
   });
 
-  settingsProfileForm.addEventListener("submit", (event) => {
+  settingsProfileForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const formData = new FormData(settingsProfileForm);
     const ageText = String(formData.get("idade") || "").trim();
     const age = ageText ? Number(ageText) : null;
     if (ageText && (!Number.isInteger(age) || age < 1 || age > 120)) {
-      settingsProfileFeedback.textContent = "Informe uma idade entre 1 e 120 anos.";
-      settingsProfileFeedback.className = "min-h-5 text-xs text-red-600";
+      exibirFeedbackPerfil("Informe uma idade entre 1 e 120 anos.", "error");
       return;
     }
 
-    const profile = {
-      ...obterPerfilSalvo(),
-      nome: String(formData.get("nome") || "").trim(),
-      idade: age,
-      email: String(formData.get("email") || "").trim(),
-    };
-    if (!salvarPerfilSalvo(profile)) return;
-    atualizarConta();
-    settingsProfileFeedback.textContent = "Perfil atualizado neste navegador.";
-    settingsProfileFeedback.className = "min-h-5 text-xs text-emerald-700";
+    const nome = String(formData.get("nome") || "").trim();
+    const email = String(formData.get("email") || "").trim().toLowerCase();
+    if (!nome || !email) {
+      exibirFeedbackPerfil("Informe seu nome e e-mail.", "error");
+      return;
+    }
+
+    const savedProfile = obterPerfilSalvo();
+    const nomeAlterado = nome !== String(usuarioAtual?.nome || "");
+    const emailAlterado = email !== String(usuarioAtual?.email || "").toLowerCase();
+    const idadeAlterada = age !== (savedProfile.idade ?? null);
+    if (!nomeAlterado && !emailAlterado && !idadeAlterada && !settingsProfilePhotoFile) {
+      exibirFeedbackPerfil("Nenhuma alteração foi feita.");
+      return;
+    }
+
+    const token = localStorage.getItem("docegestao_token");
+    const submitButton = settingsProfileForm.querySelector('button[type="submit"]');
+    if (!token || !usuarioAtual?.id_funcionario) {
+      exibirFeedbackPerfil("Entre na sua conta para salvar as alterações.", "error");
+      return;
+    }
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Salvando...";
+    }
+    exibirFeedbackPerfil("Salvando alterações...", "info", false);
+    try {
+      const foto = settingsProfilePhotoFile
+        ? await prepararFotoPerfil(settingsProfilePhotoFile)
+        : usuarioAtual?.foto || savedProfile.foto;
+      if (nomeAlterado || emailAlterado) {
+        const response = await fetch("/api/funcionarios/perfil", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ nome, email }),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.mensagem || "Não foi possível salvar as alterações do perfil.");
+        }
+
+        usuarioAtual = { ...usuarioAtual, ...result.dados };
+        localStorage.setItem("docegestao_funcionario", JSON.stringify(usuarioAtual));
+      }
+      const fotoAlterada = Boolean(settingsProfilePhotoFile && foto !== usuarioAtual?.foto);
+      if (fotoAlterada) {
+        const response = await fetch("/api/funcionarios/perfil/foto", {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ foto }),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.mensagem || "Não foi possível salvar a foto do perfil.");
+        }
+        usuarioAtual = { ...usuarioAtual, foto };
+        localStorage.setItem("docegestao_funcionario", JSON.stringify(usuarioAtual));
+      }
+      const profile = {
+        ...obterPerfilSalvo(),
+        nome,
+        idade: age,
+        email,
+        foto,
+      };
+      if (!salvarPerfilSalvo(profile)) return;
+      atualizarConta();
+      if (nomeAlterado || emailAlterado || fotoAlterada) notificarPerfilAtualizado();
+      settingsProfilePhotoFile = null;
+      settingsProfilePhoto.value = "";
+      if (settingsProfilePhotoPreviewUrl) {
+        URL.revokeObjectURL(settingsProfilePhotoPreviewUrl);
+        settingsProfilePhotoPreviewUrl = null;
+      }
+      exibirFeedbackPerfil("Alterações salvas.", "success");
+    } catch (error) {
+      console.error("Não foi possível atualizar o perfil:", error);
+      exibirFeedbackPerfil(error.message || "Não foi possível salvar as alterações.", "error");
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = "Salvar alterações";
+      }
+    }
   });
 
   [notificationsDialog, settingsDialog].forEach((dialog) => {
@@ -1406,70 +1652,101 @@ function carregarHeader() {
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
-    if (!notificationsDialog.classList.contains("hidden")) {
-      fecharDialogo(notificationsDialog, notificationsTrigger);
+    if (!callDetailsDialog.classList.contains("hidden")) {
+      fecharDetalhesChamado();
     } else if (!settingsDialog.classList.contains("hidden")) {
       fecharDialogo(settingsDialog, settingsTrigger);
+    } else if (!notificationsDialog.classList.contains("hidden")) {
+      fecharDialogo(notificationsDialog, notificationsTrigger);
     } else {
       fecharPerfil();
     }
   });
 
-  closeSelectedNotification.addEventListener("click", async () => {
-    let state = carregarNotificacoes();
-    let selectedItem = state.items.find((item) =>
-      item.id === state.selectedId && item.tipo === "chamado",
-    );
-    if (!selectedItem || closeSelectedNotification.disabled) return;
-
-    const token = localStorage.getItem("docegestao_token");
-    if (!token) {
-      exibirErroNotificacoes("Sua sessão expirou. Entre novamente para remover o chamado.");
-      return;
-    }
-
-    closeSelectedNotification.disabled = true;
-    limparErroNotificacoes();
+  callDetailsDialog.addEventListener("click", (event) => {
+    if (event.target === callDetailsDialog) fecharDetalhesChamado();
+  });
+  container.querySelector("#header-call-details-close").addEventListener(
+    "click",
+    fecharDetalhesChamado,
+  );
+  container.querySelector("#header-call-details-cancel").addEventListener(
+    "click",
+    fecharDetalhesChamado,
+  );
+  callDetailsAction.addEventListener("click", async () => {
+    if (!chamadoEmDetalhe || callDetailsAction.disabled) return;
+    const acao = callDetailsAction.dataset.action;
+    callDetailsAction.disabled = true;
+    callDetailsError.textContent = "";
+    callDetailsError.classList.add("hidden");
     try {
-      let callId = String(selectedItem.callId || selectedItem.id.replace(/^chamado:/, ""));
-      if (!/^\d+$/.test(callId)) {
-        await sincronizarChamadosNotificacoes();
-        const idMigrado = lerJsonLocalStorage(MIGRATED_CALLS_KEY, {})[callId];
-        if (!/^\d+$/.test(String(idMigrado || ""))) {
-          throw new Error("Não foi possível migrar este chamado antigo para o banco de dados.");
-        }
-        state = carregarNotificacoes();
-        selectedItem = state.items.find(
-          (item) => item.tipo === "chamado" && item.callId === String(idMigrado),
-        );
-        if (!selectedItem) {
-          throw new Error("O chamado foi atualizado. Selecione-o novamente para fechar.");
-        }
-        callId = String(idMigrado);
-      }
-
-      const response = await fetch(`/api/chamados/${encodeURIComponent(callId)}`, {
-        method: "DELETE",
-        headers: { Authorization: "Bearer " + token },
-      });
-      await lerRespostaChamados(response, "Não foi possível remover o chamado.");
-
-      const calls = lerJsonLocalStorage("docegestao_chamados", []);
-      localStorage.setItem(
-        "docegestao_chamados",
-        JSON.stringify(calls.filter((call) => String(call.id) !== callId)),
-      );
-      state.items = state.items.filter((item) => item.id !== selectedItem.id);
-      state.selectedId = null;
-      salvarNotificacoes(state);
-      renderizarNotificacoes(state);
-      limparErroNotificacoes();
+      await executarAcaoChamado(chamadoEmDetalhe, acao);
+      fecharDetalhesChamado();
     } catch (error) {
-      console.error("Não foi possível remover o chamado:", error);
-      exibirErroNotificacoes(error.message || "Não foi possível remover o chamado.");
-      closeSelectedNotification.disabled = false;
+      console.error(`Não foi possível ${acao === "assumir" ? "assumir" : "concluir"} o chamado:`, error);
+      callDetailsError.textContent = error.message || "Não foi possível atualizar o chamado.";
+      callDetailsError.classList.remove("hidden");
+    } finally {
+      if (callDetailsDialog.isConnected && chamadoEmDetalhe) {
+        callDetailsAction.disabled = chamadoEmDetalhe.status === "em_resolucao";
+      }
     }
   });
+  callDetailsCloseCall.addEventListener("click", async () => {
+    if (!chamadoEmDetalhe || callDetailsCloseCall.disabled) return;
+    const chamado = chamadoEmDetalhe;
+    callDetailsCloseCall.disabled = true;
+    callDetailsError.textContent = "";
+    callDetailsError.classList.add("hidden");
+    try {
+      if (chamado.status === "aberto") {
+        await executarAcaoChamado(chamado, "assumir");
+      }
+      if (chamadoEmDetalhe) await executarAcaoChamado(chamadoEmDetalhe, "concluir");
+      fecharDetalhesChamado();
+    } catch (error) {
+      callDetailsError.textContent = error.message || "Não foi possível fechar o chamado.";
+      callDetailsError.classList.remove("hidden");
+      callDetailsCloseCall.disabled = false;
+    }
+  });
+
+  let arrasteChamado = null;
+  activeCallDragHandle.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || !activeCallBanner.classList.contains("flex")) return;
+    const bounds = activeCallBanner.getBoundingClientRect();
+    arrasteChamado = {
+      pointerId: event.pointerId,
+      offsetX: event.clientX - bounds.left,
+      offsetY: event.clientY - bounds.top,
+    };
+    activeCallDragHandle.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+  activeCallDragHandle.addEventListener("pointermove", (event) => {
+    if (!arrasteChamado || event.pointerId !== arrasteChamado.pointerId) return;
+    const bounds = activeCallBanner.getBoundingClientRect();
+    const left = Math.max(
+      0,
+      Math.min(window.innerWidth - bounds.width, event.clientX - arrasteChamado.offsetX),
+    );
+    const top = Math.max(
+      0,
+      Math.min(window.innerHeight - bounds.height, event.clientY - arrasteChamado.offsetY),
+    );
+    activeCallBanner.style.left = `${left}px`;
+    activeCallBanner.style.top = `${top}px`;
+    activeCallBanner.style.right = "auto";
+    activeCallBanner.style.bottom = "auto";
+    activeCallBanner.style.transform = "none";
+  });
+  const terminarArrasteChamado = (event) => {
+    if (arrasteChamado?.pointerId !== event.pointerId) return;
+    arrasteChamado = null;
+  };
+  activeCallDragHandle.addEventListener("pointerup", terminarArrasteChamado);
+  activeCallDragHandle.addEventListener("pointercancel", terminarArrasteChamado);
 
   accountAction.addEventListener("click", () => {
     fecharPerfil();
@@ -1500,15 +1777,22 @@ function carregarHeader() {
   });
 
   function atualizarFoto() {
-    const foto = obterPerfilSalvo().foto || localStorage.getItem("docegestao_foto_perfil");
-    if (!foto) return;
-    fotoPerfil.src = foto;
-    fotoMenu.src = foto;
-    settingsProfileAvatar.src = foto;
+    const foto = usuarioAtual?.foto || obterPerfilSalvo().foto;
+    fotoPerfil.src = foto || avatarPadraoPerfil;
+    fotoMenu.src = foto || avatarPadraoMenu;
+    settingsProfileAvatar.src = foto || avatarPadraoConfiguracoes;
   }
+
+  window.prepararPerfilDaConta = async () => {
+    await sincronizarContaDaSessao();
+    atualizarFoto();
+    preencherPerfil();
+    return usuarioAtual;
+  };
 
   aplicarTema(localStorage.getItem(THEME_KEY) === "dark");
   atualizarConta();
+  void sincronizarContaDaSessao();
   void atualizarVisibilidadePreferenciaChamados();
   atualizarFoto();
   preencherPerfil();
@@ -1522,6 +1806,7 @@ function carregarHeader() {
       });
     }
     atualizarConta();
+    void sincronizarContaDaSessao();
     void atualizarVisibilidadePreferenciaChamados();
     atualizarNotificacoes();
     void sincronizarChamadosNotificacoes();
@@ -1529,12 +1814,21 @@ function carregarHeader() {
   });
   window.addEventListener("storage", () => {
     atualizarConta();
+    void sincronizarContaDaSessao();
     atualizarFoto();
     atualizarNotificacoes();
   });
   document.addEventListener("docegestao:atualizar-notificacoes", atualizarNotificacoes);
   document.addEventListener("docegestao:chamados-atualizados", () => {
     void sincronizarChamadosNotificacoes();
+  });
+  window.setInterval(() => {
+    if (document.hidden) return;
+    void sincronizarChamadosNotificacoes();
+    void sincronizarContaDaSessao(true);
+  }, 15000);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) void sincronizarChamadosNotificacoes();
   });
   document.addEventListener("docegestao:produto-removido", registrarProdutoRemovido);
   void sincronizarEstoqueNotificacoes();

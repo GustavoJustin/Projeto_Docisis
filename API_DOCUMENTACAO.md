@@ -46,21 +46,11 @@ Documentação automática gerada a partir das rotas e controladores do backend.
       "id_funcionario": 1,
       "nome": "Maria",
       "email": "maria@docesis.com",
-      "id_cargos": 2
+      "id_cargos": 2,
+      "foto": null,
+      "pode_cadastrar_funcionarios": 0,
+      "pode_excluir_funcionarios": 0
     }
-  }
-  ```
-
-### POST /api/login/cadastro-funcionario
-
-- Descrição: cria uma conta de funcionário. Se o cargo "Funcionário" ainda não existir, ele é criado automaticamente.
-- Body:
-  ```json
-  {
-    "nome": "Maria Oliveira",
-    "cpf": "12345678901",
-    "email": "maria@email.com",
-    "senha": "123456"
   }
   ```
 
@@ -69,7 +59,8 @@ Documentação automática gerada a partir das rotas e controladores do backend.
 - Em uma instalação sem administrador, crie a primeira conta no terminal com `npm --prefix back-end run criar-admin-inicial`.
 - O comando prepara as colunas de autenticação ausentes, permite vários funcionários no mesmo cargo e converte CPF para texto de 11 dígitos nas colunas relacionadas, preservando as chaves estrangeiras existentes.
 - Informe o CPF com ou sem pontuação; o comando remove a formatação. A senha é solicitada sem exibição e o comando só funciona enquanto ainda não existir um administrador.
-- Depois, entre pela página de login e cadastre funcionários pela área de gestão da equipe.
+- O primeiro administrador recebe permissão para criar e remover funcionários; permissões de novos administradores são escolhidas no formulário de cadastro.
+- Depois, entre pela página de login e crie funcionários pela área de gestão da equipe. O cadastro público não está disponível.
 
 ### GET /api/sessao
 
@@ -83,7 +74,10 @@ Documentação automática gerada a partir das rotas e controladores do backend.
       "id_funcionario": 1,
       "nome": "Maria",
       "email": "maria@docesis.com",
-      "nome_cargo": "Funcionário"
+      "nome_cargo": "Funcionário",
+      "foto": null,
+      "pode_cadastrar_funcionarios": 0,
+      "pode_excluir_funcionarios": 0
     }
   }
   ```
@@ -130,9 +124,20 @@ Documentação automática gerada a partir das rotas e controladores do backend.
 
 - Busca um funcionário por id sem retornar o hash da senha. Requer perfil de administrador.
 
+### PATCH /api/funcionarios/perfil
+
+- Atualiza nome e e-mail da conta autenticada e retorna os dados atualizados. Requer autenticação JWT.
+- Body: `{ "nome": "Maria Oliveira", "email": "maria@email.com" }`
+
+### PUT /api/funcionarios/perfil/foto
+
+- Salva a foto de perfil da conta autenticada no banco de dados. Requer autenticação JWT.
+- Body: `{ "foto": "data:image/jpeg;base64,..." }` (JPEG, PNG ou WebP; até 1,5 MB).
+
 ### POST /api/funcionarios
 
-- Cria um funcionário com senha definida pelo administrador. Requer perfil de administrador.
+- Cria um funcionário com senha definida pelo administrador. Requer perfil de administrador com permissão `pode_cadastrar_funcionarios`.
+- Para novos administradores, os campos `pode_cadastrar_funcionarios` e `pode_excluir_funcionarios` definem as permissões de criação e remoção de funcionários.
 - Body exemplo:
   ```json
   {
@@ -140,17 +145,27 @@ Documentação automática gerada a partir das rotas e controladores do backend.
     "id_cargos": 2,
     "nome": "Maria Oliveira",
     "email": "maria@email.com",
-    "senha": "123456"
+    "senha": "123456",
+    "foto": null,
+    "pode_cadastrar_funcionarios": false,
+    "pode_excluir_funcionarios": false
   }
   ```
 
+### PATCH /api/funcionarios/:id/senha
+
+- Redefine a senha de um funcionário sem revelar a senha anterior ou seu hash. Requer perfil de administrador.
+- Body: `{ "senha": "novaSenha123" }` (mínimo de 6 caracteres).
+
 ### PUT /api/funcionarios/:id
 
-- Atualiza funcionário. Requer perfil de administrador.
+- Atualiza dados da conta, cargo e permissões de criação/remoção. Requer perfil de administrador.
+- Para cargos não administrativos, as permissões administrativas são removidas. Não é permitido alterar o próprio cargo nem rebaixar o último administrador.
+- Body de acesso: `{ "id_cargos": 2, "pode_cadastrar_funcionarios": true, "pode_excluir_funcionarios": false }`.
 
 ### DELETE /api/funcionarios/:id
 
-- Deleta funcionário. Requer perfil de administrador.
+- Remove funcionário e registra a ação no histórico de contas. Requer perfil de administrador com permissão `pode_excluir_funcionarios`.
 
 ## Estoque
 
@@ -230,15 +245,15 @@ Documentação automática gerada a partir das rotas e controladores do backend.
 
 ### POST /api/produtos
 
-- Cria produto.
+- Cria produto no banco de dados, incluindo imagem, nome, descrição, categoria, preço, quantidade, limite, unidade e datas. Registra a entrada inicial no histórico do estoque.
 
 ### PUT /api/produtos/:id
 
-- Atualiza produto.
+- Atualiza dados do produto e registra a movimentação correspondente no histórico do estoque.
 
 ### DELETE /api/produtos/:id
 
-- Remove produto.
+- Arquiva o produto e registra a remoção no histórico do estoque.
 
 ## Fornecedores
 
@@ -283,6 +298,35 @@ Documentação automática gerada a partir das rotas e controladores do backend.
 ### DELETE /api/relatorios/:id
 
 - Remove relatório.
+
+## Chamados
+
+Todas as rotas exigem autenticação JWT.
+
+### GET /api/chamados
+
+- Lista chamados abertos e em resolução para as notificações.
+- Cada item inclui o status, quem abriu e, quando assumido, o funcionário responsável.
+
+### POST /api/chamados
+
+- Registra um chamado para o funcionário autenticado.
+- Body: `{ "descricao": "Descrição do chamado" }`.
+
+### PATCH /api/chamados/:id/assumir
+
+- Vincula o chamado aberto ao funcionário autenticado e altera o status para `em_resolucao`.
+- Um chamado assumido por outra pessoa não pode ser atribuído novamente.
+
+### PATCH /api/chamados/:id/concluir
+
+- Conclui o chamado somente se a conta autenticada for a responsável atual.
+- Mantém o registro e a data de conclusão para consulta no histórico administrativo.
+
+### GET /api/chamados/historico
+
+- Lista chamados e ações de criação/remoção de contas feitas por administradores, ordenados por data. Requer perfil de administrador.
+- Requer autenticação JWT e cargo de administrador.
 
 ## Observações
 

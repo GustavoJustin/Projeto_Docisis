@@ -31,7 +31,10 @@ class FuncionariosController {
 
     async cadastrarFuncionario(req, res) {
         try {
-            const resultado = await FuncionarioService.cadastrarFuncionario(req.body)
+            const resultado = await FuncionarioService.cadastrarFuncionario(
+                req.body,
+                req.funcionario,
+            )
             res.status(201).json(resultado)
 
         } catch (erro) {
@@ -45,7 +48,11 @@ class FuncionariosController {
 
     async atualizarFuncionario(req, res) {
         try {
-            const resultado = await FuncionarioService.atualizarFuncionario(req.params.id, req.body)
+            const resultado = await FuncionarioService.atualizarFuncionario(
+                req.params.id,
+                req.body,
+                req.funcionario.id_funcionario,
+            )
             res.json(resultado)
 
         } catch (erro) {
@@ -53,6 +60,21 @@ class FuncionariosController {
                 sucesso: false,
                 mensagem: erro.mensagem || "Erro interno do servidor",
                 erro: erro.stack || erro
+            })
+        }
+    }
+
+    async redefinirSenha(req, res) {
+        try {
+            const resultado = await FuncionarioService.redefinirSenha(
+                req.params.id,
+                req.body.senha,
+            )
+            res.json(resultado)
+        } catch (erro) {
+            res.status(erro.status || 500).json({
+                sucesso: false,
+                mensagem: erro.mensagem || "Erro interno do servidor",
             })
         }
     }
@@ -72,9 +94,27 @@ class FuncionariosController {
         }
     }
 
+    async atualizarPerfil(req, res) {
+        try {
+            const resultado = await FuncionarioService.atualizarPerfil(
+                req.funcionario.id_funcionario,
+                req.body,
+            )
+            res.json(resultado)
+        } catch (erro) {
+            res.status(erro.status || 500).json({
+                sucesso: false,
+                mensagem: erro.mensagem || "Erro interno do servidor",
+            })
+        }
+    }
+
     async deletarFuncionario(req, res) {
         try {
-            const resultado = await FuncionarioService.deletarFuncionario(req.params.id)
+            const resultado = await FuncionarioService.deletarFuncionario(
+                req.params.id,
+                req.funcionario,
+            )
             res.json(resultado)
 
         } catch (erro) {

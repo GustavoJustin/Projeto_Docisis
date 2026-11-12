@@ -92,7 +92,7 @@ class ProdutoService {
         return { sucesso: true, dados: paraEstoque(produto) }
     }
 
-    async cadastrarProduto(dados) {
+    async cadastrarProduto(dados, funcionario) {
         const { nome, categoria, descricao, unidade, quantidade, maximo, preco, imagem, chegada, validade } = dados
 
         const cadastroEstoque =
@@ -140,7 +140,10 @@ class ProdutoService {
                 imagem: imagemNormalizada,
                 data_chegada: dataChegada,
             }
-            const resultado = await ProdutoRepository.cadastrarProduto(produto)
+            const resultado = await ProdutoRepository.cadastrarProduto(produto, {
+                usuario: funcionario?.nome || funcionario?.email || 'Sistema',
+                descricao: 'Produto adicionado ao estoque.',
+            })
             return { sucesso: true, mensagem: "Produto cadastrado.", resultado }
         }
 
@@ -160,11 +163,14 @@ class ProdutoService {
             produtoLegado.id_fornecedor = Number(id_fornecedor)
         }
 
-        const resultado = await ProdutoRepository.cadastrarProduto(produtoLegado)
+        const resultado = await ProdutoRepository.cadastrarProduto(produtoLegado, {
+            usuario: funcionario?.nome || funcionario?.email || 'Sistema',
+            descricao: 'Produto adicionado ao estoque.',
+        })
         return { sucesso: true, mensagem: "Sucesso ao cadastrar", resultado }
     }
 
-    async atualizarProduto(id, dados) {
+    async atualizarProduto(id, dados, funcionario) {
         if (!id || !Number.isInteger(Number(id)) || Number(id) <= 0) {
             throw { status: 400, mensagem: "Id inválido" }
         }
@@ -225,7 +231,31 @@ class ProdutoService {
             throw { status: 400, mensagem: "Nenhum dado válido enviado para a atualização" }
         }
 
-        await ProdutoRepository.atualizarProduto(id, atualizado)
+        const quantidadeAnterior = Number(produto.quantidade) || 0
+        const quantidadeNova = atualizado.quantidade ?? quantidadeAnterior
+        const houveAlteracao = Object.keys(atualizado).some(
+            (campo) => String(produto[campo] ?? '') !== String(atualizado[campo] ?? ''),
+        )
+        let eventoEstoque
+        if (houveAlteracao) {
+            const tipo = quantidadeNova > quantidadeAnterior
+                ? 'ENTRADA'
+                : quantidadeNova < quantidadeAnterior
+                    ? 'SAIDA'
+                    : 'AJUSTE'
+            eventoEstoque = {
+                id_produtos: Number(id),
+                nome_produto: atualizado.nome_insumo || produto.nome_insumo || produto.marca || produto.tipo,
+                usuario: funcionario?.nome || funcionario?.email || 'Sistema',
+                tipo,
+                quantidade_anterior: quantidadeAnterior,
+                quantidade_nova: quantidadeNova,
+                quantidade: Math.abs(quantidadeNova - quantidadeAnterior),
+                unidade: atualizado.unidade || produto.unidade || 'un',
+                descricao: 'Dados do produto atualizados.',
+            }
+        }
+        await ProdutoRepository.atualizarProduto(id, atualizado, eventoEstoque)
         return { sucesso: true, mensagem: "Produto atualizado" }
     }
 
@@ -269,7 +299,7 @@ class ProdutoService {
         return { sucesso: true, mensagem: 'Estoque atualizado.', dados: resultado }
     }
 
-    async deletarProduto(id) {
+    async deletarProduto(id, funcionario) {
         if (!id || !Number.isInteger(Number(id)) || Number(id) <= 0) {
             throw { status: 400, mensagem: "Id inválido" }
         }
@@ -279,7 +309,10 @@ class ProdutoService {
             throw { status: 404, mensagem: "Produto não encontrado" }
         }
 
-        await ProdutoRepository.deletarProduto(id)
+        await ProdutoRepository.deletarProduto(
+            id,
+            funcionario?.nome || funcionario?.email || 'Sistema',
+        )
         return { sucesso: true, mensagem: "Produto apagado" }
     }
 }

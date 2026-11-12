@@ -1,7 +1,5 @@
 // Onde a regra de login mora: confere email/senha e devolve um token JWT.
 const AuthRepository = require("../repositories/AuthRepository");
-const CargosRepository = require("../repositories/CargosRepository");
-const FuncionarioService = require("./FuncionarioService");
 const bcrypt = require("bcryptjs"); // compara a senha digitada com o hash salvo no banco
 const jwt = require("jsonwebtoken"); // gera e assina o token
 
@@ -16,57 +14,6 @@ class AuthService {
         instagram: process.env.ADMIN_CONTACT_INSTAGRAM || "",
       },
     };
-  }
-
-  async cadastrarFuncionarioPublico(dados) {
-    const nome = String(dados.nome || "").trim();
-    const cpf = String(dados.cpf || "").replace(/\D/g, "");
-    const email = String(dados.email || "").trim().toLowerCase();
-    const senha = String(dados.senha || "");
-
-    if (!nome || !cpf || !email || !senha) {
-      throw {
-        status: 400,
-        mensagem: "Preencha nome, CPF, e-mail e senha.",
-      };
-    }
-    if (cpf.length !== 11) {
-      throw { status: 400, mensagem: "Informe um CPF com 11 dígitos." };
-    }
-    if (senha.trim().length < 6) {
-      throw {
-        status: 400,
-        mensagem: "A senha precisa ter pelo menos 6 caracteres.",
-      };
-    }
-
-    let cargoFuncionario;
-    try {
-      cargoFuncionario = await CargosRepository.garantirCargoFuncionario();
-    } catch {
-      throw {
-        status: 503,
-        mensagem:
-          "Banco de dados indisponível. Configure o arquivo back-end/.env antes de criar contas.",
-      };
-    }
-
-    if (!cargoFuncionario) {
-      throw {
-        status: 503,
-        mensagem:
-          "O cargo Funcionário precisa estar cadastrado para criar uma conta.",
-      };
-    }
-
-    return FuncionarioService.cadastrarFuncionario({
-      ...dados,
-      nome,
-      cpf,
-      email,
-      senha,
-      id_cargos: cargoFuncionario.id_cargos,
-    });
   }
 
   async login(dados) {
@@ -115,6 +62,9 @@ class AuthService {
         nome: funcionario.nome,
         email: funcionario.email,
         id_cargos: funcionario.id_cargos,
+        foto: funcionario.foto || null,
+        pode_cadastrar_funcionarios: funcionario.pode_cadastrar_funcionarios || 0,
+        pode_excluir_funcionarios: funcionario.pode_excluir_funcionarios || 0,
       },
     };
   }
