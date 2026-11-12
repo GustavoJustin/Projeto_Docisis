@@ -1,4 +1,14 @@
 const ESTOQUE_NOTIFICACOES_KEY = "docegestao_estoque_v1";
+const HISTORICO_MOVIMENTACOES_KEY = "docegestao_movimentacoes_atualizadas";
+
+function notificarHistoricoEstoque() {
+  window.dispatchEvent(new Event("estoque:movimentacao-atualizada"));
+  try {
+    localStorage.setItem(HISTORICO_MOVIMENTACOES_KEY, String(Date.now()));
+  } catch (error) {
+    console.error("Não foi possível notificar as outras abas sobre o histórico:", error);
+  }
+}
 
 function mostrarAvisoEstoque(message, type = "success") {
   const notice = document.getElementById("aviso-estoque");
@@ -679,6 +689,7 @@ async function inicializarEstoque() {
       );
       productToUpdate.quantidade = resultado.dados.quantidade;
       productToUpdate.maximo = resultado.dados.maximo;
+      if (variacao !== 0) notificarHistoricoEstoque();
       renderProducts();
       const nome = productToUpdate.nome;
       fecharModalAtualizacao();
@@ -882,6 +893,7 @@ async function inicializarEstoque() {
         ...payload,
         id: result.resultado,
       }));
+      notificarHistoricoEstoque();
       paginaAtual = 1;
       renderProducts();
       fecharModal();
@@ -988,6 +1000,7 @@ async function inicializarEstoque() {
     botaoConfirmarExclusao.textContent = "Excluindo...";
     try {
       await requisitarEstoque(`/api/produtos/${product.id}`, { method: "DELETE" });
+      notificarHistoricoEstoque();
       products = products.filter((item) => String(item.id) !== String(product.id));
       renderProducts();
       fecharModalExclusao();

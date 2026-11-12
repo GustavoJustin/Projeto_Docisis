@@ -419,7 +419,7 @@ class ProdutoRepository {
                 `INSERT INTO tbl_mov_ajuste_estoque
                     (id_produtos, nome_produto, usuario, tipo, quantidade_anterior,
                      quantidade_nova, quantidade, unidade, descricao)
-                 VALUES (?, ?, ?, 'SAIDA', ?, 0, ?, ?, ?)`,
+                 VALUES (?, ?, ?, 'SAÍDA', ?, 0, ?, ?, ?)`,
                 [
                     id,
                     nome,

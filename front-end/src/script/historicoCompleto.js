@@ -205,6 +205,7 @@
     async function carregarMovimentacoes() {
       if (carregando) return;
       carregando = true;
+      paginaAtual = 1;
       if (refreshButton) {
         refreshButton.disabled = true;
         refreshButton.textContent = "Atualizando...";
@@ -420,6 +421,20 @@
   }
 
   window.inicializarHistorico = initHistorico;
+  const atualizarHistoricoAtivo = () => {
+    if (document.hidden) return;
+    document.getElementById("btn-atualizar-historico")?.click();
+  };
+  if (!window.__historicoMovimentacoesListener) {
+    window.addEventListener("estoque:movimentacao-atualizada", atualizarHistoricoAtivo);
+    window.addEventListener("storage", (event) => {
+      if (event.key === "docegestao_movimentacoes_atualizadas") {
+        atualizarHistoricoAtivo();
+      }
+    });
+    window.addEventListener("focus", atualizarHistoricoAtivo);
+    window.__historicoMovimentacoesListener = true;
+  }
   document.addEventListener("demo:page-loaded", (event) => {
     if (event.detail?.pagina === "historico") void initHistorico();
   });

@@ -96,6 +96,30 @@ canvas {
   max-width: 100%;
 }
 
+label:has(> [data-lucide="search"]) > input {
+  padding-left: 2.75rem;
+}
+
+#search-member {
+  padding-left: 2.5rem;
+}
+
+#search-member + svg {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.relative:has(> input + [data-lucide="search"]) > input {
+  padding-left: 2.5rem;
+}
+
+label:has(> [data-lucide="search"]) > [data-lucide="search"],
+.relative:has(> input + [data-lucide="search"]) > [data-lucide="search"] {
+  left: 0.875rem;
+  width: 1rem;
+  height: 1rem;
+}
+
 .sidebar-toggle,
 .sidebar-backdrop {
   display: none;
@@ -162,22 +186,6 @@ canvas {
 
   #sidebar-container.is-open .sidebar-backdrop {
     display: block;
-  }
-
-  #conteudo-centralizado,
-  #coluna-conteudo {
-    min-height: 100vh;
-    height: auto;
-  }
-
-  #conteudo-centralizado > main {
-    height: auto;
-    min-height: 100vh;
-    overflow: visible;
-  }
-
-  #coluna-conteudo {
-    overflow: visible;
   }
 
   #header-container header {

@@ -249,10 +249,12 @@ describe("ProdutosService inventory integration", () => {
   test("archives database products when they are removed from inventory", async () => {
     ProdutoRepository.buscarProdutoId.mockResolvedValue({ id_produtos: 5 });
 
-    await expect(ProdutoService.deletarProduto(5)).resolves.toMatchObject({
+    await expect(
+      ProdutoService.deletarProduto(5, { email: "ana@example.com" }),
+    ).resolves.toMatchObject({
       sucesso: true,
     });
-    expect(ProdutoRepository.deletarProduto).toHaveBeenCalledWith(5, "Sistema");
+    expect(ProdutoRepository.deletarProduto).toHaveBeenCalledWith(5, "ana@example.com");
   });
 
   test("keeps the existing legacy product creation contract", async () => {

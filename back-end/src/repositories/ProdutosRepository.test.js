@@ -85,6 +85,71 @@ describe("ProdutosRepository stock schema", () => {
     );
   });
 
+  test("records the initial stock as an entry when creating an inventory product", async () => {
+    const connection = {
+      beginTransaction: jest.fn().mockResolvedValue(),
+      query: jest.fn()
+        .mockResolvedValueOnce([{ insertId: 17 }, []])
+        .mockResolvedValueOnce([{ insertId: 31 }, []]),
+      commit: jest.fn().mockResolvedValue(),
+      rollback: jest.fn().mockResolvedValue(),
+      release: jest.fn(),
+    };
+    pool.getConnection.mockResolvedValue(connection);
+    ProdutoRepository.preparacaoEstoque = Promise.resolve();
+    ProdutoRepository.idAutoIncrement = true;
+
+    await expect(
+      ProdutoRepository.cadastrarProduto(
+        { nome_insumo: "Leite condensado", quantidade: 12, unidade: "un" },
+        { usuario: "Ana", descricao: "Produto adicionado ao estoque." },
+      ),
+    ).resolves.toBe(17);
+
+    expect(connection.query).toHaveBeenNthCalledWith(
+      2,
+      expect.stringContaining("INSERT INTO tbl_mov_ajuste_estoque"),
+      [17, "Leite condensado", "Ana", 12, 12, "un", "Produto adicionado ao estoque."],
+    );
+    expect(connection.commit).toHaveBeenCalled();
+    expect(connection.rollback).not.toHaveBeenCalled();
+    expect(connection.release).toHaveBeenCalled();
+  });
+
+  test("records a stock exit atomically when deleting an inventory product", async () => {
+    const connection = {
+      beginTransaction: jest.fn().mockResolvedValue(),
+      query: jest.fn()
+        .mockResolvedValueOnce([[
+          {
+            id_produtos: 9,
+            nome_insumo: "Farinha",
+            quantidade: "8.00",
+            unidade: "kg",
+            ativo: 1,
+          },
+        ], []])
+        .mockResolvedValueOnce([{ affectedRows: 1 }, []])
+        .mockResolvedValueOnce([{ insertId: 32 }, []]),
+      commit: jest.fn().mockResolvedValue(),
+      rollback: jest.fn().mockResolvedValue(),
+      release: jest.fn(),
+    };
+    pool.getConnection.mockResolvedValue(connection);
+    ProdutoRepository.preparacaoEstoque = Promise.resolve();
+
+    await expect(ProdutoRepository.deletarProduto(9, "Ana")).resolves.toBe(true);
+
+    expect(connection.query).toHaveBeenNthCalledWith(
+      3,
+      expect.stringContaining("INSERT INTO tbl_mov_ajuste_estoque"),
+      [9, "Farinha", "Ana", 8, 8, "kg", "Produto removido do estoque."],
+    );
+    expect(connection.commit).toHaveBeenCalled();
+    expect(connection.rollback).not.toHaveBeenCalled();
+    expect(connection.release).toHaveBeenCalled();
+  });
+
   test("generates IDs under a database lock when the legacy primary key is not auto-increment", async () => {
     const connection = {
       query: jest.fn()
