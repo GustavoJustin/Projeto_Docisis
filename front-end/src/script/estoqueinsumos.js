@@ -305,8 +305,8 @@ async function inicializarEstoque() {
   function atualizarIndicadorCadastro() {
     const quantidade = Number(campoQuantidadeCadastro?.value);
     const maximo = Number(campoMaximoCadastro?.value);
-    const dadosValidos = Number.isFinite(quantidade) && quantidade >= 0 &&
-      Number.isFinite(maximo) && maximo > 0;
+    const dadosValidos = Number.isInteger(quantidade) && quantidade >= 0 &&
+      Number.isInteger(maximo) && maximo > 0;
     const percentual = dadosValidos ? (quantidade / maximo) * 100 : 0;
     if (textoNivelCadastro) {
       textoNivelCadastro.textContent = dadosValidos
@@ -334,8 +334,8 @@ async function inicializarEstoque() {
     if (!productToUpdate) return;
     const quantidade = Number(campoQuantidadeAtualizacao?.value);
     const maximo = Number(campoMaximoAtualizacao?.value);
-    const dadosValidos = Number.isFinite(quantidade) && quantidade >= 0 &&
-      Number.isFinite(maximo) && maximo > 0;
+    const dadosValidos = Number.isInteger(quantidade) && quantidade >= 0 &&
+      Number.isInteger(maximo) && maximo > 0;
     const percentual = dadosValidos ? (quantidade / maximo) * 100 : 0;
     if (textoNivelAtualizacao) {
       textoNivelAtualizacao.textContent = dadosValidos
@@ -522,21 +522,21 @@ async function inicializarEstoque() {
     if (!productToUpdate || !campoQuantidadeAtualizacao || !campoMaximoAtualizacao) return;
     const quantidadeDesejada = Number(campoQuantidadeAtualizacao.value);
     const limiteNovo = Number(campoMaximoAtualizacao.value);
-    if (!Number.isFinite(quantidadeDesejada) ||
+    if (!Number.isInteger(quantidadeDesejada) ||
         quantidadeDesejada < 0 ||
-        !Number.isFinite(limiteNovo) ||
+        !Number.isInteger(limiteNovo) ||
         limiteNovo <= 0 ||
         quantidadeDesejada > limiteNovo) {
       mostrarErroModal(
         "erro-atualizar-estoque",
         quantidadeDesejada > limiteNovo
           ? `A quantidade não pode ultrapassar o novo limite de ${limiteNovo} ${productToUpdate.unidade}.`
-          : `Informe um limite máximo maior que zero e uma quantidade entre 0 e ${limiteNovo} ${productToUpdate.unidade}.`,
+          : `Informe uma quantidade atual inteira entre 0 e ${limiteNovo} ${productToUpdate.unidade} e um limite máximo inteiro maior que zero.`,
       );
       return;
     }
 
-    const variacao = Math.round((quantidadeDesejada - productToUpdate.quantidade) * 100) / 100;
+    const variacao = quantidadeDesejada - productToUpdate.quantidade;
     const limiteAlterado = limiteNovo !== productToUpdate.maximo;
     if (variacao === 0 && !limiteAlterado) {
       fecharModalAtualizacao();
@@ -610,14 +610,14 @@ async function inicializarEstoque() {
   document.getElementById("btn-diminuir-atualizacao")?.addEventListener("click", () => {
     if (!campoQuantidadeAtualizacao) return;
     const atual = Number(campoQuantidadeAtualizacao.value) || 0;
-    campoQuantidadeAtualizacao.value = String(Math.max(0, Math.round((atual - 1) * 100) / 100));
+    campoQuantidadeAtualizacao.value = String(Math.max(0, atual - 1));
     campoQuantidadeAtualizacao.dispatchEvent(new Event("input", { bubbles: true }));
   });
   document.getElementById("btn-aumentar-atualizacao")?.addEventListener("click", () => {
     if (!campoQuantidadeAtualizacao) return;
     const atual = Number(campoQuantidadeAtualizacao.value) || 0;
     const maximo = Number(campoMaximoAtualizacao?.value);
-    campoQuantidadeAtualizacao.value = String(Math.min(maximo, Math.round((atual + 1) * 100) / 100));
+    campoQuantidadeAtualizacao.value = String(Math.min(maximo, atual + 1));
     campoQuantidadeAtualizacao.dispatchEvent(new Event("input", { bubbles: true }));
   });
   campoQuantidadeAtualizacao?.addEventListener("input", () => {
@@ -671,9 +671,9 @@ async function inicializarEstoque() {
     const categoria = document.getElementById("input-categoria").value;
     const quantidade = Number(campoQuantidadeCadastro.value);
     const maximo = Number(campoMaximoCadastro.value);
-    if (!Number.isFinite(quantidade) || quantidade < 0 ||
-        !Number.isFinite(maximo) || maximo <= 0) {
-      mostrarErroModal("erro-form-insumo", "Informe uma quantidade válida e um limite máximo maior que zero.");
+    if (!Number.isInteger(quantidade) || quantidade < 0 ||
+        !Number.isInteger(maximo) || maximo <= 0) {
+      mostrarErroModal("erro-form-insumo", "Informe uma quantidade atual inteira e um limite máximo inteiro maior que zero.");
       return;
     }
     if (quantidade > maximo) {

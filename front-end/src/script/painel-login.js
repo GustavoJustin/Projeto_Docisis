@@ -70,7 +70,7 @@ function inicializarLogin() {
                 .replace(/^@/, "");
             contatoInstagram.textContent = usuarioInstagram
                 ? `@${usuarioInstagram}`
-                : "Não configurado";
+                : "@DoceGestão";
             if (usuarioInstagram) {
                 contatoInstagram.href = `https://www.instagram.com/${encodeURIComponent(usuarioInstagram)}/`;
                 contatoInstagram.target = "_blank";

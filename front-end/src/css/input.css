@@ -45,3 +45,193 @@ body {
 .font-display {
   font-family: 'Fraunces', serif;
 }
+
+html {
+  min-width: 320px;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+main,
+#conteudo-centralizado,
+#coluna-conteudo {
+  min-width: 0;
+}
+
+#conteudo-centralizado {
+  width: 100%;
+}
+
+#conteudo-centralizado main,
+#coluna-conteudo main {
+  padding: clamp(1rem, 3vw, 2.5rem);
+}
+
+img,
+video,
+canvas {
+  max-width: 100%;
+}
+
+.sidebar-toggle,
+.sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  body:has(#sidebar-container) {
+    display: block;
+    min-height: 100vh;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  #sidebar-container {
+    position: fixed;
+    inset: 0 auto auto 0;
+    z-index: 70;
+    width: 0 !important;
+    height: 0;
+    flex: none;
+  }
+
+  #sidebar-container > aside {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 72;
+    width: min(17rem, calc(100vw - 3rem));
+    height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
+    transform: translateX(-105%);
+    transition: transform 180ms ease;
+  }
+
+  #sidebar-container.is-open > aside {
+    transform: translateX(0);
+  }
+
+  #sidebar-container .sidebar-toggle {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 74;
+    display: inline-flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgb(255 255 255 / 20%);
+    border-radius: 0.75rem;
+    background: #3a2a1a;
+    color: #fff;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+  }
+
+  #sidebar-container .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 71;
+    border: 0;
+    background: rgb(0 0 0 / 45%);
+  }
+
+  #sidebar-container.is-open .sidebar-backdrop {
+    display: block;
+  }
+
+  #conteudo-centralizado,
+  #coluna-conteudo {
+    min-height: 100vh;
+    height: auto;
+  }
+
+  #conteudo-centralizado > main {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  #coluna-conteudo {
+    overflow: visible;
+  }
+
+  #header-container header {
+    padding-left: 4.25rem;
+  }
+}
+
+@media (max-width: 639px) {
+  #conteudo-centralizado main,
+  #coluna-conteudo main {
+    padding: 1rem;
+  }
+
+  #header-container header {
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  #header-container header > div:first-child {
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+
+  #header-container header > div:last-child {
+    margin-left: auto;
+  }
+
+  #header-container header h1 {
+    overflow-wrap: anywhere;
+  }
+
+  #header-settings-dialog section > div:nth-child(2) > aside {
+    width: 3.75rem;
+    padding: 0.5rem;
+  }
+
+  #header-settings-dialog section > div:nth-child(2) > aside > p {
+    display: none;
+  }
+
+  #header-settings-dialog [data-settings-tab] {
+    justify-content: center;
+    padding: 0.625rem 0.25rem;
+  }
+
+  #header-settings-dialog [data-settings-tab] span {
+    display: none;
+  }
+
+  #header-settings-dialog section > div:first-child {
+    padding: 0.75rem 1rem;
+  }
+
+  #header-settings-dialog section > div:nth-child(2) > div {
+    padding: 1rem;
+  }
+
+  #toast-container {
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+  }
+
+  #toast-container > * {
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

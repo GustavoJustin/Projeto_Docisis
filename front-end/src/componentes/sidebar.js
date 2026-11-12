@@ -1,5 +1,15 @@
 const SIDEBAR_HTML = `
+  <button
+    type="button"
+    class="sidebar-toggle"
+    aria-label="Abrir menu de navegação"
+    aria-expanded="false"
+    aria-controls="app-sidebar">
+    <i data-lucide="menu" class="h-5 w-5"></i>
+  </button>
+  <button type="button" class="sidebar-backdrop" aria-label="Fechar menu de navegação" tabindex="-1"></button>
   <aside
+    id="app-sidebar"
     class="w-64 h-screen flex flex-col justify-between shrink-0 border-r border-black/5 sticky top-0 font-sans" style="background-color: #f5f0e8">
     <div>
       <!-- Cabeçalho Topo (Branco) -->
@@ -105,6 +115,41 @@ function carregarSidebar() {
   if (!container) return;
 
   container.innerHTML = SIDEBAR_HTML;
+  const menuToggle = container.querySelector(".sidebar-toggle");
+  const menuBackdrop = container.querySelector(".sidebar-backdrop");
+  const fecharMenu = () => {
+    container.classList.remove("is-open");
+    menuToggle?.setAttribute("aria-expanded", "false");
+    menuToggle?.setAttribute("aria-label", "Abrir menu de navegação");
+  };
+  menuToggle?.addEventListener("click", () => {
+    const aberto = container.classList.toggle("is-open");
+    menuToggle.setAttribute("aria-expanded", String(aberto));
+    menuToggle.setAttribute(
+      "aria-label",
+      aberto ? "Fechar menu de navegação" : "Abrir menu de navegação",
+    );
+  });
+  menuBackdrop?.addEventListener("click", fecharMenu);
+  container.querySelectorAll("aside nav a").forEach((link) => {
+    link.addEventListener("click", fecharMenu);
+  });
+  if (!window.__sidebarEscapeHandler) {
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        document
+          .getElementById("sidebar-container")
+          ?.classList.remove("is-open");
+        const toggle = document.querySelector(
+          "#sidebar-container .sidebar-toggle",
+        );
+        toggle?.setAttribute("aria-expanded", "false");
+        toggle?.setAttribute("aria-label", "Abrir menu de navegação");
+      }
+    });
+    window.__sidebarEscapeHandler = true;
+  }
+
   const linkFuncionarios = container.querySelector('[data-page="funcionarios"]');
   if (linkFuncionarios) linkFuncionarios.hidden = true;
 

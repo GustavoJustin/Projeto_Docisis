@@ -167,13 +167,15 @@ class ProdutoRepository {
             const anterior = Number(produto.quantidade) || 0
             const maximoAnterior = Number(produto.estoque_maximo) || 0
             const maximo = maximoAtualizado ?? maximoAnterior
-            const novaQuantidade = Math.round((anterior + variacao) * 100) / 100
+            const novaQuantidade = anterior + variacao
             const excedeMaximo = novaQuantidade > maximo &&
                 (anterior <= maximo || variacao >= 0)
-            if (novaQuantidade < 0 || excedeMaximo ||
+            if (!Number.isInteger(novaQuantidade) || novaQuantidade < 0 || excedeMaximo ||
                 (maximoAtualizado !== undefined && novaQuantidade > maximo)) {
                 const erro = new Error(
-                    novaQuantidade > maximo
+                    !Number.isInteger(novaQuantidade)
+                        ? 'A quantidade deve ser um número inteiro.'
+                        : novaQuantidade > maximo
                         ? `A quantidade não pode ultrapassar o máximo de ${maximo} ${produto.unidade || 'un'}.`
                         : 'A quantidade não pode ser menor que zero.',
                 )

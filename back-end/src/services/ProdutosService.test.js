@@ -104,6 +104,26 @@ describe("ProdutosService inventory integration", () => {
     await expect(
       ProdutoService.atualizarProduto(5, { quantidade: 11 }),
     ).rejects.toMatchObject({ status: 400 });
+    await expect(
+      ProdutoService.atualizarProduto(5, { quantidade: 8.5 }),
+    ).rejects.toMatchObject({ status: 400 });
+  });
+
+  test("rejects fractional current stock and maximum when creating inventory products", async () => {
+    const dadosBase = {
+      nome: "Farinha",
+      categoria: "Farinhas",
+      quantidade: 2,
+      maximo: 10,
+    };
+
+    await expect(
+      ProdutoService.cadastrarProduto({ ...dadosBase, quantidade: 2.5 }),
+    ).rejects.toMatchObject({ status: 400 });
+    await expect(
+      ProdutoService.cadastrarProduto({ ...dadosBase, maximo: 10.5 }),
+    ).rejects.toMatchObject({ status: 400 });
+    expect(ProdutoRepository.cadastrarProduto).not.toHaveBeenCalled();
   });
 
   test("rejects a new product whose initial stock is greater than its maximum", async () => {
@@ -189,6 +209,16 @@ describe("ProdutosService inventory integration", () => {
     "Ana",
     15,
     );
+  });
+
+  test("rejects fractional stock adjustments and maximums", async () => {
+    await expect(
+      ProdutoService.registrarAjusteEstoque(5, { variacao: 0.5 }, { nome: "Ana" }),
+    ).rejects.toMatchObject({ status: 400 });
+    await expect(
+      ProdutoService.registrarAjusteEstoque(5, { variacao: 0, maximo: 12.5 }, { nome: "Ana" }),
+    ).rejects.toMatchObject({ status: 400 });
+    expect(ProdutoRepository.registrarAjusteEstoque).not.toHaveBeenCalled();
   });
 
   test("rejects an initial stock above the configured limit", async () => {

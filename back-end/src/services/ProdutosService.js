@@ -37,8 +37,8 @@ function validarData(data, campo) {
 
 function validarQuantidade(valor, campo, minimo = 0) {
     const quantidade = Number(valor)
-    if (!Number.isFinite(quantidade) || quantidade < minimo) {
-        throw { status: 400, mensagem: `${campo} deve ser um número maior ou igual a ${minimo}.` }
+    if (!Number.isInteger(quantidade) || quantidade < minimo) {
+        throw { status: 400, mensagem: `${campo} deve ser um número inteiro maior ou igual a ${minimo}.` }
     }
     return quantidade
 }
@@ -251,9 +251,9 @@ class ProdutoService {
         const variacao = Number(dados.variacao)
         const maximo = dados.maximo === undefined
             ? undefined
-            : validarQuantidade(dados.maximo, 'O estoque máximo', 0.01)
-        if (!Number.isFinite(variacao) || (variacao === 0 && maximo === undefined)) {
-            throw { status: 400, mensagem: 'Informe uma alteração de quantidade ou do limite máximo.' }
+            : validarQuantidade(dados.maximo, 'O estoque máximo', 1)
+        if (!Number.isInteger(variacao) || (variacao === 0 && maximo === undefined)) {
+            throw { status: 400, mensagem: 'A alteração da quantidade e o limite máximo devem ser números inteiros.' }
         }
         const descricao = String(dados.descricao || '').trim()
         if (descricao.length > 500) {
